@@ -59,8 +59,8 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 
 	private static Logger logger = LoggerFactory.getLogger(TemplateSettingsDao.class);
 	
-	private String baseDir;
-	private String template;
+	private String templatePath;
+	private String templateName;
 	private File templateFile;
 	
 	private DocumentBuilderFactory builderFactory = null;
@@ -68,51 +68,44 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 	private Document document = null;
 	private XPath xpath;
 	
+	private ITranscode session;
+	
 	public TemplateSettingsDao()
 	{
 		// Default
 	}
 	
-	public TemplateSettingsDao(String baseDir, String template)
+	public TemplateSettingsDao(String templatePath, boolean lazyLoad)
 	{
-		this.baseDir = baseDir;
-		this.template = template;
+		this.templatePath = templatePath;
+		if(!lazyLoad) this.readTemplate();
 	}
 	
-	public TemplateSettingsDao(String baseDir, String template, boolean autoload) throws TranscodeConfigurationException
+	public TemplateSettingsDao(String templatePath)
 	{
-		this.baseDir = baseDir;
-		this.template = template;
-		if(autoload) this.load();
-	}
+		this.templatePath = templatePath;
+		this.readTemplate();
+	}	
 	
-	public TemplateSettingsDao(String template)
-	{
-		this.template = template;
-	}
-	
-	public TemplateSettingsDao(String template, boolean autoload) throws TranscodeConfigurationException
-	{
-		this.template = template;
-		if(autoload) this.load();
-	}
-	
-	public void load() throws TranscodeConfigurationException {
+	public void readTemplate() {
 		// TODO Auto-generated method stub
 		// load actual template file here
 		// then parse
 		
 		try
 		{
-			this.templateFile = (this.baseDir == null)?new File(this.template):new File(this.baseDir + File.separator + this.template);
+			logger.debug("preparing new transcode session");
+			session = new Transcode();
+			
+			this.templateFile = new File(this.templatePath);
+			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
+			logger.debug("loading template " + this.templateFile.getName());
+			
 			this.builderFactory = DocumentBuilderFactory.newInstance();
 			this.builder = this.builderFactory.newDocumentBuilder();
 			this.xpath = XPathFactory.newInstance().newXPath();
-			
-			logger.debug("loading template " + this.templateFile.getName());
 			this.document = this.builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
 			
-			ITranscode session = new Transcode();
 			
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
@@ -326,7 +319,7 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 						
 						String locationNodeAlignExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Align";
 						String locationNodeAligntContent = (String) this.xpath.compile(locationNodeAlignExpression).evaluate(this.document, XPathConstants.STRING);
-						System.out.print(locationNodeWidthContent);
+						System.out.print(locationNodeAligntContent);
 						
 					}
 					catch(Exception w)
@@ -458,41 +451,35 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 				encodeList.addEncode(encode);
 			}
 			
-			
 			/**** ad encodes list to transcode session object ***/
 			session.setEncodes(encodeList);
+			session.setEnabled(true);
 		}
-		catch(IllegalArgumentException | SAXException | IOException | ParserConfigurationException | XPathExpressionException | IllegalAccessException ee)
+		catch(TranscodeConfigurationException | IllegalArgumentException | SAXException | IOException | ParserConfigurationException | XPathExpressionException | IllegalAccessException ee)
 		{
-			throw new TranscodeConfigurationException(ee);
+			session.setEnabled(false);
+			logger.error("Error parsing template " + ee.getMessage());
 		}
-		 
 	}
 
 	public String getTemplate() {
-		return this.template;
+		return this.templatePath;
 	}
 
-	public void setTemplate(String template) {
-		this.template = template;
+	public void setTemplate(String templatePath) {
+		this.templatePath = templatePath;
 	}
 
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+		session = null;
 	}
 
-	public Object getTranscodeSession() {
+	@Override
+	public ITranscode getTranscodeConfig() {
 		// TODO Auto-generated method stub
-		return null;
+		return session;
 	}
-	
-	
-	/*******************************************
-	 *  PROTECTED METHODS *********************
-	 * ****************************************
-	 */
-	 
 	 
 
 }

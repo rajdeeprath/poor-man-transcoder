@@ -7,6 +7,7 @@ public abstract class TranscoderDAOFactory {
 	public static final int FROOM_XML_TEMPLATE = 1;
 	
 	public abstract ITranscodeSettingsDao getTranscodeDao(String filename);
+	public abstract ITranscodeSettingsDao getTranscodeDao(String filename, boolean lazyLoad);
 	
 	public abstract Object getTemplateBasePath();
 	public abstract void setTemplateBasePath(String baseDir);

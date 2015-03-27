@@ -39,7 +39,7 @@
 							<Enable>false</Enable>
 							<Name>Brand Logo</Name>
 							<Index>0</Index>
-							<ImagePath>${rootpath}/content/logo.png</ImagePath>
+							<ImagePath>C:\\Users\\Rajdeep\\Documents\\GitHub\\rajdeep\\ffmpeg-transcoder\\transcoder\\images\\logo.png</ImagePath>
 							<!-- 0 - 100 -->
 							<Opacity>100</Opacity>
 							<Location>

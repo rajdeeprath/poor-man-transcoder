@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Transcode implements ITranscode {
+public class Transcode extends Mutable implements ITranscode {
  
 	public String label;	
 	public String description;

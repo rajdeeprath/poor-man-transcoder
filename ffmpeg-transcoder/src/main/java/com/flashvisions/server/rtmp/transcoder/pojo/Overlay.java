@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import uk.co.jaimon.SimpleImageInfo;
-
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
@@ -95,8 +94,9 @@ public static class Location implements IOverlayLocation{
 		return overlayImagePath;
 	}
 	
-	public void setOverlayImagePath(String overlayImagePath) {
+	public void setOverlayImagePath(String overlayImagePath) throws IOException {
 		this.overlayImagePath = overlayImagePath;
+		this.evaluateImageDimensions();
 	}
 	
 	public int getOpacity() {
@@ -115,7 +115,7 @@ public static class Location implements IOverlayLocation{
 		this.location = location;
 	}
 	
-	protected void evaluateImageDimensions()
+	protected void evaluateImageDimensions() throws IOException
 	{
 		SimpleImageInfo imageInfo = null;
 		
@@ -125,8 +125,9 @@ public static class Location implements IOverlayLocation{
 			this.setImageHeight(imageInfo.getHeight());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			this.setImageWidth(-1);
-			this.setImageHeight(-1);
+			this.setImageWidth(0);
+			this.setImageHeight(0);
+			throw(e);
 		}finally{
 			imageInfo = null;
 		}

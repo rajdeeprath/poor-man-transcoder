@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
 
 
-public interface ITranscode {
+public interface ITranscode extends IMutable {
 
 	public String getLabel() ;
 	public void setLabel(String label);

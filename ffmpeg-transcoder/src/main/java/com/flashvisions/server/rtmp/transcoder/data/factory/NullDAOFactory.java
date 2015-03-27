@@ -21,6 +21,13 @@ public class NullDAOFactory extends TranscoderDAOFactory {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public ITranscodeSettingsDao getTranscodeDao(String filename,
+			boolean lazyLoad) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 }
