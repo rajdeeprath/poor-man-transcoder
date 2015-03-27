@@ -16,6 +16,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,6 +57,8 @@ import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 @SuppressWarnings("unused")
 public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 
+	private static Logger logger = LoggerFactory.getLogger(TemplateSettingsDao.class);
+	
 	private String baseDir;
 	private String template;
 	private File templateFile;
@@ -103,8 +107,10 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 			this.templateFile = (this.baseDir == null)?new File(this.template):new File(this.baseDir + File.separator + this.template);
 			this.builderFactory = DocumentBuilderFactory.newInstance();
 			this.builder = this.builderFactory.newDocumentBuilder();
-			this.document = this.builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
 			this.xpath = XPathFactory.newInstance().newXPath();
+			
+			logger.debug("loading template " + this.templateFile.getName());
+			this.document = this.builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
 			
 			ITranscode session = new Transcode();
 			
@@ -325,7 +331,7 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 					}
 					catch(Exception w)
 					{
-						System.err.print("An error occured in processing overlay configuration.Disabling overlay : " + w.getMessage());
+						logger.error("An error occured in processing overlay configuration.Disabling overlay : " + w.getMessage());
 						overlay.setEnabled(false);
 					}
 				}
@@ -460,6 +466,7 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 		{
 			throw new TranscodeConfigurationException(ee);
 		}
+		 
 	}
 
 	public String getTemplate() {

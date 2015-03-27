@@ -5,4 +5,14 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>ffmpeg-transcoder</name>
   <description>Wrapper library  for rtmp servers to use ffmpeg as a live transcoign engine</description>
+  <properties>
+	<slf4jVersion>1.7.10</slf4jVersion>
+  </properties>
+  <dependencies>
+	<dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-simple</artifactId>
+	<version>${slf4jVersion}</version>
+</dependency>
+</dependencies>
 </project>

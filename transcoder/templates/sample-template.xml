@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- sample transcoder template for red5-ffmpeg plugin -->
+<Template version="1">
+	<Transcode>
+		<Name>somename</Name>
+		<Description>Sample transcode template</Description>
+		
+		<Input>
+			<!-- Input param such as re for native frame rate read-in -->
+			<RawFlag>-re</RawFlag>
+		</Input>
+		
+		<Encodes>
+			<Encode>
+				<Enable>true</Enable>
+				<!-- must be unique in this sequence of encodes -->
+				<Name>Stream 2 Stream</Name>
+				<StreamName>mp4:${SourceStreamName}_source</StreamName>				
+				<Video>
+					<!-- Any supported codec, Copy, Disable -->
+					<Codec>Copy</Codec>
+					<Implementation>Default</Implementation>
+					<FrameSize>
+						<Width>320</Width>
+						<Height>240</Height>
+					</FrameSize>
+					<FrameRate>24</FrameRate>
+					<Bitrate>
+						<Min>500</Min><!-- K -->
+						<Max>600</Max><!-- K -->
+						<Buffer>500</Buffer> <!-- K (device buffer)-->
+					</Bitrate> 
+					<KeyFrameInterval>
+						<Gop>24</Gop>
+						<IntervalMin>48</IntervalMin>
+					</KeyFrameInterval>
+					<Overlays>
+						<Overlay>
+							<Enable>false</Enable>
+							<Name>Brand Logo</Name>
+							<Index>0</Index>
+							<ImagePath>${rootpath}/content/logo.png</ImagePath>
+							<!-- 0 - 100 -->
+							<Opacity>100</Opacity>
+							<Location>
+								<X>4</X>
+								<Y>4</Y>
+								<Width>${ImageWidth}</Width>
+								<Height>${ImageHeight}</Height>
+								<!-- horiz: left, right, hcenter - vert: top, bottom, vcenter -->
+								<Align>left,top</Align>
+							</Location>
+						</Overlay>
+					</Overlays>
+					<!-- Extra params such as filters -->
+					<Parameters>
+						<Param>
+							<Key></Key>
+							<Value></Value>
+						</Param>
+					</Parameters>
+				</Video>
+				
+				<Audio>
+					<!-- Any supported codec, Copy, Disable -->
+					<Codec>Copy</Codec>
+					<Implementation>Default</Implementation>
+					<Bitrate>128</Bitrate> <!-- Kbps -->
+					<!-- samplerate -->
+					<SampleRate>22050</SampleRate>
+					<!-- mono, stereo -->
+					<Channels>mono</Channels>
+					<!-- Extra params such as filters -->
+					<Parameters> 
+						<Param>
+							<Key></Key>
+							<Value></Value>
+						</Param>
+					</Parameters>
+				</Audio>
+				
+				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->
+				<Output>
+					<RawFlag>-y</RawFlag>
+					<RawFlag>-f flv</RawFlag>
+				</Output>
+				
+			</Encode>
+		</Encodes>
+	</Transcode>
+</Template>
