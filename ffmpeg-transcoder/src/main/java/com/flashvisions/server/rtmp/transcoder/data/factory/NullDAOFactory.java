@@ -1,11 +1,11 @@
 package com.flashvisions.server.rtmp.transcoder.data.factory;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeSettingsDao;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 
-public class NullDAOFactory extends TranscoderDAOFactory {
+public class NullDAOFactory extends DAOFactory {
 
 	@Override
-	public ITranscodeSettingsDao getTranscodeDao(String filename) {
+	public ITranscodeConfigDao getTranscodeDao(String filename) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -22,8 +22,10 @@ public class NullDAOFactory extends TranscoderDAOFactory {
 		
 	}
 
+	
+	/***** Important!! Not to be used with prototype pattern ******/
 	@Override
-	public ITranscodeSettingsDao getTranscodeDao(String filename,
+	public ITranscodeConfigDao getTranscodeDao(String filename,
 			boolean lazyLoad) {
 		// TODO Auto-generated method stub
 		return null;

@@ -45,10 +45,10 @@
 							<Location>
 								<X>4</X>
 								<Y>4</Y>
-								<Width>${ImageWidth}</Width>
-								<Height>${ImageHeight}</Height>
-								<!-- horiz: left, right, hcenter - vert: top, bottom, vcenter -->
-								<Align>left,top</Align>
+								<Width>${ImageWidth} + 1</Width>
+								<Height>${ImageHeight} + 1</Height>
+								<!-- TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERTOP,  CENTERBOTTOM, CENTERMIDDLE -->
+								<Align>TOPRIGHT</Align>
 							</Location>
 						</Overlay>
 					</Overlays>

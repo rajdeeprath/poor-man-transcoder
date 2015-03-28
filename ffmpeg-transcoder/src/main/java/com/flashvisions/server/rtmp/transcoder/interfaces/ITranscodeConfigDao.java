@@ -1,6 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-public interface ITranscodeSettingsDao  {
+public interface ITranscodeConfigDao  {
 	
 	public String getTemplate();
 	public void setTemplate(String templatePath);	

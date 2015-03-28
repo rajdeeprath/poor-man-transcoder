@@ -1,10 +1,14 @@
 package com.flashvisions.server.rtmp.transcoder.data.dao;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -24,6 +28,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
+import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
@@ -32,7 +37,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeSettingsDao;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel;
@@ -55,9 +60,9 @@ import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 
 @SuppressWarnings("unused")
-public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
+public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 
-	private static Logger logger = LoggerFactory.getLogger(TemplateSettingsDao.class);
+	private static Logger logger = LoggerFactory.getLogger(TemplateDao.class);
 	
 	private String templatePath;
 	private String templateName;
@@ -70,18 +75,18 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 	
 	private ITranscode session;
 	
-	public TemplateSettingsDao()
+	public TemplateDao()
 	{
 		// Default
 	}
 	
-	public TemplateSettingsDao(String templatePath, boolean lazyLoad)
+	public TemplateDao(String templatePath, boolean lazyLoad)
 	{
 		this.templatePath = templatePath;
 		if(!lazyLoad) this.readTemplate();
 	}
 	
-	public TemplateSettingsDao(String templatePath)
+	public TemplateDao(String templatePath)
 	{
 		this.templatePath = templatePath;
 		this.readTemplate();
@@ -99,6 +104,7 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 			
 			this.templateFile = new File(this.templatePath);
 			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
+			
 			logger.debug("loading template " + this.templateFile.getName());
 			
 			this.builderFactory = DocumentBuilderFactory.newInstance();
@@ -106,6 +112,8 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 			this.xpath = XPathFactory.newInstance().newXPath();
 			this.document = this.builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
 			
+			logger.debug("Updating document with expression variables");
+			TemplateParseHelper.updateDocumentWithVariables(this.document, this.xpath);
 			
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
@@ -301,26 +309,27 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 						Double locationNodeY = (Double) this.xpath.compile(locationNodeYExpression).evaluate(this.document, XPathConstants.NUMBER);
 						location.setX(locationNodeY.intValue());
 						
+						/******** evaluate overlay width *****/
 						
 						String locationNodeWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Width";
 						String locationNodeWidthContent = (String) this.xpath.compile(locationNodeWidthExpression).evaluate(this.document, XPathConstants.STRING);
-						if(overlay.getOverlayImageWidth()>0) locationNodeWidthContent = locationNodeWidthContent.replace("${ImageWidth}", String.valueOf(overlay.getOverlayImageWidth()));
-						else throw new IllegalStateException("Invalid overlay width");
-						// eval it here first
-						location.setWidth(Integer.parseInt(locationNodeWidthContent));
+						if(overlay.getOverlayImageWidth()<=0) throw new IllegalStateException("Invalid overlay width");
+						int width = TemplateParseHelper.evaluateExpressionForInt(locationNodeWidthContent, "ImageWidth", overlay.getOverlayImageWidth());
+		                location.setWidth(width);
+						
+						
+						/******** evaluate overlay height *****/
 						
 						String locationNodeHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Height";
 						String locationNodeHeightContent = (String) this.xpath.compile(locationNodeHeightExpression).evaluate(this.document, XPathConstants.STRING);
-						if(overlay.getOverlayImageHeight()>0) locationNodeHeightContent = locationNodeHeightContent.replace("${ImageHeight}", String.valueOf(overlay.getOverlayImageHeight()));
-						else throw new IllegalStateException("Invalid overlay height");
-						// eval it here first
-						location.setHeight(Integer.parseInt(locationNodeHeightContent));
+						if(overlay.getOverlayImageHeight()<=0) throw new IllegalStateException("Invalid overlay height");
+						int height = TemplateParseHelper.evaluateExpressionForInt(locationNodeHeightContent, "ImageHeight", overlay.getOverlayImageHeight());
+		                location.setHeight(height);
 						
 						
 						String locationNodeAlignExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Align";
 						String locationNodeAligntContent = (String) this.xpath.compile(locationNodeAlignExpression).evaluate(this.document, XPathConstants.STRING);
-						System.out.print(locationNodeAligntContent);
-						
+						location.setAlign(locationNodeAligntContent);
 					}
 					catch(Exception w)
 					{
@@ -332,7 +341,6 @@ public class TemplateSettingsDao implements ITranscodeSettingsDao, IDisposable {
 				
 				
 				/******** Extra video flags ***********/
-				
 				
 				String encodeNodeVideoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters";
 				Node encodeNodeVideoExtraParamsNode = (Node) this.xpath.compile(encodeNodeVideoExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);

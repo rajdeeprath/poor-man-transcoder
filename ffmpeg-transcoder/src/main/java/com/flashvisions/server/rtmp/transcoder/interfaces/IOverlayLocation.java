@@ -13,4 +13,5 @@ public interface IOverlayLocation {
 	public void setHeight(int height);
 	public ALIGNMENT getAlign();
 	public void setAlign(ALIGNMENT align);
+	public void setAlign(String alignment);
 }

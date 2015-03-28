@@ -13,7 +13,7 @@ public class Overlay extends Mutable implements IOverlay {
 public static class Location implements IOverlayLocation{
 		
 		public static enum ALIGNMENT {
-		    TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERMIDDLE 
+		    TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERTOP,  CENTERBOTTOM, CENTERMIDDLE 
 		}
 		
 		private int x;
@@ -61,6 +61,55 @@ public static class Location implements IOverlayLocation{
 		
 		public void setAlign(ALIGNMENT align) {
 			this.align = align;
+		}
+		
+		public void setAlign(String alignment) 
+		{
+			try
+			{
+				switch(ALIGNMENT.valueOf(alignment.toUpperCase()))
+				{
+					case TOPLEFT:
+						setAlign(ALIGNMENT.TOPLEFT);
+					break;
+					
+					case TOPRIGHT:
+						setAlign(ALIGNMENT.TOPRIGHT);
+					break;
+						
+					case BOTTOMLEFT:
+						setAlign(ALIGNMENT.BOTTOMLEFT);
+					break;
+						
+					case BOTTOMRIGHT:
+						setAlign(ALIGNMENT.BOTTOMRIGHT);
+					break;
+						
+					case CENTERLEFT:
+						setAlign(ALIGNMENT.CENTERLEFT);
+					break;
+						
+					case CENTERRIGHT:
+						setAlign(ALIGNMENT.CENTERRIGHT);
+					break;
+						
+					case CENTERTOP:
+						setAlign(ALIGNMENT.CENTERTOP);
+					break;
+						
+					case CENTERBOTTOM:
+						setAlign(ALIGNMENT.CENTERBOTTOM);
+					break;
+					
+					case CENTERMIDDLE:
+						setAlign(ALIGNMENT.CENTERMIDDLE);
+					break;
+				}
+			}
+			catch(Exception e)
+			{
+				throw new IllegalArgumentException("Invalid alignment constant " + alignment);
+			}
 		}
 	}
 

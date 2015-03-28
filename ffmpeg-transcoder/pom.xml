@@ -10,9 +10,14 @@
   </properties>
   <dependencies>
 	<dependency>
-	<groupId>org.slf4j</groupId>
-	<artifactId>slf4j-simple</artifactId>
-	<version>${slf4jVersion}</version>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-simple</artifactId>
+		<version>${slf4jVersion}</version>
+	</dependency>
+	<dependency>
+        <groupId>net.objecthunter</groupId>
+        <artifactId>exp4j</artifactId>
+        <version>0.4.4</version>
 </dependency>
-</dependencies>
+  </dependencies>
 </project>
