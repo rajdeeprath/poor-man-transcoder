@@ -1,6 +1,13 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-public class AudioProperty extends ArbitaryProperty {
+import java.io.Serializable;
+
+public class AudioProperty extends ArbitaryProperty implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6851221370254723856L;
 
 	public AudioProperty() {
 		super();

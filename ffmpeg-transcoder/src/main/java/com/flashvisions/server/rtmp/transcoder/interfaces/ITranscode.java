@@ -15,5 +15,5 @@ public interface ITranscode extends IMutable {
 	public void setInputflags(ArrayList<Flag> inputflags);
 	public IEncodeCollection getEncodes();
 	public void setEncodes(IEncodeCollection encodes);
-	
+	public ITranscode clone(); 
 }

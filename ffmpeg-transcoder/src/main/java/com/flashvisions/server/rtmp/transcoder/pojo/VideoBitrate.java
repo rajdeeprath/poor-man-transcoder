@@ -1,9 +1,15 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.Serializable;
+
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class VideoBitrate extends PassThru 
+public class VideoBitrate extends PassThru implements Serializable 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6254029729499034766L;
 	private int minimum;
 	private int maximum;
 	private int deviceBuffer;

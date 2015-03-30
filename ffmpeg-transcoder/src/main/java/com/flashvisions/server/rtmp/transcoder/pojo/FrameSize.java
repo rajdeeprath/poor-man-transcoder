@@ -1,10 +1,16 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.Serializable;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class FrameSize extends PassThru implements IFrameSize  {
+public class FrameSize extends PassThru implements IFrameSize, Serializable  {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3073630608867263367L;
 	private int width = 0;
 	private int height = 0;
 	

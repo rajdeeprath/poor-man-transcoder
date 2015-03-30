@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
@@ -11,8 +12,13 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Transcode extends Mutable implements ITranscode, Cloneable {
+public class Transcode extends Mutable implements ITranscode, Serializable  {
  
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8925017251384648786L;
+	
 	public String label;	
 	public String description;
 	public ArrayList<Flag> inputflags;
@@ -60,13 +66,12 @@ public class Transcode extends Mutable implements ITranscode, Cloneable {
 		this.encodes = encodes;
 	}	
 	
-	@Override
-	protected Object clone() throws CloneNotSupportedException 
+	public ITranscode clone() 
 	{
 		ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         ByteArrayOutputStream bos = null;
-        ITranscode clone = null;
+        Transcode clone = null;
         
         try
         {
@@ -76,10 +81,11 @@ public class Transcode extends Mutable implements ITranscode, Cloneable {
 	        oos.flush();               
 	        ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray()); 
 	        ois = new ObjectInputStream(bin);
-	        clone = (ITranscode) ois.readObject(); 
+	        clone = (Transcode) ois.readObject(); 
         }
         catch(Exception e)
         {
+        	e.printStackTrace();
         	clone = null;
         }
         finally

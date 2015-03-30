@@ -5,7 +5,7 @@ import com.flashvisions.server.rtmp.transcoder.data.dao.TemplateDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 
 
-public class TemplateDAOFactory extends DAOFactory 
+public class TemplateDAOFactory extends AbstractDAOFactory 
 {
 	private String baseDir;
 	

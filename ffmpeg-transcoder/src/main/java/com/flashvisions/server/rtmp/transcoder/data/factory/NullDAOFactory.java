@@ -2,7 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.data.factory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 
-public class NullDAOFactory extends DAOFactory {
+public class NullDAOFactory extends AbstractDAOFactory {
 
 	@Override
 	public ITranscodeConfigDao getTranscodeDao(String filename) {

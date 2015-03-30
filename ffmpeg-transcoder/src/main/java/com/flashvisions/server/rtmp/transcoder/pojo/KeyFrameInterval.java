@@ -1,9 +1,15 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.Serializable;
+
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class KeyFrameInterval extends PassThru  {
+public class KeyFrameInterval extends PassThru implements Serializable  {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2770042615997108385L;
 	private int gop;
 	private int minimunInterval;
 	

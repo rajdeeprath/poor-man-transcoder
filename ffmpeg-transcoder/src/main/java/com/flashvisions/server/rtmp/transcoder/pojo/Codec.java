@@ -11,6 +11,20 @@ public class Codec extends SourceProperty implements ICodec {
 	public static class Implementation{
 		
 	}
+	
+	public Codec(String name){
+		this.name = name;
+	}
+	
+	public Codec(String name, Implementation implementation){
+		this.name = name;
+		this.implementation = implementation;
+	}
+	
+	public Codec(String name, String implementation){
+		this.name = name;
+		// to do validate implementation string
+	}
 
 	public String getName() {
 		return name;

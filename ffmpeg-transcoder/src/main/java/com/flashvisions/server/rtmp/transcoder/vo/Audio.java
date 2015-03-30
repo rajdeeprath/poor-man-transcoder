@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.vo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
@@ -11,8 +12,12 @@ import com.flashvisions.server.rtmp.transcoder.pojo.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Audio extends Mutable implements IAudio {
+public class Audio extends Mutable implements IAudio, Serializable  {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6959330589535619544L;
 	private ICodec codec;
 	private Implementation codecImplementation;
 	private AudioBitrate bitrate;

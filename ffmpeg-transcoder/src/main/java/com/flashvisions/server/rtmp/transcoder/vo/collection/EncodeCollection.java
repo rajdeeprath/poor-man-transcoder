@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.vo.collection;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,8 +8,12 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
 
-public class EncodeCollection implements IEncodeCollection {
+public class EncodeCollection implements IEncodeCollection, Serializable  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9211859674545904351L;
 	private List<IEncode> encodeList;
 	
 	public EncodeCollection()

@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.vo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
@@ -12,8 +13,12 @@ import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Video extends Mutable implements IVideo {
+public class Video extends Mutable implements IVideo, Serializable  {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2225250601352394199L;
 	private ICodec codec;
 	private Implementation codecImplementation;
 	private FrameSize framesize;
