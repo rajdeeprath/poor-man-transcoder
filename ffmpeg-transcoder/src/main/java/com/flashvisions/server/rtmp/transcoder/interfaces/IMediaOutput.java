@@ -4,13 +4,15 @@ import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
 
-public interface IDataInput {
+public interface IMediaOutput {
+	public String getContainer();
+	public void setContainer(String container);
 	public String getSourcePath();
 	public void setSourcePath(String source);
 	public String getProtocol();
 	public boolean isFile();
 	public boolean isStreamingMedia();
-	public ArrayList<Flag> getInputFlags();
-	public void setInputFlags(ArrayList<Flag> inputFlags);
+	public ArrayList<Flag> getOutputFlags();
+	public void setOutputFlags(ArrayList<Flag> outputFlags);
 	public Object getMediaInfo();
 }

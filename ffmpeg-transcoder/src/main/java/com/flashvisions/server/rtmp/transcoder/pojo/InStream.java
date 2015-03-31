@@ -1,16 +1,14 @@
-package com.flashvisions.server.rtmp.transcoder.vo;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.util.ArrayList;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamInput;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IDataInput;
-import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
-
-public class StreamingSource implements IDataInput {
+public class InStream implements IStreamInput {
 
 	private String source;
 	private ArrayList<Flag> inputFlags;
 	
-	public StreamingSource(String source){
+	public InStream(String source){
 		setSourcePath(source);
 	}
 	

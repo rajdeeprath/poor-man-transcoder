@@ -97,6 +97,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 		// load actual template file here
 		// then parse
 		
+		
 		try
 		{
 			logger.debug("preparing new transcode session");
