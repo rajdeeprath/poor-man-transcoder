@@ -5,14 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
-import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Transcode extends Mutable implements ITranscode, Serializable  {
+public class TranscodeConfig extends Mutable implements ITranscodeConfig, Serializable  {
  
 	/**
 	 * 
@@ -21,7 +19,6 @@ public class Transcode extends Mutable implements ITranscode, Serializable  {
 	
 	public String label;	
 	public String description;
-	public ArrayList<Flag> inputflags;
 	public IEncodeCollection encodes;
 	
 	
@@ -46,16 +43,6 @@ public class Transcode extends Mutable implements ITranscode, Serializable  {
 		this.description = description;
 	}
 	
-	public ArrayList<Flag> getInputflags() 
-	{
-		return inputflags;
-	}
-	
-	public void setInputflags(ArrayList<Flag> inputflags) 
-	{
-		this.inputflags = inputflags;
-	}
-	
 	public IEncodeCollection getEncodes() 
 	{
 		return encodes;
@@ -66,12 +53,12 @@ public class Transcode extends Mutable implements ITranscode, Serializable  {
 		this.encodes = encodes;
 	}	
 	
-	public ITranscode clone() 
+	public Object clone() throws CloneNotSupportedException
 	{
 		ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         ByteArrayOutputStream bos = null;
-        Transcode clone = null;
+        TranscodeConfig clone = null;
         
         try
         {
@@ -81,7 +68,7 @@ public class Transcode extends Mutable implements ITranscode, Serializable  {
 	        oos.flush();               
 	        ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray()); 
 	        ois = new ObjectInputStream(bin);
-	        clone = (Transcode) ois.readObject(); 
+	        clone = (TranscodeConfig) ois.readObject(); 
         }
         catch(Exception e)
         {

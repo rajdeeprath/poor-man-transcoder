@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- sample transcoder template for red5-ffmpeg plugin -->
+<!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>somename</Name>
-		<Description>Sample transcode template</Description>
-		
-		<Input>
-			<!-- Input param such as re for native frame rate read-in -->
-			<RawFlag>-re</RawFlag>
-		</Input>
-		
+		<Name>juno</Name>
+		<Description>Sample transcode template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>

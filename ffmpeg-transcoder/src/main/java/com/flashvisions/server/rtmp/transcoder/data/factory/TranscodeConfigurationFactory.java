@@ -3,18 +3,18 @@ package com.flashvisions.server.rtmp.transcoder.data.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 
 
-public class TranscodeConfigurationFactory {
+public class TranscodeConfigurationFactory implements Cloneable {
 
 	private static TranscodeConfigurationFactory instance; 
 	private AbstractDAOFactory daoFactory;
-	private static Map<String, ITranscode> prototypes = null;;
+	private static Map<String, ITranscodeConfig> prototypes = null;;
 	
 	public TranscodeConfigurationFactory(SingletonEnforcer e){
-		prototypes = new HashMap<String, ITranscode>();
+		prototypes = new HashMap<String, ITranscodeConfig>();
 	}
 	
 	public AbstractDAOFactory getDaoFactory() {
@@ -25,14 +25,14 @@ public class TranscodeConfigurationFactory {
 		this.daoFactory = daoFactory;
 	}
 	
-	public ITranscode getTranscodeSession(String templateName)
+	public ITranscodeConfig getTranscodeSession(String templateName) throws CloneNotSupportedException
 	{
-		ITranscode config;
+		ITranscodeConfig config;
 		
 		if(prototypes.containsKey(templateName))
 		{
 			config = prototypes.get(templateName);
-			return config.clone();
+			return (ITranscodeConfig) config.clone();
 		}
 		else
 		{

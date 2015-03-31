@@ -36,7 +36,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
@@ -54,7 +54,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.VideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
 import com.flashvisions.server.rtmp.transcoder.vo.Audio;
 import com.flashvisions.server.rtmp.transcoder.vo.Encode;
-import com.flashvisions.server.rtmp.transcoder.vo.Transcode;
+import com.flashvisions.server.rtmp.transcoder.vo.TranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.vo.Video;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
@@ -73,7 +73,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 	private Document document = null;
 	private XPath xpath;
 	
-	private ITranscode session;
+	private ITranscodeConfig session;
 	
 	public TemplateDao()
 	{
@@ -100,7 +100,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 		try
 		{
 			logger.debug("preparing new transcode session");
-			session = new Transcode();
+			session = new TranscodeConfig();
 			
 			this.templateFile = new File(this.templatePath);
 			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
@@ -125,18 +125,6 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 			String templateDescriptionExpression = "/Template/Transcode/Description";
 			String description = this.xpath.compile(templateDescriptionExpression).evaluate(this.document);
 			session.setDescription(description);
-			
-			
-			/****************** look for input flags ****************/
-			String inputFlagsExpression = "/Template/Transcode/Input/RawFlag";
-			NodeList inputflagNodes = (NodeList) this.xpath.compile(inputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
-			ArrayList<Flag> inputflags = new ArrayList<Flag>(); 
-			for(int k=0;k<inputflagNodes.getLength();k++){
-			Node n = inputflagNodes.item(k);
-			String flag = n.getFirstChild().getNodeValue();
-			inputflags.add(new Flag(flag));
-			}
-			session.setInputflags(inputflags);
 			
 			
 			/****************** look for encode objects ****************/
@@ -484,7 +472,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 	}
 
 	@Override
-	public ITranscode getTranscodeConfig() {
+	public ITranscodeConfig getTranscodeConfig() {
 		// TODO Auto-generated method stub
 		return session;
 	}
