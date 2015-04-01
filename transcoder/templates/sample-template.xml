@@ -74,10 +74,12 @@
 				</Audio>
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->
-				<Output>
+				<!--
+					<Output>
 					<RawFlag>-y</RawFlag>
 					<RawFlag>-f flv</RawFlag>
-				</Output>
+					</Output>
+				-->					
 				
 			</Encode>
 		</Encodes>

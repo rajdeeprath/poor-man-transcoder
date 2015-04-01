@@ -1,12 +1,14 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.util.ArrayList;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamInput;
 
 public class InStream implements IStreamInput {
 
 	private String source;
 	private ArrayList<Flag> inputFlags;
+	private String streamName;
 	
 	public InStream(String source){
 		setSourcePath(source);
@@ -58,6 +60,18 @@ public class InStream implements IStreamInput {
 	public void setInputFlags(ArrayList<Flag> inputFlags) {
 		// TODO Auto-generated method stub
 		this.inputFlags = inputFlags;
+	}
+
+	@Override
+	public String getPublishName() {
+		// TODO Auto-generated method stub
+		return streamName;
+	}
+
+	@Override
+	public void setPublishName(String name) {
+		// TODO Auto-generated method stub
+		this.streamName = name;
 	}
 
 }
