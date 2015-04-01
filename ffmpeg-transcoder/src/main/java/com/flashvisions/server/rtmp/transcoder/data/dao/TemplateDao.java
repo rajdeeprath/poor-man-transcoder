@@ -33,6 +33,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
@@ -49,8 +51,10 @@ import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.KeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.pojo.OutMedia;
 import com.flashvisions.server.rtmp.transcoder.pojo.Overlay;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.VideoCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
 import com.flashvisions.server.rtmp.transcoder.vo.Audio;
 import com.flashvisions.server.rtmp.transcoder.vo.Encode;
@@ -148,7 +152,8 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/StreamName";
 				String encodeNodeOutputName = this.xpath.compile(encodeNodeOutputNameExpression).evaluate(this.document);
-				encode.setOutput(encodeNodeOutputName);
+				IMediaOutput output = new OutMedia(encodeNodeOutputName, true); 
+				encode.setOutput(output);
 				
 				
 				
@@ -157,8 +162,8 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
 				String encodeNodeVideoCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
-				//video.setCodec(encodeNodeVideoCodec);
-				// to do
+				video.setCodec(new VideoCodec(encodeNodeVideoCodec));
+				
 				
 				String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
 				String encodeNodeVideoCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
@@ -354,16 +359,20 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 					video.setExtraParams(extras);
 				}
 				
+				/*** all ok with video configuration */
+				video.setEnabled(true);
+				
+				/**** store video configuration into encode object *****/
+				encode.setVideoConfig(video);
+				
 				
 				
 				/******************* Audio codec information **************************************/
 				IAudio audio = new Audio();
 				
-				
 				String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
 				String encodeNodeAudioCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
-				//audio.setCodec(new AudioCodec());
-				// to do
+				audio.setCodec(new AudioCodec(encodeNodeAudioCodec));
 				
 				
 				String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
@@ -426,14 +435,17 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 					audio.setExtraParams(extras);
 				}
 				
+				/*** all ok with audio configuration */
+				audio.setEnabled(true);
+				
 				/**** store audio configuration into encode object *****/
 				encode.setAudioConfig(audio);
 				
 				
 				/****************** look for output flags ****************/
-				String outputFlagsExpression = "/Template/Transcode/Output/RawFlag";
+				String outputFlagsExpression = "/Template/Transcode/Output/Flags/RawFlag";
 				NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
-				ArrayList<Flag> outputflags = new ArrayList<Flag>(); 
+				ArrayList<IFlag> outputflags = new ArrayList<IFlag>(); 
 				for(int l=0;l<outputflagNodes.getLength();l++){
 				Node n = outputflagNodes.item(l);
 				String flag = n.getFirstChild().getNodeValue();

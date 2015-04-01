@@ -2,7 +2,9 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 
-public class Flag implements Serializable {
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+
+public class Flag implements Serializable, IFlag {
 
 	/**
 	 * 

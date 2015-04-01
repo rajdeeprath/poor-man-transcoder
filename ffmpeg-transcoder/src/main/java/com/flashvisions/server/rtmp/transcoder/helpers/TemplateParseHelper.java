@@ -22,6 +22,8 @@ public class TemplateParseHelper {
     	VARIABLEMAP = new HashMap<String, String>();
     	VARIABLEMAP.put("${ImageWidth}", "ImageWidth");
     	VARIABLEMAP.put("${ImageHeight}", "ImageHeight");
+    	VARIABLEMAP.put("${SourceApplication}", "SourceApplication");
+    	VARIABLEMAP.put("${SourceStreamName}", "SourceStreamName");
     }
 	
 

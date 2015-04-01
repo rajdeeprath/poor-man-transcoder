@@ -1,35 +1,13 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamInput;
 
-public class InStream implements IStreamInput {
+public class InStream extends InMedia implements IStreamInput {
 
-	private String source;
-	private ArrayList<Flag> inputFlags;
-	private String streamName;
-	
-	public InStream(String source){
-		setSourcePath(source);
-	}
-	
-	@Override
-	public String getSourcePath() {
-		// TODO Auto-generated method stub
-		return source;
-	}
-
-	@Override
-	public void setSourcePath(String source) {
-		// TODO Auto-generated method stub
-		this.source = source;
-	}
-
-	@Override
-	public String getProtocol() {
-		// TODO Auto-generated method stub
-		return null;
+	public InStream(String source) {
+		super(source);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -43,35 +21,4 @@ public class InStream implements IStreamInput {
 		// TODO Auto-generated method stub
 		return true;
 	}
-
-	@Override
-	public Object getMediaInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<Flag> getInputFlags() {
-		// TODO Auto-generated method stub
-		return inputFlags;
-	}
-
-	@Override
-	public void setInputFlags(ArrayList<Flag> inputFlags) {
-		// TODO Auto-generated method stub
-		this.inputFlags = inputFlags;
-	}
-
-	@Override
-	public String getPublishName() {
-		// TODO Auto-generated method stub
-		return streamName;
-	}
-
-	@Override
-	public void setPublishName(String name) {
-		// TODO Auto-generated method stub
-		this.streamName = name;
-	}
-
 }

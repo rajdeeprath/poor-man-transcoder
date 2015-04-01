@@ -2,26 +2,30 @@ package com.flashvisions.server.rtmp.transcoder.vo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionHandler;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
+import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class Session implements ISession {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
-	@SuppressWarnings("unused")
 	private ProcessBuilder transcodePb = null;
 	private Process process;
 	
@@ -175,33 +179,61 @@ public class Session implements ISession {
 				while(iterator.hasNext())
 				{
 					logger.info("Parsing encode configuration");
-					
 					IEncode encode = iterator.next();
 					
 					if(encode.getEnabled())
 					{
 						IVideo vConfig = encode.getVideoConfig();
 						IAudio aConfig = encode.getAudioConfig();
+						ArrayList<IFlag> outFlags = encode.getOutputflags();
+						IMediaOutput output = encode.getOutput();
 						
 						if(vConfig.getEnabled())
 						{
 							logger.info("Parsing video settings for encode");
+							ICodec vcodec = vConfig.getCodec();
 						}
 						
 						if(aConfig.getEnabled())
 						{
 							logger.info("Parsing audio settings for encode");
+							ICodec acodec = aConfig.getCodec();
+						}
+						
+						if(!outFlags.isEmpty())
+						{
+							logger.info("Parsing extra output flags for encode");
+							Iterator<IFlag> it = outFlags.iterator();
+							
+							while(it.hasNext())
+							{
+								IFlag flag = it.next();	
+								String data = flag.getData();
+								command.add(data);
+							}
+						}
+						
+						if(output.getSourcePath() != null)
+						{
+							logger.info("Processing output destination for encode");
+							
+							IMediaOutput destination = IOUtils.createOutputFromInput(this.source, output);
+							
+							logger.info("Processing output destination for encode"
+									+ " "
+									+ "Container :" 
+									+ destination.getContainer()
+									+ " "
+									+ "Destination :" + destination.getSourcePath());
+							
+							command.add("-y");
+							command.add("-f");
+							command.add(destination.getContainer());
+							command.add(destination.getSourcePath());
 						}
 					}
 				}
 			}
-			
-			
-			command.add("ls");
-			command.add("-l");
-			command.add("/var/tmp");
-			
-			
 		}
 	}
 }

@@ -87,4 +87,11 @@ public class EncodeCollection implements IEncodeCollection, Serializable  {
             return e;
 		}
 	}
+
+
+	@Override
+	public int getTotalEncodes() {
+		// TODO Auto-generated method stub
+		return this.encodeList.size();
+	}
 }

@@ -14,5 +14,8 @@ public interface IMediaOutput {
 	public boolean isStreamingMedia();
 	public ArrayList<Flag> getOutputFlags();
 	public void setOutputFlags(ArrayList<Flag> outputFlags);
+	public String getStreamName();
+	public void setStreamName(String streamName);
+	public boolean isTemplate();
 	public Object getMediaInfo();
 }

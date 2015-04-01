@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
-import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
 public class Encode extends Mutable implements IEncode, Serializable  {
@@ -15,21 +17,21 @@ public class Encode extends Mutable implements IEncode, Serializable  {
 	 */
 	private static final long serialVersionUID = 9149259018891670101L;
 	private String name;
-	private String output;
+	private IMediaOutput output;
 	
-	private Video vConfig;
+	private IVideo vConfig;
 	private IAudio aConfig;
 	
-	public ArrayList<Flag> outputflags;
+	public ArrayList<IFlag> outputflags;
 	
 	
 	
-	public ArrayList<Flag> getOutputflags() {
+	public ArrayList<IFlag> getOutputflags() {
 		return outputflags;
 	}
 
 
-	public void setOutputflags(ArrayList<Flag> outputflags) {
+	public void setOutputflags(ArrayList<IFlag> outputflags) {
 		this.outputflags = outputflags;
 	}
 
@@ -44,21 +46,21 @@ public class Encode extends Mutable implements IEncode, Serializable  {
 	}
 	
 	
-	public Video getVideoConfig() {
+	public IVideo getVideoConfig() {
 		return vConfig;
 	}
 	
 	
-	public void setVideoConfig(Video vConfig) {
+	public void setVideoConfig(IVideo vConfig) {
 		this.vConfig = vConfig;
 	}
 	
 	
-	public String getOutput() {
+	public IMediaOutput getOutput() {
 		return output;
 	}
 	
-	public void setOutput(String output) {
+	public void setOutput(IMediaOutput output) {
 		this.output = output;
 	}
 

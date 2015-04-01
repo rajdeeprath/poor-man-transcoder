@@ -9,7 +9,7 @@
 				<Enable>true</Enable>
 				<!-- must be unique in this sequence of encodes -->
 				<Name>Stream 2 Stream</Name>
-				<StreamName>mp4:${SourceStreamName}_source</StreamName>				
+				<StreamName>${SourceApplication}/mp4:${SourceStreamName}_source</StreamName>				
 				<Video>
 					<!-- Any supported codec, Copy, Disable -->
 					<Codec>Copy</Codec>
@@ -39,8 +39,8 @@
 							<Location>
 								<X>4</X>
 								<Y>4</Y>
-								<Width>${ImageWidth} + 1</Width>
-								<Height>${ImageHeight} + 1</Height>
+								<Width>${ImageWidth}</Width>
+								<Height>${ImageHeight}</Height>
 								<!-- TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERTOP,  CENTERBOTTOM, CENTERMIDDLE -->
 								<Align>TOPRIGHT</Align>
 							</Location>
@@ -74,12 +74,12 @@
 				</Audio>
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->
-				<!--
-					<Output>
-					<RawFlag>-y</RawFlag>
-					<RawFlag>-f flv</RawFlag>
-					</Output>
-				-->					
+				<Output>
+					<Container>auto</Container>
+					<Flags>
+						<!--<RawFlag></RawFlag>-->
+					</Flags>
+				</Output>				
 				
 			</Encode>
 		</Encodes>
