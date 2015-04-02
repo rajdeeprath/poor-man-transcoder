@@ -3,12 +3,12 @@ package com.flashvisions.server.rtmp.transcoder.vo;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioProperty;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
@@ -20,10 +20,10 @@ public class Audio extends Mutable implements IAudio, Serializable  {
 	private static final long serialVersionUID = 6959330589535619544L;
 	private ICodec codec;
 	private Implementation codecImplementation;
-	private AudioBitrate bitrate;
-	private AudioSampleRate samplerate;
-	private AudioChannel channel;
-	private ArrayList<AudioProperty> extraParams;
+	private IAudioBitrate bitrate;
+	private IAudioSampleRate samplerate;
+	private IAudioChannel channel;
+	private ArrayList<IArbitaryProperty> extraParams;
 	
 
 	public ICodec getCodec() {
@@ -42,35 +42,35 @@ public class Audio extends Mutable implements IAudio, Serializable  {
 		this.codecImplementation = codecImplementation;
 	}
 
-	public AudioBitrate getBitrate() {
+	public IAudioBitrate getBitrate() {
 		return bitrate;
 	}
 
-	public void setBitrate(AudioBitrate bitrate) {
+	public void setBitrate(IAudioBitrate bitrate) {
 		this.bitrate = bitrate;
 	}
 
-	public AudioSampleRate getSamplerate() {
+	public IAudioSampleRate getSamplerate() {
 		return samplerate;
 	}
 
-	public void setSamplerate(AudioSampleRate samplerate) {
+	public void setSamplerate(IAudioSampleRate samplerate) {
 		this.samplerate = samplerate;
 	}
 
-	public AudioChannel getChannel() {
+	public IAudioChannel getChannel() {
 		return channel;
 	}
 
-	public void setChannel(AudioChannel channel) {
+	public void setChannel(IAudioChannel channel) {
 		this.channel = channel;
 	}
 
-	public ArrayList<AudioProperty> getExtraParams() {
+	public ArrayList<IArbitaryProperty> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<AudioProperty> extraParams) {
+	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams) {
 		this.extraParams = extraParams;
 	}
 }

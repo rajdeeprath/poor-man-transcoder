@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
@@ -41,6 +42,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
+import com.flashvisions.server.rtmp.transcoder.pojo.ArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioCodec;
@@ -210,6 +212,10 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				String encodeNodeVideoBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate";
 				Node encodeNodeVideoBitrateNode = (Node) this.xpath.compile(encodeNodeVideoBitrateExpression).evaluate(this.document, XPathConstants.NODE);
 				if(encodeNodeVideoBitrateNode != null && encodeNodeVideoBitrateNode.hasChildNodes()){
+					
+					String encodeNodeVideoBitrateAvgExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Average";
+					int encodeNodeVideoBitrateAverage = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(this.document));
+					
 					String encodeNodeVideoBitrateMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Min";
 					int encodeNodeVideoBitrateMin = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(this.document));
 					
@@ -219,7 +225,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 					String encodeNodeVideoBitrateBufferExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Buffer";
 					int encodeNodeVideoBitrateBuffer = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(this.document));
 					
-					video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
+					video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateAverage, encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
 				}else {
 					video.setBitrate(new VideoBitrate(true));
 				}
@@ -344,7 +350,8 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 					String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
 					NodeList videoParams = (NodeList) this.xpath.compile(videoExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
 					
-					ArrayList<VideoProperty> extras = new ArrayList<VideoProperty>(); 
+					ArrayList<IArbitaryProperty> extras = new ArrayList<IArbitaryProperty>();
+					
 					for(int j=0;j<videoParams.getLength();j++)
 					{
 						String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Key";
@@ -421,7 +428,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 					String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
 					NodeList audioParams = (NodeList) this.xpath.compile(audioExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
 					
-					ArrayList<AudioProperty> extras = new ArrayList<AudioProperty>(); 
+					ArrayList<IArbitaryProperty> extras = new ArrayList<IArbitaryProperty>(); 
 					for(int j=0;j<audioParams.getLength();j++)
 					{
 						String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";

@@ -2,9 +2,10 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class KeyFrameInterval extends PassThru implements Serializable  {
+public class KeyFrameInterval extends PassThru implements IKeyFrameInterval, Serializable  {
 	
 	/**
 	 * 

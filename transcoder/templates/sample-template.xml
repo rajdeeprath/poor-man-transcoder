@@ -20,6 +20,7 @@
 					</FrameSize>
 					<FrameRate>24</FrameRate>
 					<Bitrate>
+						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
 						<Min>500</Min><!-- K -->
 						<Max>600</Max><!-- K -->
 						<Buffer>500</Buffer> <!-- K (device buffer)-->

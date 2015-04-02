@@ -5,5 +5,4 @@ public interface IArbitaryProperty {
 	public void setKey(String key);
 	public String getValue();
 	public void setValue(String value) ;
-	
 }

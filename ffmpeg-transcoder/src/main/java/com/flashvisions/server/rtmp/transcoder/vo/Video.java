@@ -3,13 +3,14 @@ package com.flashvisions.server.rtmp.transcoder.vo;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.pojo.FrameRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.FrameSize;
-import com.flashvisions.server.rtmp.transcoder.pojo.KeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.pojo.VideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
@@ -21,12 +22,12 @@ public class Video extends Mutable implements IVideo, Serializable  {
 	private static final long serialVersionUID = 2225250601352394199L;
 	private ICodec codec;
 	private Implementation codecImplementation;
-	private FrameSize framesize;
-	private FrameRate framerate;
-	private VideoBitrate bitrate;
-	private KeyFrameInterval keyFrameInterval;
-	private ArrayList<Object> overlays;
-	private ArrayList<VideoProperty> extraParams;
+	private IFrameSize framesize;
+	private IFrameRate framerate;
+	private IVideoBitrate bitrate;
+	private IKeyFrameInterval keyFrameInterval;
+	private IOverlayCollection overlays;
+	private ArrayList<IArbitaryProperty> extraParams;
 	
 
 	public ICodec getCodec() {
@@ -37,11 +38,11 @@ public class Video extends Mutable implements IVideo, Serializable  {
 		this.codec = codec;
 	}
 
-	public FrameSize getFramesize() {
+	public IFrameSize getFramesize() {
 		return framesize;
 	}
 
-	public void setFramesize(FrameSize framesize) {
+	public void setFramesize(IFrameSize framesize) {
 		this.framesize = framesize;
 	}
 
@@ -53,43 +54,43 @@ public class Video extends Mutable implements IVideo, Serializable  {
 		this.codecImplementation = codecImplementation;
 	}
 
-	public FrameRate getFramerate() {
+	public IFrameRate getFramerate() {
 		return framerate;
 	}
 
-	public void setFramerate(FrameRate framerate) {
+	public void setFramerate(IFrameRate framerate) {
 		this.framerate = framerate;
 	}
 
-	public VideoBitrate getBitrate() {
+	public IVideoBitrate getBitrate() {
 		return bitrate;
 	}
 
-	public void setBitrate(VideoBitrate bitrate) {
+	public void setBitrate(IVideoBitrate bitrate) {
 		this.bitrate = bitrate;
 	}
 
-	public KeyFrameInterval getKeyFrameInterval() {
+	public IKeyFrameInterval getKeyFrameInterval() {
 		return keyFrameInterval;
 	}
 
-	public void setKeyFrameInterval(KeyFrameInterval keyFrameInterval) {
+	public void setKeyFrameInterval(IKeyFrameInterval keyFrameInterval) {
 		this.keyFrameInterval = keyFrameInterval;
 	}
 
-	public ArrayList<Object> getOverlays() {
+	public IOverlayCollection getOverlays() {
 		return overlays;
 	}
 
-	public void setOverlays(ArrayList<Object> overlays) {
+	public void setOverlays(IOverlayCollection overlays) {
 		this.overlays = overlays;
 	}
 
-	public ArrayList<VideoProperty> getExtraParams() {
+	public ArrayList<IArbitaryProperty> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<VideoProperty> extraParams) {
+	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams) {
 		this.extraParams = extraParams;
 	}
 }

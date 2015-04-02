@@ -2,9 +2,10 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class VideoBitrate extends PassThru implements Serializable 
+public class VideoBitrate extends PassThru implements IVideoBitrate, Serializable 
 {
 	/**
 	 * 
@@ -12,6 +13,7 @@ public class VideoBitrate extends PassThru implements Serializable
 	private static final long serialVersionUID = 6254029729499034766L;
 	private int minimum;
 	private int maximum;
+	private int average;
 	private int deviceBuffer;
 	
 	
@@ -27,7 +29,8 @@ public class VideoBitrate extends PassThru implements Serializable
 		this.deviceBuffer = -1;
 	}
 	
-	public VideoBitrate(int minimum, int maximum, int deviceBuffer){
+	public VideoBitrate(int average, int minimum, int maximum, int deviceBuffer){
+		this.average = average;
 		this.minimum = minimum;
 		this.maximum = maximum;
 		this.deviceBuffer = deviceBuffer;
@@ -55,5 +58,17 @@ public class VideoBitrate extends PassThru implements Serializable
 	
 	public void setDeviceBuffer(int deviceBuffer) {
 		this.deviceBuffer = deviceBuffer;
+	}
+
+	@Override
+	public int getAverage() {
+		// TODO Auto-generated method stub
+		return average;
+	}
+
+	@Override
+	public void setAverage(int average) {
+		// TODO Auto-generated method stub
+		this.average = average;
 	}
 }

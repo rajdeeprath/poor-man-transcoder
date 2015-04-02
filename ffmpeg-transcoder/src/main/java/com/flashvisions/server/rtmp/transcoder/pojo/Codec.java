@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.SourceProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
-public class Codec extends SourceProperty implements ICodec {
+public class Codec extends PassThru implements ICodec {
 	
 	private String name;
 	private Implementation implementation;
