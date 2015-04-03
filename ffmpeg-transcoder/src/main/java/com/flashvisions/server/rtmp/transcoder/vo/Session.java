@@ -33,6 +33,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionHandler;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Overlay.Location.ALIGNMENT;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
@@ -240,6 +241,13 @@ public class Session implements ISession {
 											cmdLine.addArgument(vcodec.getName());
 											
 											
+											logger.info("Setting codec implementation");
+											if(vcodec.getImplementation() != Codec.Implementation.NORMAL){
+											cmdLine.addArgument("-strict");
+											cmdLine.addArgument(vcodec.getImplementation().name().toLowerCase());
+											}
+											
+											
 											logger.info("Setting frame size");
 											IFrameSize framesize = vConfig.getFramesize();
 											if(framesize.getSameAsSource())
@@ -423,6 +431,12 @@ public class Session implements ISession {
 											logger.info("Setting audio codec");
 											cmdLine.addArgument("-codec:a");
 											cmdLine.addArgument(acodec.getName());
+											
+											logger.info("Setting codec implementation");
+											if(acodec.getImplementation() != Codec.Implementation.NORMAL){
+											cmdLine.addArgument("-strict");
+											cmdLine.addArgument(acodec.getImplementation().name().toLowerCase());
+											}
 											
 											
 											logger.info("Setting audio bitrate");
