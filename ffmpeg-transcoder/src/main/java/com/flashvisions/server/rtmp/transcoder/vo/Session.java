@@ -53,6 +53,7 @@ public class Session implements ISession {
 	private SessionOutputStream outstream;
 	private SessionResultHandler resultHandler;
 	private long executonTimeout = 0;
+	private ExecuteWatchdog watchdog;
 	
 	
 	private Session(Builder builder) 
@@ -64,7 +65,8 @@ public class Session implements ISession {
 		
 		this.executonTimeout = builder.executonTimeout;
 		this.executor = new DefaultExecutor();
-		this.executor.setWatchdog(new ExecuteWatchdog(this.executonTimeout));
+		this.watchdog = new ExecuteWatchdog(this.executonTimeout);
+		
 	}
 
 	
@@ -104,11 +106,15 @@ public class Session implements ISession {
 		// TODO Auto-generated method stub
 		try 
 		{
+			
 			this.outstream = new SessionOutputStream();
-			this.resultHandler = new SessionResultHandler();
+			this.resultHandler = new SessionResultHandler(this.watchdog);
+			
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
 			this.executor.setProcessDestroyer(new SessionDestroyer());
+			this.executor.setWatchdog(this.watchdog);
 			this.executor.setExitValue(0);
+			
 			this.executor.execute(this.cmdLine, this.resultHandler);
 		} 
 		catch (Exception e) 

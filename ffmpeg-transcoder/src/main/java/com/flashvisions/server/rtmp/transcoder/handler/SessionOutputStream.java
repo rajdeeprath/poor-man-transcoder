@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.handler;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -35,6 +36,30 @@ public class SessionOutputStream extends LogOutputStream {
 		long diff = System.currentTimeMillis() - lastOutputTime;
         long diffSeconds = diff / 1000 % 60;
         return (diffSeconds>3)?false:true;
+	}
+	
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+		super.close();
+	}
+
+	@Override
+	public void flush() {
+		// TODO Auto-generated method stub
+		super.flush();
+	}
+
+	@Override
+	public int getMessageLevel() {
+		// TODO Auto-generated method stub
+		return super.getMessageLevel();
+	}
+
+	@Override
+	protected void processBuffer() {
+		// TODO Auto-generated method stub
+		super.processBuffer();
 	}
 
 }
