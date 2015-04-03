@@ -9,6 +9,7 @@ import org.apache.commons.exec.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -32,6 +33,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionHandler;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.Overlay.Location.ALIGNMENT;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class Session implements ISession {
@@ -167,7 +169,7 @@ public class Session implements ISession {
 			return this;
 		}
 		
-		public ISession build(){
+		public ISession build() throws MalformedTranscodeQueryException{
 			
 			this.session = new Session(this);
 			this.session.setInputSource(this.source);
@@ -177,271 +179,344 @@ public class Session implements ISession {
 			return this.session;
 		}
 		
-		protected void buildExecutableCommand(IMediaInput source, ITranscodeConfig config){
+		protected void buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
+			
 			logger.info("Building transcoder command");
 			
-			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
+			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
+			
 			replacementMap.put("ffmpegExecutable", "ffmpeg.exe");			
 			
+			try
+			{			
 			
-			if(config.getEnabled())
-			{
-				IEncodeCollection outputs = config.getEncodes();
-				IEncodeIterator iterator = outputs.iterator();
-				
-				while(iterator.hasNext())
-				{
-					logger.info("Parsing encode configuration");
-					IEncode encode = iterator.next();
-					
-					
-					if(encode.getEnabled())
+					if(config.getEnabled())
 					{
-						IVideo vConfig = encode.getVideoConfig();
-						IAudio aConfig = encode.getAudioConfig();
-						ArrayList<IFlag> outFlags = encode.getOutputflags();
-						IMediaOutput output = encode.getOutput();
+						IEncodeCollection outputs = config.getEncodes();
+						IEncodeIterator iterator = outputs.iterator();
 						
-						if(vConfig.getEnabled())
+						while(iterator.hasNext())
 						{
-							logger.info("Parsing video settings for encode");
-							ICodec vcodec = vConfig.getCodec();
+							logger.info("Parsing encode configuration");
+							IEncode encode = iterator.next();
 							
-							if(vcodec.getSameAsSource())
+							
+							if(encode.getEnabled())
 							{
-								// pass thru -> use same as source
-								// no op
-							}
-							else
-							{
-								// new encode params
-								cmdLine.addArgument("-codec:v");
-								cmdLine.addArgument(vcodec.getName());
+								IVideo vConfig = encode.getVideoConfig();
+								IAudio aConfig = encode.getAudioConfig();
+								ArrayList<IFlag> outFlags = encode.getOutputflags();
+								IMediaOutput output = encode.getOutput();
 								
-								
-								
-								IFrameSize framesize = vConfig.getFramesize();
-								if(framesize.getSameAsSource())
+								if(vConfig.getEnabled())
 								{
-									// NO OP
-								}
-								else
-								{
-									cmdLine.addArgument("-s");
-									cmdLine.addArgument(framesize.getWidth()+"x"+framesize.getHeight());
-								}
-								
-								
-								
-								IFrameRate framerate = vConfig.getFramerate();
-								if(framerate.getSameAsSource())
-								{
-									// NO OP
-								}
-								else
-								{
-									cmdLine.addArgument("-r");
-									cmdLine.addArgument(String.valueOf(framerate.getFramerate()));
-								}
-								
-								
-								
-								IVideoBitrate vbitrate = vConfig.getBitrate();
-								if(vbitrate.getSameAsSource())
-								{
-									// NO OP
-								}
-								else
-								{
-									if(vbitrate.getAverage()>0)
+									logger.info("Parsing video settings for encode");
+									ICodec vcodec = vConfig.getCodec();
+									
+									if(vcodec.getEnabled())
 									{
-										logger.info("ABR enabled");
-										cmdLine.addArgument("-b:v");
-										cmdLine.addArgument(vbitrate.getAverage()+"k");
+										if(vcodec.getSameAsSource())
+										{
+											// pass thru -> use same as source
+											// no op
+										}
+										else
+										{
+											logger.info("Calculating new video settings");
+											
+											
+											logger.info("Setting codec");
+											cmdLine.addArgument("-codec:v");
+											cmdLine.addArgument(vcodec.getName());
+											
+											
+											logger.info("Setting frame size");
+											IFrameSize framesize = vConfig.getFramesize();
+											if(framesize.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												cmdLine.addArgument("-s");
+												cmdLine.addArgument(framesize.getWidth()+"x"+framesize.getHeight());
+											}
+											
+											
+											logger.info("Setting frame rate");
+											IFrameRate framerate = vConfig.getFramerate();
+											if(framerate.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												cmdLine.addArgument("-r");
+												cmdLine.addArgument(String.valueOf(framerate.getFramerate()));
+											}
+											
+											
+											logger.info("Setting bitrate");
+											IVideoBitrate vbitrate = vConfig.getBitrate();
+											if(vbitrate.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												if(vbitrate.getAverage()>0)
+												{
+													logger.info("ABR enabled");
+													cmdLine.addArgument("-b:v");
+													cmdLine.addArgument(vbitrate.getAverage()+"k");
+												}
+												else
+												{
+													if(vbitrate.getMinimum()>0){
+														cmdLine.addArgument("-minrate");
+														cmdLine.addArgument(vbitrate.getMinimum()+"k");
+													}
+													
+													if(vbitrate.getMaximum()>0){
+														cmdLine.addArgument("-maxrate");
+														cmdLine.addArgument(vbitrate.getMaximum()+"k");
+													}
+													
+													if(vbitrate.getDeviceBuffer()>0){
+														cmdLine.addArgument("-bufsize");
+														cmdLine.addArgument(vbitrate.getDeviceBuffer()+"k");
+													}
+												}
+											}
+											
+											
+											logger.info("Setting keyframeinterval & gop");
+											IKeyFrameInterval keyframeinterval = vConfig.getKeyFrameInterval();
+											if(keyframeinterval.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												if(keyframeinterval.getGop()>0){
+												cmdLine.addArgument("-g");
+												cmdLine.addArgument(String.valueOf(keyframeinterval.getGop()));
+												}
+												
+												if(keyframeinterval.getMinimunInterval()>0){
+												cmdLine.addArgument("-keyint_min");
+												cmdLine.addArgument(String.valueOf(keyframeinterval.getMinimunInterval()));
+												}
+											}
+											
+											
+											/* Overlays */
+											logger.info("Setting overlays");
+											IOverlayCollection overlays = vConfig.getOverlays();
+											IOverlayIterator ito = overlays.iterator();
+											while(ito.hasNext())
+											{
+												IOverlay o = ito.next();
+												
+												if(!o.getEnabled())
+												{
+													// NO OP
+												}
+												else
+												{
+													ALIGNMENT align = o.getLocation().getAlign();
+													switch(align)
+													{
+														case BOTTOMLEFT:
+														break;
+														
+														case BOTTOMRIGHT:
+														break;
+														
+														case CENTERBOTTOM:
+														break;
+														
+														case CENTERLEFT:
+														break;
+														
+														case CENTERMIDDLE:
+														break;
+														
+														case CENTERRIGHT:
+														break;
+														
+														case CENTERTOP:
+														break;
+														
+														case TOPLEFT:
+														break;
+														
+														case TOPRIGHT:
+														break;
+													}										
+													
+												}
+											}
+											
+											
+											
+											/* Extra params such as filters */
+											logger.info("Setting extra video params");
+											ArrayList<IArbitaryProperty> extraVideoParams = vConfig.getExtraParams();
+											Iterator<?> itv = extraVideoParams.iterator();
+											while(itv.hasNext()){
+												IArbitaryProperty prop = (IArbitaryProperty) itv.next();
+												cmdLine.addArgument("-"+prop.getKey());
+												cmdLine.addArgument(prop.getValue());
+											}
+											
+										}
 									}
 									else
 									{
-										if(vbitrate.getMinimum()>0)
-										{
-											cmdLine.addArgument("-minrate");
-											cmdLine.addArgument(vbitrate.getMinimum()+"k");
-										}
-										
-										if(vbitrate.getMaximum()>0)
-										{
-											cmdLine.addArgument("-maxrate");
-											cmdLine.addArgument(vbitrate.getMaximum()+"k");
-										}
-										
-										if(vbitrate.getDeviceBuffer()>0)
-										{
-											cmdLine.addArgument("-bufsize");
-											cmdLine.addArgument(vbitrate.getDeviceBuffer()+"k");
-										}
+										cmdLine.addArgument("-vn");
 									}
-								}
-								
-								IKeyFrameInterval keyframeinterval = vConfig.getKeyFrameInterval();
-								if(keyframeinterval.getSameAsSource())
-								{
-									// NO OP
 								}
 								else
 								{
-									if(keyframeinterval.getGop()>0){
-									cmdLine.addArgument("-g");
-									cmdLine.addArgument(String.valueOf(keyframeinterval.getGop()));
-									}
+									cmdLine.addArgument("-vn");
+								}
+								
+								
+								
+								
+								/************************************************
+								 ********** Audio configurations ****************
+								 ************************************************/
+								if(aConfig.getEnabled())
+								{
+									logger.info("Parsing audio settings for encode");
+									ICodec acodec = aConfig.getCodec();
 									
-									if(keyframeinterval.getMinimunInterval()>0){
-										cmdLine.addArgument("-keyint_min");
-										cmdLine.addArgument(String.valueOf(keyframeinterval.getMinimunInterval()));
-										}
-								}
-								
-								
-								/* Overlays */
-								IOverlayCollection overlays = vConfig.getOverlays();
-								IOverlayIterator it = overlays.iterator();
-								while(it.hasNext()){
-									IOverlay overlay = it.next();
-									// to do
-								}								
-								
-								
-								/* Extra params such as filters */
-								ArrayList<IArbitaryProperty> extraVideoParams = vConfig.getExtraParams();
-								Iterator<IArbitaryProperty> itv = extraVideoParams.iterator();
-								while(it.hasNext()){
-									IArbitaryProperty prop = itv.next();
-									cmdLine.addArgument(prop.getKey());
-									cmdLine.addArgument(prop.getValue());
-								}
-								
-							}
-						}
-						else
-						{
-							cmdLine.addArgument("-vn");
-						}
-						
-						
-						
-						
-						if(aConfig.getEnabled())
-						{
-							logger.info("Parsing audio settings for encode");
-							ICodec acodec = aConfig.getCodec();
-							
-							if(acodec.getSameAsSource())
-							{
-								// pass thru -> use same as source
-								// no op
-							}
-							else
-							{
-								// new encode params
-								cmdLine.addArgument("-codec:a");
-								cmdLine.addArgument(acodec.getName());
-								
-								
-								
-								IAudioBitrate abitrate = aConfig.getBitrate();
-								if(abitrate.getSameAsSource())
-								{
-									// NO OP
-								}
-								else
-								{
-									if(abitrate.getBitrate()>0)
+									if(acodec.getEnabled())
 									{
-										cmdLine.addArgument("-b:a");
-										cmdLine.addArgument(abitrate.getBitrate()+"k");
+										if(acodec.getSameAsSource())
+										{
+											// pass thru -> use same as source
+											// no op
+										}
+										else
+										{
+											// new encode params
+											logger.info("Setting audio codec");
+											cmdLine.addArgument("-codec:a");
+											cmdLine.addArgument(acodec.getName());
+											
+											
+											logger.info("Setting audio bitrate");
+											IAudioBitrate abitrate = aConfig.getBitrate();
+											if(abitrate.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												if(abitrate.getBitrate()>0) {
+													cmdLine.addArgument("-b:a");
+													cmdLine.addArgument(abitrate.getBitrate()+"k");
+												}
+											}
+											
+											
+											logger.info("Setting audio samplerate");
+											IAudioSampleRate asamplerate = aConfig.getSamplerate();
+											if(asamplerate.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												if(asamplerate.getSamplerate()>0){
+												cmdLine.addArgument("-ar");
+												cmdLine.addArgument(String.valueOf(asamplerate.getSamplerate()));
+												}
+											}
+											
+											
+											logger.info("Setting audio channel");
+											IAudioChannel achannel = aConfig.getChannel();
+											if(achannel.getSameAsSource())
+											{
+												// NO OP
+											}
+											else
+											{
+												if(achannel.getChannels()>0){
+												cmdLine.addArgument("-ac");
+												cmdLine.addArgument(String.valueOf(achannel.getChannels()));
+												}
+											}
+											
+											
+											/* Extra params such as filters */
+											logger.info("Setting extra audio params");
+											ArrayList<IArbitaryProperty> extraAudioParams = aConfig.getExtraParams();
+											Iterator<?> ita = extraAudioParams.iterator();
+											while(ita.hasNext()){
+												IArbitaryProperty prop = (IArbitaryProperty) ita.next();
+												cmdLine.addArgument("-"+prop.getKey());
+												cmdLine.addArgument(prop.getValue());
+											}
+										}
 									}
-								}
-								
-								
-								IAudioSampleRate asamplerate = aConfig.getSamplerate();
-								if(asamplerate.getSameAsSource())
-								{
-									// NO OP
+									else
+									{
+										cmdLine.addArgument("-an");
+									}
 								}
 								else
 								{
-									if(asamplerate.getSamplerate()>0){
-									cmdLine.addArgument("-ar");
-									cmdLine.addArgument(String.valueOf(asamplerate.getSamplerate()));
+									cmdLine.addArgument("-an");
+								}
+								
+								
+								
+								if(!outFlags.isEmpty())
+								{
+									logger.info("Parsing extra output flags for encode");
+									Iterator<IFlag> it = outFlags.iterator();
+									
+									while(it.hasNext())	{
+										cmdLine.addArgument(it.next().getData());
 									}
 								}
 								
 								
-								IAudioChannel achannel = aConfig.getChannel();
-								if(achannel.getSameAsSource())
+								if(output.getSourcePath() != null)
 								{
-									// NO OP
-								}
-								else
-								{
-									if(achannel.getChannels()>0){
-									cmdLine.addArgument("-ac");
-									cmdLine.addArgument(String.valueOf(achannel.getChannels()));
-									}
-								}
-								
-								/* Extra params such as filters */
-								ArrayList<IArbitaryProperty> extraAudioParams = aConfig.getExtraParams();
-								Iterator<IArbitaryProperty> ita = extraAudioParams.iterator();
-								while(ita.hasNext()){
-									IArbitaryProperty prop = ita.next();
-									cmdLine.addArgument(prop.getKey());
-									cmdLine.addArgument(prop.getValue());
+									logger.info("Processing output destination for encode");
+									
+									IMediaOutput destination = IOUtils.createOutputFromInput(this.source, output);
+									
+									logger.info("Output destination for encode"
+											+ " "
+											+ "Container :" 
+											+ destination.getContainer()
+											+ " "
+											+ "Destination :" + destination.getSourcePath());
+									
+									cmdLine.addArgument("-y");
+									
+									cmdLine.addArgument("-f");
+									cmdLine.addArgument(destination.getContainer());
+									
+									cmdLine.addArgument(destination.getSourcePath());
 								}
 							}
 						}
-						else
-						{
-							cmdLine.addArgument("-an");
-						}
 						
-						
-						
-						if(!outFlags.isEmpty())
-						{
-							logger.info("Parsing extra output flags for encode");
-							Iterator<IFlag> it = outFlags.iterator();
-							
-							while(it.hasNext())
-							{
-								cmdLine.addArgument(it.next().getData());
-							}
-						}
-						
-						
-						if(output.getSourcePath() != null)
-						{
-							logger.info("Processing output destination for encode");
-							
-							IMediaOutput destination = IOUtils.createOutputFromInput(this.source, output);
-							
-							logger.info("Processing output destination for encode"
-									+ " "
-									+ "Container :" 
-									+ destination.getContainer()
-									+ " "
-									+ "Destination :" + destination.getSourcePath());
-							
-							cmdLine.addArgument("-y");
-							
-							cmdLine.addArgument("-f");
-							cmdLine.addArgument(destination.getContainer());
-							
-							cmdLine.addArgument(destination.getSourcePath());
-						}
+						cmdLine.setSubstitutionMap(replacementMap);
 					}
-				}
-				
-				cmdLine.setSubstitutionMap(replacementMap);
+			}
+			catch(Exception e)
+			{
+				throw new MalformedTranscodeQueryException(e);
 			}
 		}
 	}

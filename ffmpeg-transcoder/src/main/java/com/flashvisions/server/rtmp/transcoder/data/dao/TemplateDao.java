@@ -164,13 +164,9 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
 				String encodeNodeVideoCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
-				video.setCodec(new VideoCodec(encodeNodeVideoCodec));
-				
-				
 				String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
 				String encodeNodeVideoCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
-				//video.setCodecImplementation(encodeNodeVideoCodecImplementation);
-				// to do
+				video.setCodec(new VideoCodec(encodeNodeVideoCodec, encodeNodeVideoCodecImplementation));
 				
 				
 				String encodeNodeVideoFrameSizeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize";
@@ -330,6 +326,11 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 						String locationNodeAlignExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Align";
 						String locationNodeAligntContent = (String) this.xpath.compile(locationNodeAlignExpression).evaluate(this.document, XPathConstants.STRING);
 						location.setAlign(locationNodeAligntContent);
+						
+						overlay.setLocation(location);
+						
+						/*** add overlay to list  of overlays */
+						overlays.addOverlay(overlay);
 					}
 					catch(Exception w)
 					{
@@ -337,6 +338,9 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 						overlay.setEnabled(false);
 					}
 				}
+				
+				/********* store all overlays ***/
+				video.setOverlays(overlays);
 				
 				
 				
@@ -369,23 +373,22 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				/*** all ok with video configuration */
 				video.setEnabled(true);
 				
+				
+				
 				/**** store video configuration into encode object *****/
 				encode.setVideoConfig(video);
 				
 				
 				
-				/******************* Audio codec information **************************************/
+				/******************* Audio codec information *************************************
+				 * ******************************************************************************/
 				IAudio audio = new Audio();
 				
 				String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
 				String encodeNodeAudioCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
-				audio.setCodec(new AudioCodec(encodeNodeAudioCodec));
-				
-				
 				String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
 				String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
-				//audio.setCodecImplementation(new Codec.Implementation());
-				// to do
+				audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
 				
 				
 				/* Use set bitrate or else follow from source */
@@ -444,6 +447,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				/*** all ok with audio configuration */
 				audio.setEnabled(true);
+				
 				
 				/**** store audio configuration into encode object *****/
 				encode.setAudioConfig(audio);

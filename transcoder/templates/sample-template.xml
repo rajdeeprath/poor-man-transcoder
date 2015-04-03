@@ -11,9 +11,10 @@
 				<Name>Stream 2 Stream</Name>
 				<StreamName>${SourceApplication}/mp4:${SourceStreamName}_source</StreamName>				
 				<Video>
-					<!-- Any supported codec, Copy, Disable -->
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
 					<Codec>Copy</Codec>
-					<Implementation>Default</Implementation>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation></Implementation>
 					<FrameSize>
 						<Width>320</Width>
 						<Height>240</Height>
@@ -57,9 +58,10 @@
 				</Video>
 				
 				<Audio>
-					<!-- Any supported codec, Copy, Disable -->
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
 					<Codec>Copy</Codec>
-					<Implementation>Default</Implementation>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation></Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
 					<!-- samplerate -->
 					<SampleRate>22050</SampleRate>

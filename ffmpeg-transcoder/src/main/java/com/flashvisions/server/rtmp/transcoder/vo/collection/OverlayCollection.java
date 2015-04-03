@@ -85,4 +85,10 @@ public class OverlayCollection implements IOverlayCollection,Serializable {
             return e;
 		}
 	}
+
+	@Override
+	public int getTotalOverlays() {
+		// TODO Auto-generated method stub
+		return overlayList.size();
+	}
 }
