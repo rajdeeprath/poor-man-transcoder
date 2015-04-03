@@ -7,7 +7,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 public class Codec extends PassThru implements ICodec, IMutable {
 	
 	public static enum Type {
-        COPY, DISABLE
+        PASSTHRU, DISABLE
     }
 	
 	public static enum Implementation {
@@ -38,7 +38,7 @@ public class Codec extends PassThru implements ICodec, IMutable {
 		return name;
 	}
 
-	public void setName(String name) {
+	protected void setName(String name) {
 		this.name = name;
 	}
 
@@ -71,11 +71,10 @@ public class Codec extends PassThru implements ICodec, IMutable {
 			case DISABLE:
 			this.setEnabled(false);
 			break;
-			case COPY:
+			case PASSTHRU:
 			this.setSameAsSource(true);	
 			break;
 			default:
-			this.setName(codecName);
 			valid = true;
 			break;
 		}

@@ -372,7 +372,7 @@ public class Session implements ISession {
 											/* Extra params such as filters */
 											logger.info("Setting extra video params");
 											ArrayList<IArbitaryProperty> extraVideoParams = vConfig.getExtraParams();
-											Iterator<?> itv = extraVideoParams.iterator();
+											Iterator<IArbitaryProperty> itv = extraVideoParams.iterator();
 											while(itv.hasNext()){
 												IArbitaryProperty prop = (IArbitaryProperty) itv.next();
 												cmdLine.addArgument("-"+prop.getKey());
