@@ -11,9 +11,6 @@ public interface ISession {
 	public ITranscodeConfig getTranscodeConfig();
 	public void setTranscodeConfig(ITranscodeConfig config);
 	
-	public ISessionHandler getHandler();
-	public void setHandler(ISessionHandler handler);
-	
 	public void start();
 	public boolean stop();
 	public boolean isRunning();

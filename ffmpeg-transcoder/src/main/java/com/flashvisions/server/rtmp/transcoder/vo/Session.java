@@ -1,15 +1,20 @@
 package com.flashvisions.server.rtmp.transcoder.vo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
+import com.flashvisions.server.rtmp.transcoder.handler.SessionDestroyer;
+import com.flashvisions.server.rtmp.transcoder.handler.SessionResultHandler;
+import com.flashvisions.server.rtmp.transcoder.handler.SessionOutputStream;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -29,7 +34,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayIterator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionHandler;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
@@ -41,19 +45,26 @@ public class Session implements ISession {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
-	private ProcessBuilder transcodePb = null;
-	private Process process;
-	
 	private ITranscodeConfig config;
-	private ISessionHandler handler;
 	private IMediaInput source;
+	
+	private DefaultExecutor executor;
+	private CommandLine cmdLine;
+	private SessionOutputStream outstream;
+	private SessionResultHandler resultHandler;
+	private long executonTimeout = 0;
 	
 	
 	private Session(Builder builder) 
 	{
 		this.config = builder.config;
 		this.source = builder.source;
-		this.transcodePb = builder.transcodePb;
+		this.cmdLine = builder.cmdLine;	
+		
+		
+		this.executonTimeout = builder.executonTimeout;
+		this.executor = new DefaultExecutor();
+		this.executor.setWatchdog(new ExecuteWatchdog(this.executonTimeout));
 	}
 
 	
@@ -88,29 +99,19 @@ public class Session implements ISession {
 	}
 
 	@Override
-	public ISessionHandler getHandler() {
-		// TODO Auto-generated method stub
-		return handler;
-	}
-
-	@Override
-	public void setHandler(ISessionHandler handler) {
-		// TODO Auto-generated method stub
-		this.handler = handler;
-	}
-
-	@Override
 	public void start() 
 	{
 		// TODO Auto-generated method stub
 		try 
 		{
-			process = transcodePb.start();
-			
-			if(handler != null) 
-			handler.onStart(this, process);
+			this.outstream = new SessionOutputStream();
+			this.resultHandler = new SessionResultHandler();
+			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
+			this.executor.setProcessDestroyer(new SessionDestroyer());
+			this.executor.setExitValue(0);
+			this.executor.execute(this.cmdLine, this.resultHandler);
 		} 
-		catch (IOException e) 
+		catch (Exception e) 
 		{
 			logger.info("Error starting process " + e.getMessage());
 		}
@@ -121,11 +122,8 @@ public class Session implements ISession {
 	{
 		try
 		{
-			if(process != null && process.isAlive())
-			process.destroyForcibly();
-			
-			if(handler != null) 
-			handler.onStop(this, process);
+			if(isRunning())
+			executor.getWatchdog().destroyProcess();
 		}
 		catch(Exception e)
 		{
@@ -140,10 +138,7 @@ public class Session implements ISession {
 	@Override
 	public boolean isRunning() 
 	{
-		if(process != null && process.isAlive())
-		return true;
-		else
-		return false;	
+		return (this.outstream == null)?false:this.outstream.isRunning();
 	}
 
 	
@@ -154,7 +149,10 @@ public class Session implements ISession {
 		private ITranscodeConfig config;
 		private IMediaInput source;
 		private ISession session;		
-		private ProcessBuilder transcodePb;
+		
+		private CommandLine cmdLine;
+		private long executonTimeout = 15000;
+		
 		
 		public static Builder newSession(){
 			return new Builder();
@@ -172,15 +170,12 @@ public class Session implements ISession {
 		
 		public ISession build() throws MalformedTranscodeQueryException{
 			
-			this.session = new Session(this);
-			this.session.setInputSource(this.source);
-			this.session.setTranscodeConfig(this.config);
-			this.buildExecutableCommand(this.source, this.config);
-			
+			this.cmdLine = buildExecutableCommand(this.source, this.config);
+			this.session = new Session(this);						
 			return this.session;
 		}
 		
-		protected void buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
+		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
@@ -549,11 +544,21 @@ public class Session implements ISession {
 						
 						cmdLine.setSubstitutionMap(replacementMap);
 					}
+					
+					return cmdLine;
 			}
 			catch(Exception e)
 			{
 				throw new MalformedTranscodeQueryException(e);
 			}
+		}
+
+		public long getExecutonTimeout() {
+			return executonTimeout;
+		}
+
+		public void setExecutonTimeout(long executonTimeout) {
+			this.executonTimeout = executonTimeout;
 		}
 	}
 }
