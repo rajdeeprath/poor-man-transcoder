@@ -385,9 +385,9 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				IAudio audio = new Audio();
 				
 				String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
-				String encodeNodeAudioCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
+				String encodeNodeAudioCodec = this.xpath.compile(encodeNodeAudioCodecExpression).evaluate(this.document);
 				String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
-				String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
+				String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(this.document);
 				audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
 				
 				
@@ -414,7 +414,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				/* Use set channel type or else follow from source */
 				String encodeNodeAudioChannelTypeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Channels";
 				String encodeNodeAudioChannelType = this.xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(this.document);
-				if(encodeNodeAudioChannelType != null && encodeNodeAudioChannelType == "mono" || encodeNodeAudioChannelType == "stereo"){
+				if(encodeNodeAudioChannelType != null){
 				audio.setChannel(new AudioChannel(encodeNodeAudioChannelType));
 				}else{
 				audio.setChannel(new AudioChannel(true));

@@ -12,7 +12,7 @@
 				<StreamName>${SourceApplication}/mp4:${SourceStreamName}_source</StreamName>				
 				<Video>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
+					<Codec>Disable</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation></Implementation>
 					<FrameSize>

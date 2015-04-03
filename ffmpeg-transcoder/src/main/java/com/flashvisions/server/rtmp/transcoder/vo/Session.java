@@ -201,21 +201,30 @@ public class Session implements ISession {
 							logger.info("Parsing encode configuration");
 							IEncode encode = iterator.next();
 							
-							
-							if(encode.getEnabled())
+							try
 							{
+								if(!encode.getEnabled())
+								throw new Exception("Video configuration disabled");	
+							
 								IVideo vConfig = encode.getVideoConfig();
 								IAudio aConfig = encode.getAudioConfig();
 								ArrayList<IFlag> outFlags = encode.getOutputflags();
 								IMediaOutput output = encode.getOutput();
 								
-								if(vConfig.getEnabled())
+								try
 								{
 									logger.info("Parsing video settings for encode");
-									ICodec vcodec = vConfig.getCodec();
 									
-									if(vcodec.getEnabled())
+									if(!vConfig.getEnabled())
+									throw new Exception("Video configuration disabled");
+																	
+									try
 									{
+										ICodec vcodec = vConfig.getCodec();
+										
+										if(!vcodec.getEnabled())
+										throw new Exception("Video codec disabled");
+									
 										if(vcodec.getSameAsSource())
 										{
 											// pass thru -> use same as source
@@ -360,7 +369,6 @@ public class Session implements ISession {
 											}
 											
 											
-											
 											/* Extra params such as filters */
 											logger.info("Setting extra video params");
 											ArrayList<IArbitaryProperty> extraVideoParams = vConfig.getExtraParams();
@@ -373,13 +381,14 @@ public class Session implements ISession {
 											
 										}
 									}
-									else
+									catch(Exception e)
 									{
-										cmdLine.addArgument("-vn");
+										throw(e); 
 									}
 								}
-								else
+								catch(Exception e)
 								{
+									logger.info("Condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
 									cmdLine.addArgument("-vn");
 								}
 								
@@ -389,13 +398,20 @@ public class Session implements ISession {
 								/************************************************
 								 ********** Audio configurations ****************
 								 ************************************************/
-								if(aConfig.getEnabled())
+								try
 								{
-									logger.info("Parsing audio settings for encode");
-									ICodec acodec = aConfig.getCodec();
+									if(!aConfig.getEnabled())
+									throw new Exception("Audio configuration disabled");
 									
-									if(acodec.getEnabled())
+									logger.info("Parsing audio settings for encode");
+									
+									try
 									{
+										ICodec acodec = aConfig.getCodec();
+										
+										if(!acodec.getEnabled())
+										throw new Exception("Audio codec disabled");
+									
 										if(acodec.getSameAsSource())
 										{
 											// pass thru -> use same as source
@@ -465,15 +481,17 @@ public class Session implements ISession {
 											}
 										}
 									}
-									else
+									catch(Exception e)
 									{
-										cmdLine.addArgument("-an");
+										throw(e);
 									}
 								}
-								else
+								catch(Exception e)
 								{
+									logger.info("Condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
 									cmdLine.addArgument("-an");
 								}
+								
 								
 								
 								
@@ -508,6 +526,10 @@ public class Session implements ISession {
 									
 									cmdLine.addArgument(destination.getSourcePath());
 								}
+							}
+							catch(Exception e)
+							{
+								logger.info("Disabled encode configuration. Skipping...");
 							}
 						}
 						
