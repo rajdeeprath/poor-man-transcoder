@@ -10,7 +10,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class TranscodeConfig extends Mutable implements ITranscodeConfig, Serializable  {
+public class Transcode extends Mutable implements ITranscodeConfig, Serializable  {
  
 	/**
 	 * 
@@ -58,7 +58,7 @@ public class TranscodeConfig extends Mutable implements ITranscodeConfig, Serial
 		ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         ByteArrayOutputStream bos = null;
-        TranscodeConfig clone = null;
+        Transcode clone = null;
         
         try
         {
@@ -68,7 +68,7 @@ public class TranscodeConfig extends Mutable implements ITranscodeConfig, Serial
 	        oos.flush();               
 	        ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray()); 
 	        ois = new ObjectInputStream(bin);
-	        clone = (TranscodeConfig) ois.readObject(); 
+	        clone = (Transcode) ois.readObject(); 
         }
         catch(Exception e)
         {

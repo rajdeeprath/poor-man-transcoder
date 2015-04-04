@@ -24,10 +24,7 @@ public class VideoCodec extends Codec implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public VideoCodec(String name, Codec.Implementation implementation){
-		super(name, implementation);
-	}
-	
+
 	public VideoCodec(String name, String implementation){
 		super(name, implementation);
 	}

@@ -24,14 +24,9 @@ public class Codec extends PassThru implements ICodec, IMutable {
 		this.name = name;
 	}
 	
-	public Codec(String name, Implementation implementation){
-		if(validateCodec(name))	this.name = name;
-		this.implementation = implementation;
-	}
-	
 	public Codec(String name, String implementation){
 		if(validateCodec(name)) this.name = name;
-		// to do validate implementation string
+		validateImplementation(implementation); 
 	}
 
 	public String getName() {
@@ -82,10 +77,8 @@ public class Codec extends PassThru implements ICodec, IMutable {
 		return valid;
 	}
 	
-	protected boolean validateImplementation(String implementation)
+	protected void validateImplementation(String implementation)
 	{
-		boolean valid = false;
-		
 		switch(Implementation.valueOf(implementation.toUpperCase()))
 		{
 			case VERY:
@@ -106,10 +99,9 @@ public class Codec extends PassThru implements ICodec, IMutable {
 			
 			case NORMAL:
 			default:
+			setImplementation(Implementation.NORMAL);
 			break;
 		}
-		
-		return valid;
 	}	
 
 }

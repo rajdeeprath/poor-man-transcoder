@@ -1,7 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 
-public interface ISession {
+public interface ISession extends IDisposable {
 
 	public int getIdentifier();
 	

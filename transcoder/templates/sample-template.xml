@@ -11,10 +11,10 @@
 				<Name>Stream 2 Stream</Name>
 				<StreamName>${SourceApplication}/mp4:${SourceStreamName}_source</StreamName>				
 				<Video>
-					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Disable</Codec>
+					<!-- Any supported codec, PassThru, Disable, {codecname} -->
+					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation></Implementation>
+					<Implementation>normal</Implementation>
 					<FrameSize>
 						<Width>320</Width>
 						<Height>240</Height>
@@ -31,37 +31,37 @@
 						<IntervalMin>48</IntervalMin>
 					</KeyFrameInterval>
 					<Overlays>
+						<!--
 						<Overlay>
 							<Enable>false</Enable>
 							<Name>Brand Logo</Name>
 							<Index>0</Index>
 							<ImagePath>C:\\Users\\Rajdeep\\Documents\\GitHub\\rajdeep\\ffmpeg-transcoder\\transcoder\\images\\logo.png</ImagePath>
-							<!-- 0 - 100 -->
 							<Opacity>100</Opacity>
 							<Location>
 								<X>4</X>
 								<Y>4</Y>
 								<Width>${ImageWidth}</Width>
 								<Height>${ImageHeight}</Height>
-								<!-- TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERTOP,  CENTERBOTTOM, CENTERMIDDLE -->
 								<Align>TOPRIGHT</Align>
 							</Location>
 						</Overlay>
+						-->
 					</Overlays>
 					<!-- Extra params such as filters -->
 					<Parameters>
 						<Param>
-							<Key></Key>
-							<Value></Value>
+							<Key>profile:v</Key>
+							<Value>high</Value>
 						</Param>
 					</Parameters>
 				</Video>
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
+					<Codec>PassThru</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation></Implementation>
+					<Implementation>normal</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
 					<!-- samplerate -->
 					<SampleRate>22050</SampleRate>

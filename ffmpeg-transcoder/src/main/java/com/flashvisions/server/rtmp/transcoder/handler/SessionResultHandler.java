@@ -6,16 +6,23 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
+
 public class SessionResultHandler extends DefaultExecuteResultHandler {
 
 	private static Logger logger = LoggerFactory.getLogger(SessionResultHandler.class);
 	private ExecuteWatchdog watchdog;
+	private ISession session;
 	
-	
-	public SessionResultHandler(ExecuteWatchdog watchdog){
-		this.watchdog = watchdog;
+	public SessionResultHandler(ExecuteWatchdog watchdog, ISession session){
+		this.setWatchdog(watchdog);
+		this.setSession(session);
 	}
 	
+	private void setWatchdog(ExecuteWatchdog watchdog) {
+		this.watchdog = watchdog;
+	}
+
 	@Override
 	public ExecuteException getException() {
 		// TODO Auto-generated method stub
@@ -50,10 +57,22 @@ public class SessionResultHandler extends DefaultExecuteResultHandler {
 		logger.error("Process timed out");
 		else
 		logger.error("Process failed : " + e.getMessage());
+		
+		// destroy parent session
+		this.session.dispose();
+		this.session = null;
 	}
-
+	
 	public ExecuteWatchdog getWatchdog() {
 		return watchdog;
+	}
+
+	public ISession getSession() {
+		return session;
+	}
+
+	public void setSession(ISession session) {
+		this.session = session;
 	}
 
 }

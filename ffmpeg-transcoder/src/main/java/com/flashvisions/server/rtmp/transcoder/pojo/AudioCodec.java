@@ -24,10 +24,7 @@ public class AudioCodec extends Codec implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public AudioCodec(String name, Codec.Implementation implementation){
-		super(name, implementation);
-	}
-	
+
 	public AudioCodec(String name, String implementation){
 		super(name, implementation);
 	}

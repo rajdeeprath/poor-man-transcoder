@@ -62,11 +62,11 @@ public class Session implements ISession {
 		this.source = builder.source;
 		this.cmdLine = builder.cmdLine;	
 		
-		
 		this.executonTimeout = builder.executonTimeout;
 		this.executor = new DefaultExecutor();
 		this.watchdog = new ExecuteWatchdog(this.executonTimeout);
 		
+		logger.info("Session ready for execution");
 	}
 
 	
@@ -108,10 +108,10 @@ public class Session implements ISession {
 		{
 			
 			this.outstream = new SessionOutputStream();
-			this.resultHandler = new SessionResultHandler(this.watchdog);
+			this.resultHandler = new SessionResultHandler(this.watchdog, this);
 			
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
-			this.executor.setProcessDestroyer(new SessionDestroyer());
+			this.executor.setProcessDestroyer(new SessionDestroyer(this));
 			this.executor.setWatchdog(this.watchdog);
 			this.executor.setExitValue(0);
 			
@@ -145,6 +145,40 @@ public class Session implements ISession {
 	public boolean isRunning() 
 	{
 		return (this.outstream == null)?false:this.outstream.isRunning();
+	}
+	
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		logger.info("Destroying session");
+		
+		try{watchdog.stop();}
+		catch(Exception e1){	}
+		finally{watchdog = null;}
+		
+		try{outstream.close();}
+		catch(Exception e2){}
+		finally{outstream = null;}
+	
+		try{resultHandler = null;}
+		catch(Exception e3){}
+		finally{}
+		
+		try{cmdLine = null;}
+		catch(Exception e3){}
+		finally{}
+		
+		try{executor = null;}
+		catch(Exception e4){}
+		finally{}
+		
+		try{source = null;}
+		catch(Exception e5){}
+		finally{}
+		
+		try{config = null;}
+		catch(Exception e6){}
+		finally{}
 	}
 
 	
@@ -185,16 +219,25 @@ public class Session implements ISession {
 			
 			logger.info("Building transcoder command");
 			
+			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
 			
-			replacementMap.put("ffmpegExecutable", "ffmpeg.exe");			
+			replacementMap.put("ffmpegExecutable", TranscoderSystem.getEnv(TranscoderSystem.Vars.FFMPEG_EXECUTABLE_PATH));	
+			replacementMap.put("inputSource", source.getSourcePath());
 			
 			try
-			{			
-			
+			{
+				
 					if(config.getEnabled())
 					{
+						
+						{
+							logger.info("Setting input source");
+							cmdLine.addArgument("-i");
+							cmdLine.addArgument("${inputSource}");
+						}
+						
 						IEncodeCollection outputs = config.getEncodes();
 						IEncodeIterator iterator = outputs.iterator();
 						
@@ -433,8 +476,9 @@ public class Session implements ISession {
 											cmdLine.addArgument("-codec:a");
 											cmdLine.addArgument(acodec.getName());
 											
+											
 											logger.info("Setting codec implementation");
-											if(acodec.getImplementation() != Codec.Implementation.NORMAL){
+											if(acodec.getImplementation() != null && acodec.getImplementation() != Codec.Implementation.NORMAL){
 											cmdLine.addArgument("-strict");
 											cmdLine.addArgument(acodec.getImplementation().name().toLowerCase());
 											}
@@ -533,9 +577,7 @@ public class Session implements ISession {
 											+ destination.getContainer()
 											+ " "
 											+ "Destination :" + destination.getSourcePath());
-									
-									cmdLine.addArgument("-y");
-									
+																		
 									cmdLine.addArgument("-f");
 									cmdLine.addArgument(destination.getContainer());
 									
@@ -567,4 +609,7 @@ public class Session implements ISession {
 			this.executonTimeout = executonTimeout;
 		}
 	}
+
+
+	
 }

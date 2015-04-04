@@ -60,7 +60,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.VideoCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
 import com.flashvisions.server.rtmp.transcoder.vo.Audio;
 import com.flashvisions.server.rtmp.transcoder.vo.Encode;
-import com.flashvisions.server.rtmp.transcoder.vo.TranscodeConfig;
+import com.flashvisions.server.rtmp.transcoder.vo.Transcode;
 import com.flashvisions.server.rtmp.transcoder.vo.Video;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
@@ -107,7 +107,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 		try
 		{
 			logger.debug("preparing new transcode session");
-			session = new TranscodeConfig();
+			session = new Transcode();
 			
 			this.templateFile = new File(this.templatePath);
 			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
