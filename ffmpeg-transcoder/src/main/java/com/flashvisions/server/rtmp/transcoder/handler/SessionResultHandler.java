@@ -59,8 +59,8 @@ public class SessionResultHandler extends DefaultExecuteResultHandler {
 		logger.error("Process failed : " + e.getMessage());
 		
 		// destroy parent session
-		this.session.dispose();
-		this.session = null;
+		//this.session.dispose();
+		//this.session = null;
 	}
 	
 	public ExecuteWatchdog getWatchdog() {

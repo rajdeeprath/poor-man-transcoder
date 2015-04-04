@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
 
 public interface IMediaOutput {
-	public String getContainer();
-	public void setContainer(String container);
+	public IContainer getContainer();
+	public void setContainer(IContainer container);
 	public String getSourcePath();
 	public void setSourcePath(String source);
 	public String getProtocol();

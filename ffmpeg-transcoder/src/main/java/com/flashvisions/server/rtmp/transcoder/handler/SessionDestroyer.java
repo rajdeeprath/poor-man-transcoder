@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.handler;
 
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 
 public class SessionDestroyer extends ShutdownHookProcessDestroyer {
@@ -20,6 +20,7 @@ public class SessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean add(Process process) {
 		// TODO Auto-generated method stub
 		logger.info("adding process " + process);
+		this.session.setProcess(process);
 		return super.add(process);
 	}
 
@@ -33,6 +34,7 @@ public class SessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean remove(Process process) {
 		// TODO Auto-generated method stub
 		logger.info("removing process " + process.toString());
+		this.session.setProcess(null);
 		return super.remove(process);
 	}
 

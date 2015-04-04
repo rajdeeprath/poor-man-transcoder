@@ -454,7 +454,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				
 				/****************** look for output flags ****************/
-				String outputFlagsExpression = "/Template/Transcode/Output/Flags/RawFlag";
+				String outputFlagsExpression = "/Template/Transcode/Properties/Property";
 				NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
 				ArrayList<IFlag> outputflags = new ArrayList<IFlag>(); 
 				for(int l=0;l<outputflagNodes.getLength();l++){

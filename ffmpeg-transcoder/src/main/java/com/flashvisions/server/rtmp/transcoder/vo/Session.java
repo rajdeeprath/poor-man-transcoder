@@ -55,6 +55,8 @@ public class Session implements ISession {
 	private long executonTimeout = 0;
 	private ExecuteWatchdog watchdog;
 	
+	private Process proc;
+	
 	
 	private Session(Builder builder) 
 	{
@@ -182,6 +184,16 @@ public class Session implements ISession {
 	}
 
 	
+	public Process getProcess() {
+		return proc;
+	}
+
+
+	public void setProcess(Process proc) {
+		this.proc = proc;
+	}
+
+
 	/***************** Session Builder *********************/
 	
 	public static class Builder {
@@ -579,7 +591,7 @@ public class Session implements ISession {
 											+ "Destination :" + destination.getSourcePath());
 																		
 									cmdLine.addArgument("-f");
-									cmdLine.addArgument(destination.getContainer());
+									cmdLine.addArgument(destination.getContainer().getName());
 									
 									cmdLine.addArgument(destination.getSourcePath());
 								}

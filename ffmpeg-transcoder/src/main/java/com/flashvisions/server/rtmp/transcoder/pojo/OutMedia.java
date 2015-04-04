@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 
 public class OutMedia implements IMediaOutput {
@@ -13,7 +14,7 @@ public class OutMedia implements IMediaOutput {
 	private String streamName;
 	private String protocol;
 	private String source;
-	private String container;
+	private IContainer container;
 	private ArrayList<Flag> outputFlags;
 	
 	
@@ -27,13 +28,13 @@ public class OutMedia implements IMediaOutput {
 	}
 	
 	@Override
-	public String getContainer() {
+	public IContainer getContainer() {
 		// TODO Auto-generated method stub
 		return container;
 	}
 
 	@Override
-	public void setContainer(String container) {
+	public void setContainer(IContainer container) {
 		// TODO Auto-generated method stub
 		this.container = container;
 	}
@@ -111,22 +112,23 @@ public class OutMedia implements IMediaOutput {
 				case RTMPE:
 				case RTMPS:
 				case RTMPT:
-					setContainer(String.valueOf(Container.SCHEMES.FLV).toLowerCase());
+					setContainer(new Container(String.valueOf(Container.Type.FLV)));
 					break;
 					
 				case RTP:
-					setContainer(String.valueOf(Container.SCHEMES.RTP).toLowerCase());
+					setContainer(new Container(String.valueOf(Container.Type.RTP)));
 					break;
 					
 				case RTSP:
-					setContainer(String.valueOf(Container.SCHEMES.RTSP).toLowerCase());
+					setContainer(new Container(String.valueOf(Container.Type.RTSP)));
 					break;
 					
 				default:
 					if(this.streamName.toLowerCase().contains("m3u8"))
-					setContainer(String.valueOf(Container.SCHEMES.SEGMENT).toLowerCase());
+					setContainer(new Container(String.valueOf(Container.Type.SEGMENT)));
 					break;
-			
+					
+				/* Need to add mp4 support */
 			}
 			
 		} 

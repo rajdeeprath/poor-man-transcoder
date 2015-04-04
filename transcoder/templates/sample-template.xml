@@ -76,13 +76,11 @@
 					</Parameters>
 				</Audio>
 				
-				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->
-				<Output>
-					<Container>auto</Container>
-					<Flags>
-						<!--<RawFlag></RawFlag>-->
-					</Flags>
-				</Output>				
+				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
+				
+				<Properties>
+					<!--<Property></Property>-->
+				</Properties>
 				
 			</Encode>
 		</Encodes>
