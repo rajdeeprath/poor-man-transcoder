@@ -21,11 +21,11 @@ public class TranscodeConfigurationFactory implements Cloneable {
 		return daoFactory;
 	}
 
-	public void setDaoFactory(AbstractDAOFactory daoFactory) {
+	public void setDaoSupplier(AbstractDAOFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 	
-	public ITranscodeConfig getTranscodeSession(String templateName) throws CloneNotSupportedException
+	public ITranscodeConfig getTranscodeConfiguration(String templateName) throws CloneNotSupportedException
 	{
 		ITranscodeConfig config;
 		

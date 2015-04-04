@@ -14,7 +14,7 @@ import org.w3c.dom.NodeList;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-import com.flashvisions.server.rtmp.transcoder.vo.TranscoderSystem;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
 public class TemplateParseHelper {
 	
@@ -26,8 +26,8 @@ public class TemplateParseHelper {
     	VARIABLEMAP.put("${ImageHeight}", "ImageHeight");
     	VARIABLEMAP.put("${SourceApplication}", "SourceApplication");
     	VARIABLEMAP.put("${SourceStreamName}", "SourceStreamName");
-    	VARIABLEMAP.put("${workingDirectory}", TranscoderSystem.getEnv(TranscoderSystem.Vars.WORKING_DIRECTORY));
-    	VARIABLEMAP.put("${templateDirectory}", TranscoderSystem.getEnv(TranscoderSystem.Vars.TEMPLATE_DIRECTORY));
+    	VARIABLEMAP.put("${workingDirectory}", Globals.getEnv(Globals.Vars.WORKING_DIRECTORY));
+    	VARIABLEMAP.put("${templateDirectory}", Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY));
     }
 	
 

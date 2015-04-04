@@ -11,6 +11,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.data.dao.LibRtmpConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionResultHandler;
@@ -28,6 +29,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
@@ -39,6 +41,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Overlay.Location.ALIGNMENT;
+import com.flashvisions.server.rtmp.transcoder.server.Server;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class Session implements ISession {
@@ -69,6 +73,7 @@ public class Session implements ISession {
 		this.watchdog = new ExecuteWatchdog(this.executonTimeout);
 		
 		logger.info("Session ready for execution");
+		logger.info(cmdLine.toString());	
 	}
 
 	
@@ -85,21 +90,9 @@ public class Session implements ISession {
 	}
 
 	@Override
-	public void setInputSource(IMediaInput source) {
-		// TODO Auto-generated method stub
-		this.source = source;
-	}
-
-	@Override
 	public ITranscodeConfig getTranscodeConfig() {
 		// TODO Auto-generated method stub
 		return config;
-	}
-
-	@Override
-	public void setTranscodeConfig(ITranscodeConfig config) {
-		// TODO Auto-generated method stub
-		this.config = config;
 	}
 
 	@Override
@@ -200,10 +193,12 @@ public class Session implements ISession {
 		
 		private ITranscodeConfig config;
 		private IMediaInput source;
-		private ISession session;		
+		private ISession session;	
+		private ILibRtmpConfig librtmpConfig;
 		
 		private CommandLine cmdLine;
 		private long executonTimeout = 15000;
+		private Server serverType;
 		
 		
 		public static Builder newSession(){
@@ -220,11 +215,43 @@ public class Session implements ISession {
 			return this;
 		}
 		
+		public Builder forServer(String rtmpserver){
+			switch(Server.valueOf(rtmpserver.toUpperCase()))
+			{
+				case RED5:
+				serverType = Server.RED5;
+				break;
+				
+				case WOWZA:
+				serverType = Server.WOWZA;
+				break;
+			
+			}
+			return this;
+		}
+		
+		public Builder usingLibRtmpConfig(ILibRtmpConfig librtmpConfig){
+			this.librtmpConfig = librtmpConfig;
+			return this;
+		}
+		
 		public ISession build() throws MalformedTranscodeQueryException{
 			
 			this.cmdLine = buildExecutableCommand(this.source, this.config);
 			this.session = new Session(this);						
 			return this.session;
+		}
+		
+		private String buildLibRtmpString(ILibRtmpConfig librtmpConfig)
+		{
+			return librtmpConfig.toString();
+		}
+		
+		private ILibRtmpConfig buildLibRtmpConfigurion(IMediaInput input, Server serverType)
+		{
+			ILibRtmpConfig configuration = LibRtmpConfigurationFactory.getLibRtmpConfiguration(serverType);
+			configuration.parseRtmp(input);
+			return configuration;
 		}
 		
 		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
@@ -235,15 +262,22 @@ public class Session implements ISession {
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
 			
-			replacementMap.put("ffmpegExecutable", TranscoderSystem.getEnv(TranscoderSystem.Vars.FFMPEG_EXECUTABLE_PATH));	
-			replacementMap.put("inputSource", source.getSourcePath());
+			replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));	
+			
 			
 			try
 			{
+					
+					/* Building librtmp params string */
+					{
+						ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
+						String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
+						replacementMap.put("inputSource", libRtmpParamString);
+					}
+					
 				
 					if(config.getEnabled())
 					{
-						
 						{
 							logger.info("Setting input source");
 							cmdLine.addArgument("-i");
