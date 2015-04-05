@@ -1,18 +1,32 @@
 package com.flashvisions.server.rtmp.transcoder.facade;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
+import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
+import com.flashvisions.server.rtmp.transcoder.system.Server;
+import com.flashvisions.server.rtmp.transcoder.utils.TranscoderUtils;
 
 public final class TranscoderFacade implements ITranscoderFacade {
 
+	private static Logger logger = LoggerFactory.getLogger(TranscoderFacade.class);
+	
 	private String ffmpegPath;
 	private String homeDirectoryPath;
 	private String workingDirectoryPath;
-	private String serverName;
+	private String server;
 	
+	private TranscodeSessionPool pool;
 	private static volatile ITranscoderFacade instance;
 	
 	
@@ -37,9 +51,40 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	
 
 	@Override
-	public void init() {
+	public void init() throws TranscoderException {
 		// TODO Auto-generated method stub
-		
+		try
+		{
+			if(ffmpegPath.equals(null))
+			throw new IOException("Please specify ffmpeg executable path");
+			logger.info("FFmpeg path : " + ffmpegPath);
+			
+			File home = new File(homeDirectoryPath);
+			if(!home.exists()) throw new IOException("Please specify media server home");
+			logger.info("Home directory : " + home.getAbsolutePath());
+			
+			
+			File working = new File(workingDirectoryPath);
+			if(!working.exists()){
+				workingDirectoryPath = home.getAbsolutePath();
+				working  = new File(workingDirectoryPath);
+			}
+			logger.info("Working directory : " + working.getAbsolutePath());
+			
+			
+			if(!TranscoderUtils.isValidMediaServer(server)) throw new IllegalArgumentException("Invlaid server type");
+			logger.info("Target server platform : " + server);
+			
+			logger.info("Preparing session pool");
+			pool = new TranscodeSessionPool(Server.valueOf(server.toUpperCase()));
+			
+			logger.info("Transcoder ready");
+		}
+		catch(Exception e)
+		{
+			logger.error("Transcoder initialization failed " + e.getMessage());
+			throw new TranscoderException(e);
+		}
 	}
 
 	@Override
@@ -56,16 +101,16 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	}
 
 	@Override
-	public void setOperatingServer(String serverName) {
+	public void setOperatingMediaServer(String serverName) {
 		// TODO Auto-generated method stub
-		this.serverName = serverName;
-		Globals.addEnv(Globals.Vars.OPERATING_SERVER, this.serverName);
+		this.server = serverName;
+		Globals.addEnv(Globals.Vars.OPERATING_SERVER, this.server);
 	}
 
 	@Override
-	public String getOperatingServer() {
+	public String getOperatingMediaServer() {
 		// TODO Auto-generated method stub
-		return serverName;
+		return server;
 	}
 
 	@Override
@@ -95,60 +140,38 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	}
 
 	@Override
-	public Object doTranscode(IMediaInput input, String usingTemplate) {
+	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException {
+		// TODO Auto-generated method stub
+		ISession session = pool.checkOut(input, usingTemplate);
+		session.start();
+		
+		return session.getSignature();
+	}
+
+	@Override
+	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig) throws TranscoderException {
+		// TODO Auto-generated method stub
+		ISession session = pool.checkOut(input, usingTemplate);
+		session.start();
+		
+		return session.getSignature();
+	}
+
+	@Override
+	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public Object doTranscode(IMediaInput input, String usingTemplate,
-			ILibRtmpConfig librtmpConfig) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode,
-			ILibRtmpConfig librtmpConfig) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void abortTranscode(IMediaInput input, String usingTemplate) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void abortTranscode(IMediaInput input, String usingTemplate,
-			ILibRtmpConfig librtmpConfig) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void abortTranscode(IMediaInput input, ITranscodeConfig transcode,
-			ILibRtmpConfig librtmpConfig) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void abortTranscode(long sessionId) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void abortTranscode(String sessionSignature) {
 		// TODO Auto-generated method stub
-		
-	}	
+		pool.checkIn(pool.getSession(sessionSignature));
+	}
 }
-
-class SingletonEnforcer{
-	
-}
-
-

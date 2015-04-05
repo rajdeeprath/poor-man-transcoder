@@ -1,14 +1,16 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
+import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
+
 public interface ITranscoderFacade {
 
-	public void init();
+	public void init() throws TranscoderException;
 	
 	public void setFFmpegPath(String ffmpegPath);
 	public String getFFmpegPath();
 	
-	public void setOperatingServer(String serverName);
-	public String getOperatingServer();
+	public void setOperatingMediaServer(String serverName);
+	public String getOperatingMediaServer();
 	
 	public void setWorkingDirectory(String workingDirectoryPath);
 	public String getWorkingDirectory();
@@ -16,13 +18,10 @@ public interface ITranscoderFacade {
 	public void setHomeDirectory(String homeDirectoryPath);
 	public String getHomeDirectory();
 	
-	public Object doTranscode(IMediaInput input, String usingTemplate);
-	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig);
-	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig);
+	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException;
+	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
+	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
 		
-	public void abortTranscode(IMediaInput input, String usingTemplate);
-	public void abortTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig);
-	public void abortTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig);
-	public void abortTranscode(long sessionId);
-	public void abortTranscode(String sessionSignature);
+	public void abortTranscode(long sessionId) throws TranscoderException;;
+	public void abortTranscode(String sessionSignature) throws TranscoderException;;
 }
