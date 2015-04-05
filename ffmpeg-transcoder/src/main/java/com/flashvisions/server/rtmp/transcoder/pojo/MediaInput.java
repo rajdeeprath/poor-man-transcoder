@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 
-public class InMedia implements IMediaInput, Serializable {
+public class MediaInput implements IMediaInput, Serializable {
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ public class InMedia implements IMediaInput, Serializable {
 	private String container;
 	private ArrayList<IProperty> inputFlags;
 	
-	public InMedia(String source){
+	public MediaInput(String source){
 		setSourcePath(source);
 	}
 	

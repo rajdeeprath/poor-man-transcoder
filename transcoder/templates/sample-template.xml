@@ -32,7 +32,7 @@
 					</KeyFrameInterval>
 					<Overlays>
 						<!-- only one supported for now -->
-						<Overlay>
+						<!--<Overlay>
 							<Enable>false</Enable>
 							<Name>Brand Logo</Name>
 							<Index>0</Index>
@@ -46,6 +46,7 @@
 								<Align>TOPRIGHT</Align>
 							</Location>
 						</Overlay>
+						-->
 					</Overlays>
 					<!-- Extra params such as filters -->
 					<Parameters>

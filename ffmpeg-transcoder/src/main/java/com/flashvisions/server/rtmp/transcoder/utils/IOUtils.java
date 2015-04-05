@@ -2,10 +2,11 @@ package com.flashvisions.server.rtmp.transcoder.utils;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.OutMedia;
+import com.flashvisions.server.rtmp.transcoder.pojo.MediaOutput;
 
 public class IOUtils {
 
+	
 	public static IMediaOutput createOutputFromInput(IMediaInput in, IMediaOutput out){
 		
 		String insource = in.getSourcePath();
@@ -16,7 +17,7 @@ public class IOUtils {
 		outsource = outsource.replace("SourceApplication", inapp);
 		outsource = outsource.replace("SourceStreamName", streamname);
 		
-		return new OutMedia(outsource);
+		return new MediaOutput(outsource);
 	}
 	
 	

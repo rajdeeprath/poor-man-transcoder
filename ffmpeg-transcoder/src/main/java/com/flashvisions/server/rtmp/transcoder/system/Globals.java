@@ -10,6 +10,7 @@ public final class Globals {
 		public static final String OPERATING_SERVER = "operatingServer";
 		public static final String HOME_DIRECTORY = "homeDirectory";
 		public static final String WORKING_DIRECTORY = "workingDirectory";
+		public static final String TEMPLATE_DIRECTORY = "templateDirectory";
 	}
 	
 	private static Map<String, String> envMap;

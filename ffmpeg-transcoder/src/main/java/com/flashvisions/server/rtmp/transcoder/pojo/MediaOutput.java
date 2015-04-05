@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 
-public class OutMedia implements IMediaOutput, Serializable {
+public class MediaOutput implements IMediaOutput, Serializable {
 
 	/**
 	 * 
@@ -24,11 +24,11 @@ public class OutMedia implements IMediaOutput, Serializable {
 	private ArrayList<Property> outputFlags;
 	
 	
-	public OutMedia(String source){
+	public MediaOutput(String source){
 		setSourcePath(source);
 	}
 	
-	public OutMedia(String source, boolean isTemplate){
+	public MediaOutput(String source, boolean isTemplate){
 		this.isTemplate = isTemplate ;
 		setSourcePath(source);
 	}

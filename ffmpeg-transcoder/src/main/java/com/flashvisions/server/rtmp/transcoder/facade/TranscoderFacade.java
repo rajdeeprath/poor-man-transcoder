@@ -24,6 +24,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	private String ffmpegPath;
 	private String homeDirectoryPath;
 	private String workingDirectoryPath;
+	private String templateDirectoryPath;
 	private String server;
 	
 	private TranscodeSessionPool pool;
@@ -62,6 +63,11 @@ public final class TranscoderFacade implements ITranscoderFacade {
 			File home = new File(homeDirectoryPath);
 			if(!home.exists()) throw new IOException("Please specify media server home");
 			logger.info("Home directory : " + home.getAbsolutePath());
+			
+			
+			File templatesHome = new File(templateDirectoryPath);
+			if(!templatesHome.exists()) throw new IOException("Please specify transcoder templates directory");
+			logger.info("Template directory : " + templatesHome.getAbsolutePath());
 			
 			
 			File working = new File(workingDirectoryPath);
@@ -125,6 +131,20 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		// TODO Auto-generated method stub
 		return workingDirectoryPath;
 	}
+	
+	@Override
+	public void setTemplateDirectory(String templateDirectoryPath) {
+		// TODO Auto-generated method stub
+		this.templateDirectoryPath = templateDirectoryPath;
+		Globals.addEnv(Globals.Vars.TEMPLATE_DIRECTORY, this.templateDirectoryPath);
+	}
+
+
+	@Override
+	public String getTemplateDirectory() {
+		// TODO Auto-generated method stub
+		return templateDirectoryPath;
+	}
 
 	@Override
 	public void setHomeDirectory(String homeDirectoryPath) {
@@ -145,7 +165,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		ISession session = pool.checkOut(input, usingTemplate);
 		session.start();
 		
-		return session.getSignature();
+		return null;
 	}
 
 	@Override
@@ -174,4 +194,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		// TODO Auto-generated method stub
 		pool.checkIn(pool.getSession(sessionSignature));
 	}
+
+
+	
 }

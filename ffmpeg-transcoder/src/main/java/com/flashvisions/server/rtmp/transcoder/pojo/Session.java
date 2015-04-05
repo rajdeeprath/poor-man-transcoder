@@ -627,10 +627,10 @@ public class Session implements ISession {
 								}
 								
 								
-								if(output.getSourcePath() != null)
+								logger.info("Processing output destination for encode");
+								
+								try
 								{
-									logger.info("Processing output destination for encode");
-									
 									IMediaOutput destination = IOUtils.createOutputFromInput(this.source, output);
 									
 									logger.info("Output destination for encode"
@@ -645,10 +645,15 @@ public class Session implements ISession {
 									
 									cmdLine.addArgument(destination.getSourcePath());
 								}
+								catch(Exception e)
+								{
+									logger.info("Error evaluating output");
+									throw(e);
+								}
 							}
 							catch(Exception e)
 							{
-								logger.info("Disabled encode configuration. Skipping...");
+								logger.info("Disabled encode configuration. {"+e.getMessage()+"} Skipping...");
 							}
 						}
 						

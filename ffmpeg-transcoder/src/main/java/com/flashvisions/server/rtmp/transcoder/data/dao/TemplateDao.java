@@ -55,7 +55,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.KeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.pojo.OutMedia;
+import com.flashvisions.server.rtmp.transcoder.pojo.MediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.Overlay;
 import com.flashvisions.server.rtmp.transcoder.pojo.Transcode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Video;
@@ -154,7 +154,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/StreamName";
 				String encodeNodeOutputName = this.xpath.compile(encodeNodeOutputNameExpression).evaluate(this.document);
-				IMediaOutput output = new OutMedia(encodeNodeOutputName, true); 
+				IMediaOutput output = new MediaOutput(encodeNodeOutputName, true); 
 				encode.setOutput(output);
 				
 				

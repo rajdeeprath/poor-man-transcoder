@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
 
-public class InFile extends InMedia implements IFileInput {
+public class FileInput extends MediaInput implements IFileInput {
 
 	/**
 	 * 
@@ -12,7 +12,7 @@ public class InFile extends InMedia implements IFileInput {
 	private static final long serialVersionUID = -9181863808562433505L;
 	File file;
 	
-	public InFile(String source) {
+	public FileInput(String source) {
 		super(source);
 		// TODO Auto-generated constructor stub
 	}
