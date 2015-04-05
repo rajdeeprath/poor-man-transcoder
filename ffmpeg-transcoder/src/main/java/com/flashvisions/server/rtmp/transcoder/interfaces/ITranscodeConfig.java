@@ -10,5 +10,5 @@ public interface ITranscodeConfig extends IMutable, Cloneable {
 	public void setDescription(String description);
 	public IEncodeCollection getEncodes();
 	public void setEncodes(IEncodeCollection encodes);
-	Object clone() throws CloneNotSupportedException;
+	public ITranscodeConfig clone();
 }

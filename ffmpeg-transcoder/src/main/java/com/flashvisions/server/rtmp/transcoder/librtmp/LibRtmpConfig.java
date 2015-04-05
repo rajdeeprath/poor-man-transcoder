@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.server;
+package com.flashvisions.server.rtmp.transcoder.librtmp;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
@@ -12,6 +12,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	private String appName;
 	private String playPath;
 	private String tcUrl;
+	private long buffer;
 	
 	
 	public int getTimeout() {
@@ -69,6 +70,14 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	public void setTcUrl(String tcUrl) {
 		this.tcUrl = tcUrl;
 	}
+	
+	public long getBuffer() {
+		return buffer;
+	}
+
+	public void setBuffer(long buffer) {
+		this.buffer = buffer;
+	}
 
 	@Override
 	public void parseRtmp(IMediaInput input) {
@@ -86,6 +95,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		this.setPlayPath(playpath);
 		this.setTcUrl(tcUrl);
 		this.setLive(true);
+		this.setBuffer(50);
 	}
 
 	@Override
@@ -93,8 +103,10 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		// TODO Auto-generated method stub
 		String fullUrl = rtmpApplication + "/" + stream; 
 		String SPACE = " ";
-		return "\"" + fullUrl + SPACE + "live=1" + SPACE + "timeout=" + getTimeout() + SPACE + "app=" + getAppName() + SPACE + "playpath=" + getPlayPath() + SPACE + "tcUrl=" + getTcUrl() + "\"";
+		return "\"" + fullUrl + SPACE + "live=1" + SPACE + "buffer=" + getBuffer() + SPACE + "timeout=" + getTimeout() + SPACE + "app=" + getAppName() + SPACE + "playpath=" + getPlayPath() + SPACE + "tcUrl=" + getTcUrl() + "\"";
 	}
+
+	
 
 	
 }

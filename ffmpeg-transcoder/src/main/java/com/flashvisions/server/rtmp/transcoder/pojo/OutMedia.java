@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -7,7 +8,12 @@ import java.util.ArrayList;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 
-public class OutMedia implements IMediaOutput {
+public class OutMedia implements IMediaOutput, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3595050843355103978L;
 
 	private boolean isTemplate;
 	
@@ -15,7 +21,7 @@ public class OutMedia implements IMediaOutput {
 	private String protocol;
 	private String source;
 	private IContainer container;
-	private ArrayList<Flag> outputFlags;
+	private ArrayList<Property> outputFlags;
 	
 	
 	public OutMedia(String source){
@@ -71,13 +77,13 @@ public class OutMedia implements IMediaOutput {
 	}
 
 	@Override
-	public ArrayList<Flag> getOutputFlags() {
+	public ArrayList<Property> getOutputFlags() {
 		// TODO Auto-generated method stub
 		return this.outputFlags;
 	}
 
 	@Override
-	public void setOutputFlags(ArrayList<Flag> outputFlags) {
+	public void setOutputFlags(ArrayList<Property> outputFlags) {
 		// TODO Auto-generated method stub
 		this.outputFlags = outputFlags;
 	}

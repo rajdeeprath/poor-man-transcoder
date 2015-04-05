@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.server;
+package com.flashvisions.server.rtmp.transcoder.librtmp;
 
 public class Red5LibRtmpConfig extends LibRtmpConfig {
 		

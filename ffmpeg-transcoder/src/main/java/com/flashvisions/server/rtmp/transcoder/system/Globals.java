@@ -7,14 +7,9 @@ public final class Globals {
 
 	public static class Vars{
 		public static final String FFMPEG_EXECUTABLE_PATH = "ffmpegExcutable";
+		public static final String OPERATING_SERVER = "operatingServer";
+		public static final String HOME_DIRECTORY = "homeDirectory";
 		public static final String WORKING_DIRECTORY = "workingDirectory";
-		public static final String TEMPLATE_DIRECTORY = "templateDirectory";
-		
-		/*
-		public static final String HLS_OUTPUT_DIRECTORY = "hlsOutDirectory";
-		public static final String FFMPEG_READ_TIMEOUT = "transcoderReadTimeout";
-		public static final String FFMPEG_START_DELAY = "transcoderStartDelay";
-		*/
 	}
 	
 	private static Map<String, String> envMap;

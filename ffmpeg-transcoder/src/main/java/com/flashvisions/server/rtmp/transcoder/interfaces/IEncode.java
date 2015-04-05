@@ -12,6 +12,6 @@ public interface IEncode extends IMutable {
 	public void setOutput(IMediaOutput output);
 	public String getName() ;
 	public void setName(String name);
-	public ArrayList<IFlag> getOutputflags();
-	public void setOutputflags(ArrayList<IFlag> outputflags);
+	public ArrayList<IProperty> getOutputflags();
+	public void setOutputflags(ArrayList<IProperty> outputflags);
 }

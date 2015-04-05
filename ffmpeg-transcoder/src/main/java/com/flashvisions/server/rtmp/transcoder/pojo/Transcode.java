@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.vo;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,7 +8,6 @@ import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
 public class Transcode extends Mutable implements ITranscodeConfig, Serializable  {
  
@@ -53,7 +52,7 @@ public class Transcode extends Mutable implements ITranscodeConfig, Serializable
 		this.encodes = encodes;
 	}	
 	
-	public Object clone() throws CloneNotSupportedException
+	public ITranscodeConfig clone()
 	{
 		ObjectOutputStream oos = null;
         ObjectInputStream ois = null;

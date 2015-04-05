@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.vo;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,9 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.data.dao.LibRtmpConfigurationFactory;
+import com.flashvisions.server.rtmp.transcoder.data.factory.AbstractDAOFactory;
+import com.flashvisions.server.rtmp.transcoder.data.factory.LibRtmpConfigurationFactory;
+import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionResultHandler;
@@ -25,7 +27,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
@@ -39,11 +41,10 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
-import com.flashvisions.server.rtmp.transcoder.pojo.Overlay.Location.ALIGNMENT;
-import com.flashvisions.server.rtmp.transcoder.server.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
+import com.flashvisions.server.rtmp.transcoder.system.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
+import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 public class Session implements ISession {
 
@@ -54,16 +55,20 @@ public class Session implements ISession {
 	
 	private DefaultExecutor executor;
 	private CommandLine cmdLine;
+	private PumpStreamHandler pumpStream;
 	private SessionOutputStream outstream;
 	private SessionResultHandler resultHandler;
 	private long executonTimeout = 0;
 	private ExecuteWatchdog watchdog;
 	
 	private Process proc;
-	
+	private String signature; 
+	private static long id;
 	
 	private Session(Builder builder) 
 	{
+		Session.id++;
+		
 		this.config = builder.config;
 		this.source = builder.source;
 		this.cmdLine = builder.cmdLine;	
@@ -72,15 +77,21 @@ public class Session implements ISession {
 		this.executor = new DefaultExecutor();
 		this.watchdog = new ExecuteWatchdog(this.executonTimeout);
 		
-		logger.info("Session ready for execution");
-		logger.info(cmdLine.toString());	
+		this.signature = builder.signature;
+		//logger.info("Session signature :" + this.signature);
+		logger.info(Session.id +":"+this.cmdLine.toString());
 	}
 
+	@Override
+	public long getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
 	
 	@Override
-	public int getIdentifier() {
+	public String getSignature() {
 		// TODO Auto-generated method stub
-		return -1;
+		return signature;
 	}
 
 	@Override
@@ -103,9 +114,10 @@ public class Session implements ISession {
 		{
 			
 			this.outstream = new SessionOutputStream();
+			this.pumpStream = new PumpStreamHandler(this.outstream);
 			this.resultHandler = new SessionResultHandler(this.watchdog, this);
 			
-			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
+			this.executor.setStreamHandler(this.pumpStream);
 			this.executor.setProcessDestroyer(new SessionDestroyer(this));
 			this.executor.setWatchdog(this.watchdog);
 			this.executor.setExitValue(0);
@@ -154,6 +166,10 @@ public class Session implements ISession {
 		try{outstream.close();}
 		catch(Exception e2){}
 		finally{outstream = null;}
+		
+		try{pumpStream = null;}
+		catch(Exception e2){}
+		finally{}
 	
 		try{resultHandler = null;}
 		catch(Exception e3){}
@@ -191,17 +207,25 @@ public class Session implements ISession {
 	
 	public static class Builder {
 		
+		// responsible for loading data from xml template
+		private static AbstractDAOFactory daoproducer;
+		private TranscodeConfigurationFactory configFactory;
+				
 		private ITranscodeConfig config;
+		private String templateFile;
+		
 		private IMediaInput source;
 		private ISession session;	
 		private ILibRtmpConfig librtmpConfig;
+		private String signature;
 		
-		private CommandLine cmdLine;
 		private long executonTimeout = 15000;
+		private CommandLine cmdLine;
 		private Server serverType;
 		
 		
 		public static Builder newSession(){
+			daoproducer = AbstractDAOFactory.getDAOFactory(AbstractDAOFactory.FROM_XML_TEMPLATE);
 			return new Builder();
 		}
 		
@@ -225,8 +249,23 @@ public class Session implements ISession {
 				case WOWZA:
 				serverType = Server.WOWZA;
 				break;
+				
+				case FMS:
+				break;
+				
+				default:
+				break;
 			
 			}
+			return this;
+		}
+
+		public void withTimeout(long executonTimeout) {
+			this.executonTimeout = executonTimeout;
+		}
+
+		public Builder usingTemplateFile(String templateFile) {
+			this.templateFile = templateFile;
 			return this;
 		}
 		
@@ -236,8 +275,9 @@ public class Session implements ISession {
 		}
 		
 		public ISession build() throws MalformedTranscodeQueryException{
-			
+			this.config = (this.templateFile != null)?this.buildTranscodeConfigFromTemplate(this.templateFile):this.config;
 			this.cmdLine = buildExecutableCommand(this.source, this.config);
+			this.signature = SessionUtil.generateSessionSignature(source.getSourcePath(), templateFile);
 			this.session = new Session(this);						
 			return this.session;
 		}
@@ -254,28 +294,34 @@ public class Session implements ISession {
 			return configuration;
 		}
 		
+		protected ITranscodeConfig buildTranscodeConfigFromTemplate(String templateFile)
+		{
+			configFactory = TranscodeConfigurationFactory.getInstance();
+			configFactory.setDaoSupplier(daoproducer);
+			
+			return configFactory.getTranscodeConfiguration(templateFile);
+		}
+		
+		
 		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
-			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
-			
-			replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));	
 			
 			
 			try
 			{
-					
+					replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
+				
 					/* Building librtmp params string */
 					{
 						ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
 						String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
-						replacementMap.put("inputSource", libRtmpParamString);
+						replacementMap.put("inputSource", libRtmpParamString);	
 					}
-					
-				
+										
 					if(config.getEnabled())
 					{
 						{
@@ -299,7 +345,7 @@ public class Session implements ISession {
 							
 								IVideo vConfig = encode.getVideoConfig();
 								IAudio aConfig = encode.getAudioConfig();
-								ArrayList<IFlag> outFlags = encode.getOutputflags();
+								ArrayList<IProperty> outFlags = encode.getOutputflags();
 								IMediaOutput output = encode.getOutput();
 								
 								try
@@ -432,37 +478,7 @@ public class Session implements ISession {
 												}
 												else
 												{
-													ALIGNMENT align = o.getLocation().getAlign();
-													switch(align)
-													{
-														case BOTTOMLEFT:
-														break;
-														
-														case BOTTOMRIGHT:
-														break;
-														
-														case CENTERBOTTOM:
-														break;
-														
-														case CENTERLEFT:
-														break;
-														
-														case CENTERMIDDLE:
-														break;
-														
-														case CENTERRIGHT:
-														break;
-														
-														case CENTERTOP:
-														break;
-														
-														case TOPLEFT:
-														break;
-														
-														case TOPRIGHT:
-														break;
-													}										
-													
+													// DO OP
 												}
 											}
 											
@@ -603,7 +619,7 @@ public class Session implements ISession {
 								if(!outFlags.isEmpty())
 								{
 									logger.info("Parsing extra output flags for encode");
-									Iterator<IFlag> it = outFlags.iterator();
+									Iterator<IProperty> it = outFlags.iterator();
 									
 									while(it.hasNext())	{
 										cmdLine.addArgument(it.next().getData());
@@ -620,12 +636,12 @@ public class Session implements ISession {
 									logger.info("Output destination for encode"
 											+ " "
 											+ "Container :" 
-											+ destination.getContainer()
+											+ destination.getContainer().getName().toLowerCase()
 											+ " "
 											+ "Destination :" + destination.getSourcePath());
 																		
 									cmdLine.addArgument("-f");
-									cmdLine.addArgument(destination.getContainer().getName());
+									cmdLine.addArgument(destination.getContainer().getName().toLowerCase());
 									
 									cmdLine.addArgument(destination.getSourcePath());
 								}
@@ -636,6 +652,7 @@ public class Session implements ISession {
 							}
 						}
 						
+						
 						cmdLine.setSubstitutionMap(replacementMap);
 					}
 					
@@ -643,19 +660,11 @@ public class Session implements ISession {
 			}
 			catch(Exception e)
 			{
+				logger.info("Error : " + e.getMessage());
 				throw new MalformedTranscodeQueryException(e);
 			}
 		}
 
-		public long getExecutonTimeout() {
-			return executonTimeout;
-		}
-
-		public void setExecutonTimeout(long executonTimeout) {
-			this.executonTimeout = executonTimeout;
-		}
+		
 	}
-
-
-	
 }

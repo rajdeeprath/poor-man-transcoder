@@ -3,10 +3,10 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 public interface ISession extends IDisposable {
 
-	public int getIdentifier();
+	public long getId();
+	public String getSignature();
 	
 	public Process getProcess();
-	
 	/* Important!!! not to be used by user */
 	public void setProcess(Process proc);
 	

@@ -8,7 +8,6 @@ import uk.co.jaimon.SimpleImageInfo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
 public class Overlay extends Mutable implements IOverlay, Serializable {
 	

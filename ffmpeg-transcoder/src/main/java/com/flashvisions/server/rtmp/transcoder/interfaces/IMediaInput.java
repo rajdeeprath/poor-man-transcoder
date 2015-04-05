@@ -10,8 +10,8 @@ public interface IMediaInput {
 	public String getProtocol();
 	public boolean isFile();
 	public boolean isStreamingMedia();
-	public ArrayList<IFlag> getInputFlags();
-	public void setInputFlags(ArrayList<IFlag> inputFlags);
+	public ArrayList<IProperty> getInputFlags();
+	public void setInputFlags(ArrayList<IProperty> inputFlags);
 	public String getStreamName();
 	public void setStreamName(String streamName);
 	public Object getMediaInfo();

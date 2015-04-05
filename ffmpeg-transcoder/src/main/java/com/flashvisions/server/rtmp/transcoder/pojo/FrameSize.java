@@ -3,7 +3,6 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
 public class FrameSize extends PassThru implements IFrameSize, Serializable  {
 	

@@ -34,7 +34,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
@@ -43,25 +43,25 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.ArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.Audio;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
-import com.flashvisions.server.rtmp.transcoder.pojo.Flag;
+import com.flashvisions.server.rtmp.transcoder.pojo.Encode;
+import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.KeyFrameInterval;
 import com.flashvisions.server.rtmp.transcoder.pojo.OutMedia;
 import com.flashvisions.server.rtmp.transcoder.pojo.Overlay;
+import com.flashvisions.server.rtmp.transcoder.pojo.Transcode;
+import com.flashvisions.server.rtmp.transcoder.pojo.Video;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
-import com.flashvisions.server.rtmp.transcoder.vo.Audio;
-import com.flashvisions.server.rtmp.transcoder.vo.Encode;
-import com.flashvisions.server.rtmp.transcoder.vo.Transcode;
-import com.flashvisions.server.rtmp.transcoder.vo.Video;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 
@@ -456,11 +456,11 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				/****************** look for output flags ****************/
 				String outputFlagsExpression = "/Template/Transcode/Properties/Property";
 				NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
-				ArrayList<IFlag> outputflags = new ArrayList<IFlag>(); 
+				ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
 				for(int l=0;l<outputflagNodes.getLength();l++){
 				Node n = outputflagNodes.item(l);
 				String flag = n.getFirstChild().getNodeValue();
-				outputflags.add(new Flag(flag));
+				outputflags.add(new Property(flag));
 				}
 				
 				/**** store any extra output flags *****/

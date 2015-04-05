@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.vo;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +12,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
 public class Video extends Mutable implements IVideo, Serializable  {
 	

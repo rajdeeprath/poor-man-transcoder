@@ -1,14 +1,13 @@
-package com.flashvisions.server.rtmp.transcoder.vo;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
 public class Encode extends Mutable implements IEncode, Serializable  {
 	
@@ -22,16 +21,16 @@ public class Encode extends Mutable implements IEncode, Serializable  {
 	private IVideo vConfig;
 	private IAudio aConfig;
 	
-	public ArrayList<IFlag> outputflags;
+	public ArrayList<IProperty> outputflags;
 	
 	
 	
-	public ArrayList<IFlag> getOutputflags() {
+	public ArrayList<IProperty> getOutputflags() {
 		return outputflags;
 	}
 
 
-	public void setOutputflags(ArrayList<IFlag> outputflags) {
+	public void setOutputflags(ArrayList<IProperty> outputflags) {
 		this.outputflags = outputflags;
 	}
 

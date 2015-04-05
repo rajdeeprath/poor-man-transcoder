@@ -2,7 +2,6 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMutable;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
 public class Codec extends PassThru implements ICodec, IMutable {
 	
@@ -18,6 +17,9 @@ public class Codec extends PassThru implements ICodec, IMutable {
 	private Implementation implementation = null;
 	private boolean enabled = true;
 	
+	public Codec(){
+		
+	}
 
 	public Codec(String name){
 		if(validateCodec(name))

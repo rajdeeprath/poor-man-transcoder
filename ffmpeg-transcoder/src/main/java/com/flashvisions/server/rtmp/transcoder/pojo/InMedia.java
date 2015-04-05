@@ -1,19 +1,24 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 
-public class InMedia implements IMediaInput {
+public class InMedia implements IMediaInput, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -914688622907385993L;
 	private String streamName;
 	private String protocol;
 	private String source;
 	private String container;
-	private ArrayList<IFlag> inputFlags;
+	private ArrayList<IProperty> inputFlags;
 	
 	public InMedia(String source){
 		setSourcePath(source);
@@ -51,13 +56,13 @@ public class InMedia implements IMediaInput {
 	}
 
 	@Override
-	public ArrayList<IFlag> getInputFlags() {
+	public ArrayList<IProperty> getInputFlags() {
 		// TODO Auto-generated method stub
 		return this.inputFlags;
 	}
 
 	@Override
-	public void setInputFlags(ArrayList<IFlag> inputFlags) {
+	public void setInputFlags(ArrayList<IProperty> inputFlags) {
 		// TODO Auto-generated method stub
 		this.inputFlags = inputFlags;
 	}

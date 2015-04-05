@@ -18,6 +18,10 @@ public class VideoCodec extends Codec implements Serializable {
 	public static enum Type {
 		LIBX264, FLV, LIBTHEORA, H263, FLASHSV, MPEG4
     }
+	
+	public VideoCodec(){
+		super();
+	}
 
 	public VideoCodec(String name) {
 		super(name);

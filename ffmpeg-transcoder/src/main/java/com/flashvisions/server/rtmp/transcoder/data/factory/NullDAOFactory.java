@@ -10,18 +10,6 @@ public class NullDAOFactory extends AbstractDAOFactory {
 		return null;
 	}
 
-	@Override
-	public Object getTemplateBasePath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTemplateBasePath(String baseDir) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	
 	/***** Important!! Not to be used with prototype pattern ******/
 	@Override

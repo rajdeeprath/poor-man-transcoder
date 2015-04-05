@@ -2,9 +2,9 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.Serializable;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFlag;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 
-public class Flag implements Serializable, IFlag {
+public class Property implements Serializable, IProperty {
 
 	/**
 	 * 
@@ -12,11 +12,11 @@ public class Flag implements Serializable, IFlag {
 	private static final long serialVersionUID = -7482351439593873349L;
 	private String data;
 	
-	public Flag(String data) {
+	public Property(String data) {
 		this.data = data;
 	}
 	
-	public Flag() {
+	public Property() {
 	}
 
 	public String getData() {

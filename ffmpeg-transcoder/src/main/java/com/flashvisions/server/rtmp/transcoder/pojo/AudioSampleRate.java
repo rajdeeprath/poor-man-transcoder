@@ -3,7 +3,6 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
 public class AudioSampleRate extends PassThru implements IAudioSampleRate, Serializable
 {

@@ -4,6 +4,11 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamOutput;
 
 public class OutStream extends OutMedia implements IStreamOutput {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3821162980006650017L;
+
 	public OutStream(String source) {
 		super(source);
 	}

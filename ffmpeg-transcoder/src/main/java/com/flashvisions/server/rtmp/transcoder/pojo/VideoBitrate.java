@@ -3,7 +3,6 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThru;
 
 public class VideoBitrate extends PassThru implements IVideoBitrate, Serializable 
 {

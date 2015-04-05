@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.pojo.base;
+package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMutable;
 

@@ -7,7 +7,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
 
 
-public class TranscodeConfigurationFactory implements Cloneable {
+public class TranscodeConfigurationFactory {
 
 	private static TranscodeConfigurationFactory instance; 
 	private AbstractDAOFactory daoFactory;
@@ -25,20 +25,20 @@ public class TranscodeConfigurationFactory implements Cloneable {
 		this.daoFactory = daoFactory;
 	}
 	
-	public ITranscodeConfig getTranscodeConfiguration(String templateName) throws CloneNotSupportedException
+	public ITranscodeConfig getTranscodeConfiguration(String template)
 	{
 		ITranscodeConfig config;
 		
-		if(prototypes.containsKey(templateName))
+		if(prototypes.containsKey(template))
 		{
-			config = prototypes.get(templateName);
+			config = prototypes.get(template);
 			return (ITranscodeConfig) config.clone();
 		}
 		else
 		{
-			ITranscodeConfigDao dao = this.daoFactory.getTranscodeDao(templateName);
+			ITranscodeConfigDao dao = this.daoFactory.getTranscodeDao(template);
 			config = dao.getTranscodeConfig();
-			prototypes.put(templateName, config);
+			prototypes.put(template, config);
 			return config;
 		}		
 	}

@@ -19,6 +19,10 @@ public class AudioCodec extends Codec implements Serializable {
 		LIBSPEEX, LIBMP3LAME, AAC, LIBFDK_AAC, LIBVO_AACENC, LIBFAAC, LIBVORBIS, NELLYMOSER 
     }
 
+	public AudioCodec(){
+		super();
+	}
+	
 	public AudioCodec(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
