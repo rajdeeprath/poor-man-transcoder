@@ -13,6 +13,28 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	private String workingDirectoryPath;
 	private String serverName;
 	
+	private static volatile ITranscoderFacade instance;
+	
+	
+	private TranscoderFacade(){
+		
+	}
+	
+	
+	public static ITranscoderFacade getInstance()
+	{
+		if(instance == null)
+		{
+			synchronized (TranscoderFacade.class){
+				if(instance == null){
+					instance = new TranscoderFacade();
+				}
+			}
+		}
+		
+		return instance;
+	}
+	
 
 	@Override
 	public void init() {
@@ -122,8 +144,11 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	public void abortTranscode(String sessionSignature) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	
-
+	}	
 }
+
+class SingletonEnforcer{
+	
+}
+
+
