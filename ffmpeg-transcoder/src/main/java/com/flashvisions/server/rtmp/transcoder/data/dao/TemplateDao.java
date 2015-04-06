@@ -39,8 +39,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfigDao;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.ArbitaryProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.Audio;
@@ -66,7 +66,7 @@ import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 
 @SuppressWarnings("unused")
-public class TemplateDao implements ITranscodeConfigDao, IDisposable {
+public class TemplateDao implements ITranscodeDao, IDisposable {
 
 	private static Logger logger = LoggerFactory.getLogger(TemplateDao.class);
 	
@@ -79,7 +79,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 	private Document document = null;
 	private XPath xpath;
 	
-	private ITranscodeConfig session;
+	private ITranscode session;
 	
 	public TemplateDao()
 	{
@@ -454,7 +454,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 				
 				
 				/****************** look for output flags ****************/
-				String outputFlagsExpression = "/Template/Transcode/Properties/Property";
+				String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Properties/Property";
 				NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
 				ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
 				for(int l=0;l<outputflagNodes.getLength();l++){
@@ -496,7 +496,7 @@ public class TemplateDao implements ITranscodeConfigDao, IDisposable {
 	}
 
 	@Override
-	public ITranscodeConfig getTranscodeConfig() {
+	public ITranscode getTranscodeConfig() {
 		// TODO Auto-generated method stub
 		return session;
 	}

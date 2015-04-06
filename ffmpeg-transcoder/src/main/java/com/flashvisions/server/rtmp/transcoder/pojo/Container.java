@@ -4,7 +4,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 
 public class Container implements IContainer {
 	public static enum Type {
-        FLV, MP4, SEGMENT, RTSP, RTMP, RTP, MPEGTS
+        FLV, MP4, SEGMENT, RTSP, RTMP, RTP, MPEGTS, M3U8
     }
 	
 	private String name;

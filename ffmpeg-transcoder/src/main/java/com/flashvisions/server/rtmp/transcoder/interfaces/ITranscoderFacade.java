@@ -23,7 +23,7 @@ public interface ITranscoderFacade {
 	
 	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException;
 	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
-	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
+	public Object doTranscode(IMediaInput input, ITranscode transcode, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
 		
 	public void abortTranscode(long sessionId) throws TranscoderException;;
 	public void abortTranscode(String sessionSignature) throws TranscoderException;;

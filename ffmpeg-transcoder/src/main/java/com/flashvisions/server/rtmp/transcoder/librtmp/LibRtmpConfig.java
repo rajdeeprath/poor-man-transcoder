@@ -95,7 +95,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		this.setPlayPath(playpath);
 		this.setTcUrl(tcUrl);
 		this.setLive(true);
-		this.setBuffer(50);
+		this.setBuffer(200);
 	}
 
 	@Override
@@ -103,7 +103,33 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		// TODO Auto-generated method stub
 		String fullUrl = rtmpApplication + "/" + stream; 
 		String SPACE = " ";
-		return "\"" + fullUrl + SPACE + "live=1" + SPACE + "buffer=" + getBuffer() + SPACE + "timeout=" + getTimeout() + SPACE + "app=" + getAppName() + SPACE + "playpath=" + getPlayPath() + SPACE + "tcUrl=" + getTcUrl() + "\"";
+		String command = "\"";
+		
+		command += fullUrl;
+		command += SPACE;
+		
+		command += "live=" + ((isLive())?1:0);
+		command += SPACE;
+		
+		command += "timeout=" + getTimeout();
+		command += SPACE;
+		
+		if(getBuffer()>0){
+		command += "buffer=" + getBuffer();
+		command += SPACE;
+		}
+		
+		if(!getPlayPath().equals("")){
+		command += "playpath=" + getPlayPath();
+		}command += SPACE;
+		
+		if(!getTcUrl().equals("")){
+		command += "tcUrl=" + getTcUrl();
+		command += SPACE;	
+		}
+		command += "\"";
+		
+		return command;
 	}
 
 	

@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +39,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayIterator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
@@ -50,7 +51,7 @@ public class Session implements ISession {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
-	private ITranscodeConfig config;
+	private ITranscode config;
 	private IMediaInput source;
 	
 	private DefaultExecutor executor;
@@ -58,7 +59,7 @@ public class Session implements ISession {
 	private PumpStreamHandler pumpStream;
 	private SessionOutputStream outstream;
 	private SessionResultHandler resultHandler;
-	private long executonTimeout = 0;
+	private long executonTimeout;
 	private ExecuteWatchdog watchdog;
 	
 	private Process proc;
@@ -75,11 +76,11 @@ public class Session implements ISession {
 		
 		this.executonTimeout = builder.executonTimeout;
 		this.executor = new DefaultExecutor();
-		this.watchdog = new ExecuteWatchdog(this.executonTimeout);
-		
+		this.executor.setWorkingDirectory(new File(Globals.getEnv(Globals.Vars.WORKING_DIRECTORY)));
+		this.watchdog = new ExecuteWatchdog(executonTimeout);
 		this.signature = builder.signature;
-		//logger.info("Session signature :" + this.signature);
-		logger.info(Session.id +":"+this.cmdLine.toString());
+		
+		logger.info("Command :" + this.cmdLine.toString());
 	}
 
 	@Override
@@ -101,7 +102,7 @@ public class Session implements ISession {
 	}
 
 	@Override
-	public ITranscodeConfig getTranscodeConfig() {
+	public ITranscode getTranscodeConfig() {
 		// TODO Auto-generated method stub
 		return config;
 	}
@@ -211,7 +212,7 @@ public class Session implements ISession {
 		private static AbstractDAOFactory daoproducer;
 		private TranscodeConfigurationFactory configFactory;
 				
-		private ITranscodeConfig config;
+		private ITranscode config;
 		private String templateFile;
 		
 		private IMediaInput source;
@@ -219,7 +220,7 @@ public class Session implements ISession {
 		private ILibRtmpConfig librtmpConfig;
 		private String signature;
 		
-		private long executonTimeout = 15000;
+		private long executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		private CommandLine cmdLine;
 		private Server serverType;
 		
@@ -229,7 +230,7 @@ public class Session implements ISession {
 			return new Builder();
 		}
 		
-		public Builder usingTranscodeConfig(ITranscodeConfig config){
+		public Builder usingTranscodeConfig(ITranscode config){
 			this.config = config;
 			return this;
 		}
@@ -294,7 +295,7 @@ public class Session implements ISession {
 			return configuration;
 		}
 		
-		protected ITranscodeConfig buildTranscodeConfigFromTemplate(String templateFile)
+		protected ITranscode buildTranscodeConfigFromTemplate(String templateFile)
 		{
 			configFactory = TranscodeConfigurationFactory.getInstance();
 			configFactory.setDaoSupplier(daoproducer);
@@ -303,7 +304,7 @@ public class Session implements ISession {
 		}
 		
 		
-		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscodeConfig config) throws MalformedTranscodeQueryException{
+		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscode config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
@@ -613,9 +614,6 @@ public class Session implements ISession {
 									cmdLine.addArgument("-an");
 								}
 								
-								
-								
-								
 								if(!outFlags.isEmpty())
 								{
 									logger.info("Parsing extra output flags for encode");
@@ -639,7 +637,9 @@ public class Session implements ISession {
 											+ destination.getContainer().getName().toLowerCase()
 											+ " "
 											+ "Destination :" + destination.getSourcePath());
-																		
+																
+									cmdLine.addArgument("-y");
+									
 									cmdLine.addArgument("-f");
 									cmdLine.addArgument(destination.getContainer().getName().toLowerCase());
 									

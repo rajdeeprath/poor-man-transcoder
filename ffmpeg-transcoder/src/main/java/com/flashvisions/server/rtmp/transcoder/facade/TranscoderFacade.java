@@ -10,7 +10,7 @@ import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
@@ -178,7 +178,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	}
 
 	@Override
-	public Object doTranscode(IMediaInput input, ITranscodeConfig transcode, ILibRtmpConfig librtmpConfig) {
+	public Object doTranscode(IMediaInput input, ITranscode transcode, ILibRtmpConfig librtmpConfig) {
 		// TODO Auto-generated method stub
 		return null;
 	}

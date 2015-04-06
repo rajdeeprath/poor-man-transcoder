@@ -7,9 +7,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 
-public class Transcode extends Mutable implements ITranscodeConfig, Serializable  {
+public class Transcode extends Mutable implements ITranscode, Serializable  {
  
 	/**
 	 * 
@@ -52,7 +52,7 @@ public class Transcode extends Mutable implements ITranscodeConfig, Serializable
 		this.encodes = encodes;
 	}	
 	
-	public ITranscodeConfig clone()
+	public ITranscode clone()
 	{
 		ObjectOutputStream oos = null;
         ObjectInputStream ois = null;

@@ -2,7 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 
 
-public interface ITranscodeConfig extends IMutable, Cloneable {
+public interface ITranscode extends IMutable {
 
 	public String getLabel() ;
 	public void setLabel(String label);
@@ -10,5 +10,5 @@ public interface ITranscodeConfig extends IMutable, Cloneable {
 	public void setDescription(String description);
 	public IEncodeCollection getEncodes();
 	public void setEncodes(IEncodeCollection encodes);
-	public ITranscodeConfig clone();
+	public ITranscode clone();
 }

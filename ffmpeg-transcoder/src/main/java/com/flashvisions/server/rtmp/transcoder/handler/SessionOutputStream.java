@@ -27,7 +27,7 @@ public class SessionOutputStream extends LogOutputStream {
 		
 		lines.add(line);
 		lastOutputTime = System.currentTimeMillis();		
-		logger.info(level+" : "+line);
+		logger.info(line);
 	}
 	
 	/* Estimates if process is running by checking if there was output in last 3 seconds */

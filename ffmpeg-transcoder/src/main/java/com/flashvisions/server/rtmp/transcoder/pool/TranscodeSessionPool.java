@@ -10,7 +10,7 @@ import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQuery
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeConfig;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
 import com.flashvisions.server.rtmp.transcoder.system.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
@@ -56,7 +56,7 @@ public class TranscodeSessionPool {
 	  }
 	  
 	  // !!! for future use
-	  protected ISession create(IMediaInput input, ITranscodeConfig transcode) throws MalformedTranscodeQueryException
+	  protected ISession create(IMediaInput input, ITranscode transcode) throws MalformedTranscodeQueryException
 	  {
 		  // need to add template name to transcode object else session signature wont be created
 		  ISession session = Session.Builder.newSession()

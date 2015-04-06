@@ -11,7 +11,7 @@ public interface ISession extends IDisposable {
 	public void setProcess(Process proc);
 	
 	public IMediaInput getInputSource();	
-	public ITranscodeConfig getTranscodeConfig();
+	public ITranscode getTranscodeConfig();
 	
 	public void start();
 	public boolean stop();
