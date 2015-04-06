@@ -1,15 +1,10 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
 
-public class AudioSampleRate extends PassThru implements IAudioSampleRate, Serializable
+public class AudioSampleRate extends PassThruProperty implements IAudioSampleRate
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8862673192135863714L;
 	private int samplerate;
 	
 	

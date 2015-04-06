@@ -16,6 +16,6 @@ public interface IAudio extends IMutable {
 	public void setSamplerate(IAudioSampleRate samplerate);
 	public IAudioChannel getChannel();
 	public void setChannel(IAudioChannel channels);
-	public ArrayList<IArbitaryProperty> getExtraParams();
-	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams);
+	public ArrayList<IParam> getExtraParams();
+	public void setExtraParams(ArrayList<IParam> extraParams);
 }

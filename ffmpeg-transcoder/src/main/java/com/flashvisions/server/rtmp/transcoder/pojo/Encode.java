@@ -1,6 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
@@ -8,13 +7,10 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Encode extends Mutable implements IEncode, Serializable  {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9149259018891670101L;
+public class Encode extends Mutable implements IEncode  {
+
 	private String name;
 	private IMediaOutput output;
 	

@@ -1,17 +1,17 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
 
-public class ArbitaryProperty implements IArbitaryProperty {
+public class Param implements IParam {
 
 	private String key;
 	private String value;
 	
-	public ArbitaryProperty() {
+	public Param() {
 		
 	}
 	
-	public ArbitaryProperty(String key, String value) {
+	public Param(String key, String value) {
 		this.key = key; this.value = value;
 	}
 	
@@ -35,6 +35,5 @@ public class ArbitaryProperty implements IArbitaryProperty {
 	{
 		this.value = value;
 	}
-	
 	
 }

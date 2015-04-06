@@ -1,13 +1,8 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamOutput;
 
 public class StreamOutput extends MediaOutput implements IStreamOutput {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3821162980006650017L;
 
 	public StreamOutput(String source) {
 		super(source);

@@ -3,8 +3,8 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 import java.util.ArrayList;
 
 public interface IMediaInput {
-	public String getContainer();
-	public void setContainer(String container);
+	public IContainer getContainer();
+	public void setContainer(IContainer container);
 	public String getSourcePath();
 	public void setSourcePath(String source);
 	public String getProtocol();

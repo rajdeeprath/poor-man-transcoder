@@ -1,6 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-import com.flashvisions.server.rtmp.transcoder.pojo.Overlay.Location.ALIGNMENT;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.Overlay.Location.ALIGNMENT;
 
 public interface IOverlayLocation {
 

@@ -1,23 +1,25 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
+import com.flashvisions.server.rtmp.transcoder.pojo.Container;
+import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
-public class MediaInput implements IMediaInput, Serializable {
+public class MediaInput implements IMediaInput {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -914688622907385993L;
+	private static Logger logger = LoggerFactory.getLogger(MediaInput.class);
+	
 	private String streamName;
 	private String protocol;
 	private String source;
-	private String container;
+	private IContainer container;
 	private ArrayList<IProperty> inputFlags;
 	
 	public MediaInput(String source){
@@ -74,14 +76,14 @@ public class MediaInput implements IMediaInput, Serializable {
 	}
 
 	@Override
-	public String getContainer() {
+	public IContainer getContainer() {
 		// TODO Auto-generated method stub
 		return this.container;
 	}
 
 	@Override
-	public void setContainer(String container) {
-		// TODO Auto-generated method stub
+	public void setContainer(IContainer container) {
+		// TODO Auto-generated method stub		
 		this.container = container;
 	}
 
@@ -104,10 +106,11 @@ public class MediaInput implements IMediaInput, Serializable {
 			URI uri = new URI(this.source);
 			this.protocol = uri.getScheme();
 			this.streamName = uri.getPath().substring(uri.getPath().lastIndexOf("/")+1);
+			this.setContainer(new Container(IOUtils.getContainer(this.source)));
 		} 
-		catch (URISyntaxException e) 
+		catch (Exception e) 
 		{
-			e.printStackTrace();
+			logger.info(e.getMessage());
 		}
 	}
 }

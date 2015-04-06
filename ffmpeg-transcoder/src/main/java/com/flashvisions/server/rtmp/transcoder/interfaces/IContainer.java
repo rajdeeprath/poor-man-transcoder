@@ -1,10 +1,8 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-import com.flashvisions.server.rtmp.transcoder.pojo.Container.Type;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.ContainerType;
 
 public interface IContainer {
-
-	public String getName();
-	public void setName(String name);
-	public Type getScheme();
+	public ContainerType getType();
+	public void setType(ContainerType type);
 }

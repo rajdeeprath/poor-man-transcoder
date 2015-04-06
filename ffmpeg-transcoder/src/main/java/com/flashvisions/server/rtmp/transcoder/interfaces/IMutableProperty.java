@@ -1,0 +1,5 @@
+package com.flashvisions.server.rtmp.transcoder.interfaces;
+
+public interface IMutableProperty extends IMutable {
+
+}

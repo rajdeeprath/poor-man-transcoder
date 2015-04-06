@@ -1,21 +1,18 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
-import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 
-public class AudioCodec extends Codec implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6184248445560383627L;
+public class AudioCodec extends Codec {
+
 	private static Logger logger = LoggerFactory.getLogger(AudioCodec.class);
 	
-	public static enum Type {
+	public static enum Encoder {
 		LIBSPEEX, LIBMP3LAME, AAC, LIBFDK_AAC, LIBVO_AACENC, LIBFAAC, LIBVORBIS, NELLYMOSER 
     }
 
@@ -46,7 +43,7 @@ public class AudioCodec extends Codec implements Serializable {
 		{
 			try
 			{
-				switch(Type.valueOf(codecName.toUpperCase()))
+				switch(Encoder.valueOf(codecName.toUpperCase()))
 				{	
 					default:
 					valid = true;

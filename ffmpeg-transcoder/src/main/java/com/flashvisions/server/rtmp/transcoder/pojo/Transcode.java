@@ -4,17 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Transcode extends Mutable implements ITranscode, Serializable  {
- 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8925017251384648786L;
+public class Transcode extends Mutable implements ITranscode  {
 	
 	public String label;	
 	public String description;

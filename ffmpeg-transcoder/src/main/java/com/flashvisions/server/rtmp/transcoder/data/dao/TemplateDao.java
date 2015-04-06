@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
@@ -42,26 +42,24 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.pojo.ArbitaryProperty;
-import com.flashvisions.server.rtmp.transcoder.pojo.Audio;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioCodec;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioProperty;
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.Param;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Encode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Property;
-import com.flashvisions.server.rtmp.transcoder.pojo.FrameRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.FrameSize;
-import com.flashvisions.server.rtmp.transcoder.pojo.KeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.pojo.MediaOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.Overlay;
 import com.flashvisions.server.rtmp.transcoder.pojo.Transcode;
-import com.flashvisions.server.rtmp.transcoder.pojo.Video;
-import com.flashvisions.server.rtmp.transcoder.pojo.VideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.VideoCodec;
-import com.flashvisions.server.rtmp.transcoder.pojo.VideoProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.Audio;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.KeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.Overlay;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.Video;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoCodec;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 
@@ -354,7 +352,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 					String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
 					NodeList videoParams = (NodeList) this.xpath.compile(videoExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
 					
-					ArrayList<IArbitaryProperty> extras = new ArrayList<IArbitaryProperty>();
+					ArrayList<IParam> extras = new ArrayList<IParam>();
 					
 					for(int j=0;j<videoParams.getLength();j++)
 					{
@@ -364,7 +362,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 						String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Value";
 						String videoParamsValue = this.xpath.compile(videoParamsValueExpression).evaluate(this.document);
 						
-						extras.add(new VideoProperty(videoParamsKey, videoParamsValue));
+						extras.add(new Param(videoParamsKey, videoParamsValue));
 					}
 					
 					video.setExtraParams(extras);
@@ -431,7 +429,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 					String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
 					NodeList audioParams = (NodeList) this.xpath.compile(audioExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
 					
-					ArrayList<IArbitaryProperty> extras = new ArrayList<IArbitaryProperty>(); 
+					ArrayList<IParam> extras = new ArrayList<IParam>(); 
 					for(int j=0;j<audioParams.getLength();j++)
 					{
 						String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";
@@ -440,7 +438,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 						String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Value";
 						String audioParamsValue = this.xpath.compile(audioParamsValueExpression).evaluate(this.document);
 						
-						extras.add(new AudioProperty(audioParamsKey, audioParamsValue));
+						extras.add(new Param(audioParamsKey, audioParamsValue));
 					}
 					audio.setExtraParams(extras);
 				}

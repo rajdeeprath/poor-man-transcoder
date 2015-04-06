@@ -1,9 +1,8 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
@@ -12,13 +11,10 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Video extends Mutable implements IVideo, Serializable  {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2225250601352394199L;
+public class Video extends Mutable implements IVideo  {
+
 	private ICodec codec;
 	private Implementation codecImplementation;
 	private IFrameSize framesize;
@@ -26,7 +22,7 @@ public class Video extends Mutable implements IVideo, Serializable  {
 	private IVideoBitrate bitrate;
 	private IKeyFrameInterval keyFrameInterval;
 	private IOverlayCollection overlays;
-	private ArrayList<IArbitaryProperty> extraParams;
+	private ArrayList<IParam> extraParams;
 	
 
 	public ICodec getCodec() {
@@ -85,11 +81,11 @@ public class Video extends Mutable implements IVideo, Serializable  {
 		this.overlays = overlays;
 	}
 
-	public ArrayList<IArbitaryProperty> getExtraParams() {
+	public ArrayList<IParam> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams) {
+	public void setExtraParams(ArrayList<IParam> extraParams) {
 		this.extraParams = extraParams;
 	}
 }

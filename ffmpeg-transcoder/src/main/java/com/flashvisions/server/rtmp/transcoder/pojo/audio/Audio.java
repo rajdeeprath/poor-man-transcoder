@@ -1,29 +1,25 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Audio extends Mutable implements IAudio, Serializable  {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6959330589535619544L;
+public class Audio extends Mutable implements IAudio  {
+
 	private ICodec codec;
 	private Implementation codecImplementation;
 	private IAudioBitrate bitrate;
 	private IAudioSampleRate samplerate;
 	private IAudioChannel channel;
-	private ArrayList<IArbitaryProperty> extraParams;
-	
+	private ArrayList<IParam> extraParams;
+
 
 	public ICodec getCodec() {
 		return codec;
@@ -65,11 +61,11 @@ public class Audio extends Mutable implements IAudio, Serializable  {
 		this.channel = channel;
 	}
 
-	public ArrayList<IArbitaryProperty> getExtraParams() {
+	public ArrayList<IParam> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams) {
+	public void setExtraParams(ArrayList<IParam> extraParams) {
 		this.extraParams = extraParams;
 	}
 }

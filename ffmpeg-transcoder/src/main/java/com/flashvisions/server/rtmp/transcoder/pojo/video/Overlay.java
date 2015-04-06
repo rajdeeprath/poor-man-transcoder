@@ -1,27 +1,19 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import uk.co.jaimon.SimpleImageInfo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
 
-public class Overlay extends Mutable implements IOverlay, Serializable {
+public class Overlay extends Mutable implements IOverlay {
 	
-/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3055247918283162290L;
 
-public static class Location implements IOverlayLocation, Serializable{
-		
-		/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8679229337020703748L;
+public static class Location implements IOverlayLocation{
+
 
 		public static enum ALIGNMENT {
 		    TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT, CENTERLEFT, CENTERRIGHT, CENTERTOP,  CENTERBOTTOM, CENTERMIDDLE 

@@ -1,15 +1,10 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
 
-public class KeyFrameInterval extends PassThru implements IKeyFrameInterval, Serializable  {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2770042615997108385L;
+public class KeyFrameInterval extends PassThruProperty implements IKeyFrameInterval  {
+
 	private int gop;
 	private int minimunInterval;
 	

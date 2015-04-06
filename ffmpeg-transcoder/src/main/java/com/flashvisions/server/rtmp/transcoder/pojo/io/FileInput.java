@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import java.io.File;
 
@@ -6,10 +6,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
 
 public class FileInput extends MediaInput implements IFileInput {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -9181863808562433505L;
 	File file;
 	
 	public FileInput(String source) {

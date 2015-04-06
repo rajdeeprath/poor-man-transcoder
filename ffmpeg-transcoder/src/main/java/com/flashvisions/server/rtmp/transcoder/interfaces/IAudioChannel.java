@@ -1,6 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-import com.flashvisions.server.rtmp.transcoder.pojo.AudioChannel.ChannelType;
+import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel.ChannelType;
 
 public interface IAudioChannel extends IPassThru {
 

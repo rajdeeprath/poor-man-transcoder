@@ -1,20 +1,21 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.Container;
+import com.flashvisions.server.rtmp.transcoder.pojo.Property;
+import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
-public class MediaOutput implements IMediaOutput, Serializable {
+public class MediaOutput implements IMediaOutput {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3595050843355103978L;
-
+	private static Logger logger = LoggerFactory.getLogger(MediaOutput.class);
+	
 	private boolean isTemplate;
 	
 	private String streamName;
@@ -111,36 +112,11 @@ public class MediaOutput implements IMediaOutput, Serializable {
 			URI uri = new URI(this.source);
 			this.protocol = uri.getScheme();
 			this.streamName = uri.getPath().substring(uri.getPath().lastIndexOf("/")+1);
-			
-			switch(Protocol.SCHEMES.valueOf(this.protocol.toUpperCase()))
-			{		
-				case RTMP:
-				case RTMPE:
-				case RTMPS:
-				case RTMPT:
-					setContainer(new Container(String.valueOf(Container.Type.FLV)));
-					break;
-					
-				case RTP:
-					setContainer(new Container(String.valueOf(Container.Type.RTP)));
-					break;
-					
-				case RTSP:
-					setContainer(new Container(String.valueOf(Container.Type.RTSP)));
-					break;
-					
-				default:
-					if(this.streamName.toLowerCase().contains("m3u8"))
-					setContainer(new Container(String.valueOf(Container.Type.SEGMENT)));
-					break;
-					
-				/* Need to add mp4 support */
-			}
-			
+			this.setContainer(new Container(IOUtils.getContainer(this.source)));
 		} 
-		catch (URISyntaxException e) 
+		catch (Exception e) 
 		{
-			e.printStackTrace();
+			logger.info(e.getMessage());
 		}
 	}
 

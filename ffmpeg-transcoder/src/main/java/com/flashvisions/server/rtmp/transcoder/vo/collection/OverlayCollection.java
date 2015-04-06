@@ -1,6 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.vo.collection;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +7,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayIterator;
 
-public class OverlayCollection implements IOverlayCollection,Serializable {
+public class OverlayCollection implements IOverlayCollection {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3728370346373576056L;
 	private List<IOverlay> overlayList;
 	
 	public OverlayCollection()

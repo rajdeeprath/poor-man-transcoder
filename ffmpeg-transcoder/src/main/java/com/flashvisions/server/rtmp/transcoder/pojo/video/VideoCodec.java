@@ -1,17 +1,13 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
-public class VideoCodec extends Codec implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1644227612003274254L;
+public class VideoCodec extends Codec {
+	
 	private static Logger logger = LoggerFactory.getLogger(VideoCodec.class);
 	
 	

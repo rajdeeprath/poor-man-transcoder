@@ -19,7 +19,7 @@ import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQuery
 import com.flashvisions.server.rtmp.transcoder.handler.SessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionOutputStream;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IArbitaryProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
@@ -307,6 +307,7 @@ public class Session implements ISession {
 		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscode config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
+			logger.info(source.getSourcePath()+":"+source.getContainer());
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
@@ -315,13 +316,16 @@ public class Session implements ISession {
 			try
 			{
 					replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-				
+					replacementMap.put("inputSource", source.getSourcePath());
+					
+					
 					/* Building librtmp params string */
+					if(IOUtils.isRTMPCompatStream(source))
 					{
 						ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
 						String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
 						replacementMap.put("inputSource", libRtmpParamString);	
-					}
+					}					
 										
 					if(config.getEnabled())
 					{
@@ -366,7 +370,8 @@ public class Session implements ISession {
 										if(vcodec.getSameAsSource())
 										{
 											// pass thru -> use same as source
-											// no op
+											cmdLine.addArgument("-codec:copy");
+											cmdLine.addArgument(vcodec.getName());
 										}
 										else
 										{
@@ -486,10 +491,10 @@ public class Session implements ISession {
 											
 											/* Extra params such as filters */
 											logger.info("Setting extra video params");
-											ArrayList<IArbitaryProperty> extraVideoParams = vConfig.getExtraParams();
-											Iterator<IArbitaryProperty> itv = extraVideoParams.iterator();
+											ArrayList<IParam> extraVideoParams = vConfig.getExtraParams();
+											Iterator<IParam> itv = extraVideoParams.iterator();
 											while(itv.hasNext()){
-												IArbitaryProperty prop = (IArbitaryProperty) itv.next();
+												IParam prop = (IParam) itv.next();
 												cmdLine.addArgument("-"+prop.getKey());
 												cmdLine.addArgument(prop.getValue());
 											}
@@ -530,7 +535,8 @@ public class Session implements ISession {
 										if(acodec.getSameAsSource())
 										{
 											// pass thru -> use same as source
-											// no op
+											cmdLine.addArgument("-codec:a");
+											cmdLine.addArgument("copy");
 										}
 										else
 										{
@@ -594,10 +600,10 @@ public class Session implements ISession {
 											
 											/* Extra params such as filters */
 											logger.info("Setting extra audio params");
-											ArrayList<IArbitaryProperty> extraAudioParams = aConfig.getExtraParams();
+											ArrayList<IParam> extraAudioParams = aConfig.getExtraParams();
 											Iterator<?> ita = extraAudioParams.iterator();
 											while(ita.hasNext()){
-												IArbitaryProperty prop = (IArbitaryProperty) ita.next();
+												IParam prop = (IParam) ita.next();
 												cmdLine.addArgument("-"+prop.getKey());
 												cmdLine.addArgument(prop.getValue());
 											}
@@ -634,14 +640,15 @@ public class Session implements ISession {
 									logger.info("Output destination for encode"
 											+ " "
 											+ "Container :" 
-											+ destination.getContainer().getName().toLowerCase()
+											+ destination.getContainer().toString()
 											+ " "
-											+ "Destination :" + destination.getSourcePath());
+											+ "Destination :" 
+											+ destination.getSourcePath());
 																
 									cmdLine.addArgument("-y");
 									
 									cmdLine.addArgument("-f");
-									cmdLine.addArgument(destination.getContainer().getName().toLowerCase());
+									cmdLine.addArgument(destination.getContainer().toString());
 									
 									cmdLine.addArgument(destination.getSourcePath());
 								}

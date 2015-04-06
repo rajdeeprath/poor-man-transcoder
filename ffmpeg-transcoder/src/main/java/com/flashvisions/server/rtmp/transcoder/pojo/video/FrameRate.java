@@ -1,15 +1,10 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
 
-public class FrameRate extends PassThru implements IFrameRate, Serializable {
+public class FrameRate extends PassThruProperty implements IFrameRate {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -276324663480345326L;
 	private int framerate;
 
 	public FrameRate(){

@@ -1,15 +1,9 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
+package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileOutput;
 
 public class FileOutput extends MediaOutput implements IFileOutput {
 	
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2412359376247912111L;
-
 	public FileOutput(String source) {
 		super(source);
 	}

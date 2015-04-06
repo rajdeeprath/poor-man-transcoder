@@ -20,6 +20,6 @@ public interface IVideo extends IMutable {
 	public void setKeyFrameInterval(IKeyFrameInterval keyFrameInterval);
 	public IOverlayCollection getOverlays();
 	public void setOverlays(IOverlayCollection overlays);
-	public ArrayList<IArbitaryProperty> getExtraParams();
-	public void setExtraParams(ArrayList<IArbitaryProperty> extraParams);
+	public ArrayList<IParam> getExtraParams();
+	public void setExtraParams(ArrayList<IParam> extraParams);
 }

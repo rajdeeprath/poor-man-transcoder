@@ -1,15 +1,10 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
 
-public class VideoBitrate extends PassThru implements IVideoBitrate, Serializable 
+public class VideoBitrate extends PassThruProperty implements IVideoBitrate 
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6254029729499034766L;
 	private int minimum;
 	private int maximum;
 	private int average;

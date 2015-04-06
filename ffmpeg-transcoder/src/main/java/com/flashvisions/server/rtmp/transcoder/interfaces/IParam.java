@@ -1,6 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-public interface IArbitaryProperty {
+public interface IParam {
 	public String getKey();
 	public void setKey(String key);
 	public String getValue();

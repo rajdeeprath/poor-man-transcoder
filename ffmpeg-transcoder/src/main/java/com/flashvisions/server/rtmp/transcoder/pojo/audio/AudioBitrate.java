@@ -1,15 +1,10 @@
-package com.flashvisions.server.rtmp.transcoder.pojo;
-
-import java.io.Serializable;
+package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
 
-public class AudioBitrate extends PassThru implements IAudioBitrate, Serializable 
+public class AudioBitrate extends PassThruProperty implements IAudioBitrate 
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8520782797618220444L;
 	private int bitrate;
 	
 	public AudioBitrate(boolean sameAsSource){
