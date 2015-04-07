@@ -13,14 +13,6 @@ public class TemplateDAOFactory extends AbstractDAOFactory
 	public ITranscodeDao getTranscodeDao(String filename) {
 		// TODO Auto-generated method stub
 		return new TemplateDao(Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + filename);
-	}
-	
-	
-	/***** Important!! Not to be used with prototype pattern ******/
-	@Override
-	public ITranscodeDao getTranscodeDao(String filename, boolean lazyLoad) {
-		// TODO Auto-generated method stub
-		return new TemplateDao((Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + filename), lazyLoad);
 	}	
 	
 }

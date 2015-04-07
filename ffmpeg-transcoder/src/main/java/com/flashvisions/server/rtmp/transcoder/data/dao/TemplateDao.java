@@ -64,7 +64,7 @@ import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
 
 @SuppressWarnings("unused")
-public class TemplateDao implements ITranscodeDao, IDisposable {
+public class TemplateDao implements ITranscodeDao {
 
 	private static Logger logger = LoggerFactory.getLogger(TemplateDao.class);
 	
@@ -72,39 +72,30 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 	private String templateName;
 	private File templateFile;
 	
-	private DocumentBuilderFactory builderFactory = null;
-	private DocumentBuilder builder = null;
-	private Document document = null;
-	private XPath xpath;
 	
-	private ITranscode session;
 	
-	public TemplateDao()
-	{
-		// Default
-	}
+	private ITranscode transcodeObject;
 	
-	public TemplateDao(String templatePath, boolean lazyLoad)
-	{
-		this.templatePath = templatePath;
-		if(!lazyLoad) this.readTemplate();
-	}
 	
 	public TemplateDao(String templatePath)
 	{
 		this.templatePath = templatePath;
-		this.readTemplate();
 	}	
 	
-	public void readTemplate() {
-		// TODO Auto-generated method stub
-		// load actual template file here
-		// then parse
+	protected ITranscode readTemplate() 
+	{
+		ITranscode session = null;;
+		
+		DocumentBuilderFactory builderFactory = null;
+		DocumentBuilder builder = null;
+		Document document = null;
+		XPath xpath;
 		
 		
 		try
 		{
 			logger.debug("preparing new transcode session");
+			
 			session = new Transcode();
 			
 			this.templateFile = new File(this.templatePath);
@@ -112,29 +103,29 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 			
 			logger.debug("loading template " + this.templateFile.getName());
 			
-			this.builderFactory = DocumentBuilderFactory.newInstance();
-			this.builder = this.builderFactory.newDocumentBuilder();
-			this.xpath = XPathFactory.newInstance().newXPath();
-			this.document = this.builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
+			builderFactory = DocumentBuilderFactory.newInstance();
+			builder = builderFactory.newDocumentBuilder();
+			xpath = XPathFactory.newInstance().newXPath();
+			document = builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
 			
 			logger.debug("Updating document with expression variables");
-			TemplateParseHelper.updateDocumentWithVariables(this.document, this.xpath);
+			TemplateParseHelper.updateDocumentWithVariables(document, xpath);
 			
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
-			String name = this.xpath.compile(templateNameExpression).evaluate(this.document);
+			String name = xpath.compile(templateNameExpression).evaluate(document);
 			session.setLabel(name);
 			
 			
 			/****************** template description ****************/
 			String templateDescriptionExpression = "/Template/Transcode/Description";
-			String description = this.xpath.compile(templateDescriptionExpression).evaluate(this.document);
+			String description = xpath.compile(templateDescriptionExpression).evaluate(document);
 			session.setDescription(description);
 			
 			
 			/****************** look for encode objects ****************/
 			String encodeNodesExpression = "/Template/Transcode/Encodes/Encode";
-			NodeList encodeNodes = (NodeList) this.xpath.compile(encodeNodesExpression).evaluate(this.document, XPathConstants.NODESET);
+			NodeList encodeNodes = (NodeList) xpath.compile(encodeNodesExpression).evaluate(document, XPathConstants.NODESET);
 			
 			IEncodeCollection encodeList = new EncodeCollection();
 			for(int i=0;i<encodeNodes.getLength();i++){
@@ -143,15 +134,15 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				/******************* generic encode information **************************************/
 				
 				String encodeNodeEnabledExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Enable";
-				boolean encodeNodeEnabled = Boolean.parseBoolean(this.xpath.compile(encodeNodeEnabledExpression).evaluate(this.document));
+				boolean encodeNodeEnabled = Boolean.parseBoolean(xpath.compile(encodeNodeEnabledExpression).evaluate(document));
 				encode.setEnabled(encodeNodeEnabled);
 				
 				String encodeNodeNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Name";
-				String encodeNodeName = this.xpath.compile(encodeNodeNameExpression).evaluate(this.document);
+				String encodeNodeName = xpath.compile(encodeNodeNameExpression).evaluate(document);
 				encode.setName(encodeNodeName);
 				
 				String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/StreamName";
-				String encodeNodeOutputName = this.xpath.compile(encodeNodeOutputNameExpression).evaluate(this.document);
+				String encodeNodeOutputName = xpath.compile(encodeNodeOutputNameExpression).evaluate(document);
 				IMediaOutput output = new MediaOutput(encodeNodeOutputName, true); 
 				encode.setOutput(output);			
 				
@@ -162,9 +153,9 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
-					String encodeNodeVideoCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
+					String encodeNodeVideoCodec = xpath.compile(encodeNodeVideoCodecExpression).evaluate(document);
 					String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
-					String encodeNodeVideoCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
+					String encodeNodeVideoCodecImplementation = xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(document);
 					video.setCodec(new VideoCodec(encodeNodeVideoCodec, encodeNodeVideoCodecImplementation));
 				}
 				catch(Exception e)
@@ -177,14 +168,14 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try	
 				{	
 					String encodeNodeVideoFrameSizeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize";
-					Node encodeNodeVideoFrameSizeNode = (Node) this.xpath.compile(encodeNodeVideoFrameSizeExpression).evaluate(this.document, XPathConstants.NODE);
+					Node encodeNodeVideoFrameSizeNode = (Node) xpath.compile(encodeNodeVideoFrameSizeExpression).evaluate(document, XPathConstants.NODE);
 					
 					if(encodeNodeVideoFrameSizeNode != null && encodeNodeVideoFrameSizeNode.hasChildNodes()) 
 					{
 						String encodeNodeVideoFrameWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Width";
-						Double encodeNodeVideoFrameWidth = (Double) this.xpath.compile(encodeNodeVideoFrameWidthExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double encodeNodeVideoFrameWidth = (Double) xpath.compile(encodeNodeVideoFrameWidthExpression).evaluate(document, XPathConstants.NUMBER);
 						String encodeNodeVideoFrameHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Height";
-						Double encodeNodeVideoFrameHeight = (Double) this.xpath.compile(encodeNodeVideoFrameHeightExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double encodeNodeVideoFrameHeight = (Double) xpath.compile(encodeNodeVideoFrameHeightExpression).evaluate(document, XPathConstants.NUMBER);
 						int width = encodeNodeVideoFrameWidth.intValue();
 						int height = encodeNodeVideoFrameHeight.intValue();
 						
@@ -211,7 +202,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeVideoFrameRateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameRate";
-					String encodeNodeVideoFrameRate = this.xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(this.document);
+					String encodeNodeVideoFrameRate = xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(document);
 					if(encodeNodeVideoFrameRate != null) 
 					{
 						int encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
@@ -236,20 +227,20 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeVideoBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate";
-					Node encodeNodeVideoBitrateNode = (Node) this.xpath.compile(encodeNodeVideoBitrateExpression).evaluate(this.document, XPathConstants.NODE);
+					Node encodeNodeVideoBitrateNode = (Node) xpath.compile(encodeNodeVideoBitrateExpression).evaluate(document, XPathConstants.NODE);
 					if(encodeNodeVideoBitrateNode != null && encodeNodeVideoBitrateNode.hasChildNodes())
 					{
 						String encodeNodeVideoBitrateAvgExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Average";
-						int encodeNodeVideoBitrateAverage = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(this.document));
+						int encodeNodeVideoBitrateAverage = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Min";
-						int encodeNodeVideoBitrateMin = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(this.document));
+						int encodeNodeVideoBitrateMin = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateMaxExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Max";
-						int encodeNodeVideoBitrateMax = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(this.document));
+						int encodeNodeVideoBitrateMax = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateBufferExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Buffer";
-						int encodeNodeVideoBitrateBuffer = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(this.document));
+						int encodeNodeVideoBitrateBuffer = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(document));
 						
 						video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateAverage, encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
 					}
@@ -270,16 +261,16 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeVideoKeyFrameIntervalExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval";
-					Node encodeNodeVideoKeyFrameIntervalNode = (Node) this.xpath.compile(encodeNodeVideoKeyFrameIntervalExpression).evaluate(this.document, XPathConstants.NODE);
+					Node encodeNodeVideoKeyFrameIntervalNode = (Node) xpath.compile(encodeNodeVideoKeyFrameIntervalExpression).evaluate(document, XPathConstants.NODE);
 					if(encodeNodeVideoKeyFrameIntervalNode != null && encodeNodeVideoKeyFrameIntervalNode.hasChildNodes())
 					{
 						String encodeNodeVideoKeyFrameIntervalGopExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/Gop";
-						String encodeNodeVideoGop = this.xpath.compile(encodeNodeVideoKeyFrameIntervalGopExpression).evaluate(this.document);
+						String encodeNodeVideoGop = xpath.compile(encodeNodeVideoKeyFrameIntervalGopExpression).evaluate(document);
 						if(encodeNodeVideoGop == null) throw new TranscodeConfigurationException("Invalid gop size");
 						int encodeNodeVideoKFIGop = Integer.parseInt(encodeNodeVideoGop);
 						
 						String encodeNodeVideoKeyFrameIntervalMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/IntervalMin";
-						String encodeNodeVideoKeyFrameIntervalMin = this.xpath.compile(encodeNodeVideoKeyFrameIntervalMinExpression).evaluate(this.document);
+						String encodeNodeVideoKeyFrameIntervalMin = xpath.compile(encodeNodeVideoKeyFrameIntervalMinExpression).evaluate(document);
 						if(encodeNodeVideoKeyFrameIntervalMin == null) throw new TranscodeConfigurationException("Invalid min keyframeinterval");
 						int encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
 						
@@ -302,7 +293,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				/**************** Overlays ************/
 				
 				String overlayNodesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay";
-				NodeList overlayNodes = (NodeList) this.xpath.compile(overlayNodesExpression).evaluate(this.document, XPathConstants.NODESET);
+				NodeList overlayNodes = (NodeList) xpath.compile(overlayNodesExpression).evaluate(document, XPathConstants.NODESET);
 				
 				IOverlayCollection overlays = new OverlayCollection();
 				for(int m=0;m<overlayNodes.getLength();m++)
@@ -312,55 +303,55 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 					try
 					{
 						String overlayNodeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]";
-						Node overlayNode = (Node) this.xpath.compile(overlayNodeExpression).evaluate(this.document, XPathConstants.NODE);
+						Node overlayNode = (Node) xpath.compile(overlayNodeExpression).evaluate(document, XPathConstants.NODE);
 						
 						
 						String overlayNodeEnableExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Enable";
-						boolean overlayEnable = (Boolean) this.xpath.compile(overlayNodeEnableExpression).evaluate(this.document, XPathConstants.BOOLEAN);
+						boolean overlayEnable = (Boolean) xpath.compile(overlayNodeEnableExpression).evaluate(document, XPathConstants.BOOLEAN);
 						overlay.setEnabled(overlayEnable);
 						
 						
 						String overlayNodeNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Name";
-						String overlayName = (String) this.xpath.compile(overlayNodeNameExpression).evaluate(this.document, XPathConstants.STRING);
+						String overlayName = (String) xpath.compile(overlayNodeNameExpression).evaluate(document, XPathConstants.STRING);
 						overlay.setLabel(overlayName);
 						
 						
 						String overlayNodeIndexExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Index";
-						Double overlayIndex = (Double) this.xpath.compile(overlayNodeIndexExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double overlayIndex = (Double) xpath.compile(overlayNodeIndexExpression).evaluate(document, XPathConstants.NUMBER);
 						overlay.setZindex(overlayIndex.intValue());	
 						
 						
 						String overlayNodeImageExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/ImagePath";
-						String overlayImage = (String) this.xpath.compile(overlayNodeImageExpression).evaluate(this.document, XPathConstants.STRING);
+						String overlayImage = (String) xpath.compile(overlayNodeImageExpression).evaluate(document, XPathConstants.STRING);
 						overlay.setOverlayImagePath(overlayImage);
 						
 						
 						String overlayNodeOpacityExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Opacity";
-						Double overlayOpacity = (Double) this.xpath.compile(overlayNodeOpacityExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double overlayOpacity = (Double) xpath.compile(overlayNodeOpacityExpression).evaluate(document, XPathConstants.NUMBER);
 						overlay.setOpacity(overlayOpacity.intValue());
 						
 						
 						/******* location *****/
 						
 						String locationNodeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location";
-						Node locationNode = (Node) this.xpath.compile(overlayNodeExpression).evaluate(this.document, XPathConstants.NODE);
+						Node locationNode = (Node) xpath.compile(overlayNodeExpression).evaluate(document, XPathConstants.NODE);
 						
 						IOverlayLocation location  = new Overlay.Location();
 						
 						
 						String locationNodeXExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/X";
-						Double locationNodeX = (Double) this.xpath.compile(locationNodeXExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double locationNodeX = (Double) xpath.compile(locationNodeXExpression).evaluate(document, XPathConstants.NUMBER);
 						location.setX(locationNodeX.intValue());
 						
 						
 						String locationNodeYExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Y";
-						Double locationNodeY = (Double) this.xpath.compile(locationNodeYExpression).evaluate(this.document, XPathConstants.NUMBER);
+						Double locationNodeY = (Double) xpath.compile(locationNodeYExpression).evaluate(document, XPathConstants.NUMBER);
 						location.setX(locationNodeY.intValue());
 						
 						/******** evaluate overlay width *****/
 						
 						String locationNodeWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Width";
-						String locationNodeWidthContent = (String) this.xpath.compile(locationNodeWidthExpression).evaluate(this.document, XPathConstants.STRING);
+						String locationNodeWidthContent = (String) xpath.compile(locationNodeWidthExpression).evaluate(document, XPathConstants.STRING);
 						if(overlay.getOverlayImageWidth()<=0) throw new IllegalStateException("Invalid overlay width");
 						int width = TemplateParseHelper.evaluateExpressionForInt(locationNodeWidthContent, "ImageWidth", overlay.getOverlayImageWidth());
 		                location.setWidth(width);
@@ -369,14 +360,14 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 						/******** evaluate overlay height *****/
 						
 						String locationNodeHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Height";
-						String locationNodeHeightContent = (String) this.xpath.compile(locationNodeHeightExpression).evaluate(this.document, XPathConstants.STRING);
+						String locationNodeHeightContent = (String) xpath.compile(locationNodeHeightExpression).evaluate(document, XPathConstants.STRING);
 						if(overlay.getOverlayImageHeight()<=0) throw new IllegalStateException("Invalid overlay height");
 						int height = TemplateParseHelper.evaluateExpressionForInt(locationNodeHeightContent, "ImageHeight", overlay.getOverlayImageHeight());
 		                location.setHeight(height);
 						
 						
 						String locationNodeAlignExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Align";
-						String locationNodeAligntContent = (String) this.xpath.compile(locationNodeAlignExpression).evaluate(this.document, XPathConstants.STRING);
+						String locationNodeAligntContent = (String) xpath.compile(locationNodeAlignExpression).evaluate(document, XPathConstants.STRING);
 						location.setAlign(locationNodeAligntContent);
 						
 						overlay.setLocation(location);
@@ -401,21 +392,21 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeVideoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters";
-					Node encodeNodeVideoExtraParamsNode = (Node) this.xpath.compile(encodeNodeVideoExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
+					Node encodeNodeVideoExtraParamsNode = (Node) xpath.compile(encodeNodeVideoExtraParamsExpression).evaluate(document, XPathConstants.NODE);
 					
 					if(encodeNodeVideoExtraParamsNode != null && encodeNodeVideoExtraParamsNode.hasChildNodes())
 					{
 						String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
-						NodeList videoParams = (NodeList) this.xpath.compile(videoExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
+						NodeList videoParams = (NodeList) xpath.compile(videoExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
 						ArrayList<IParam> extras = new ArrayList<IParam>();
 						
 						for(int j=0;j<videoParams.getLength();j++)
 						{
 							String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Key";
-							String videoParamsKey = this.xpath.compile(videoParamsKeyExpression).evaluate(this.document);
+							String videoParamsKey = xpath.compile(videoParamsKeyExpression).evaluate(document);
 							
 							String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Value";
-							String videoParamsValue = this.xpath.compile(videoParamsValueExpression).evaluate(this.document);
+							String videoParamsValue = xpath.compile(videoParamsValueExpression).evaluate(document);
 							
 							extras.add(new Param(videoParamsKey, videoParamsValue));
 						}
@@ -447,9 +438,9 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
-					String encodeNodeAudioCodec = this.xpath.compile(encodeNodeAudioCodecExpression).evaluate(this.document);
+					String encodeNodeAudioCodec = xpath.compile(encodeNodeAudioCodecExpression).evaluate(document);
 					String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
-					String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(this.document);
+					String encodeNodeAudioCodecImplementation = xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(document);
 					audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
 				}
 				catch(Exception e)
@@ -462,7 +453,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeAudioBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Bitrate";
-					String encodeNodeAudioBitrate = this.xpath.compile(encodeNodeAudioBitrateExpression).evaluate(this.document);
+					String encodeNodeAudioBitrate = xpath.compile(encodeNodeAudioBitrateExpression).evaluate(document);
 					if(encodeNodeAudioBitrate != null && Integer.parseInt(encodeNodeAudioBitrate)>0)
 					{
 						audio.setBitrate(new AudioBitrate(Integer.parseInt(encodeNodeAudioBitrate)));
@@ -482,7 +473,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeAudioSamplerateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/SampleRate";
-					String encodeNodeAudioSampleRate = this.xpath.compile(encodeNodeAudioSamplerateExpression).evaluate(this.document);
+					String encodeNodeAudioSampleRate = xpath.compile(encodeNodeAudioSamplerateExpression).evaluate(document);
 					if(encodeNodeAudioSampleRate != null && Integer.parseInt(encodeNodeAudioSampleRate)>0)
 					{
 						audio.setSamplerate(new AudioSampleRate(Integer.parseInt(encodeNodeAudioSampleRate)));
@@ -503,7 +494,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String encodeNodeAudioChannelTypeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Channels";
-					String encodeNodeAudioChannelType = this.xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(this.document);
+					String encodeNodeAudioChannelType = xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(document);
 					if(encodeNodeAudioChannelType != null)
 					{
 						audio.setChannel(new AudioChannel(encodeNodeAudioChannelType));
@@ -520,28 +511,26 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				}
 				
 				
-				
-				
 				/******** Extra audio flags ***********/
 				
 				try
 				{
 					String encodeNodeAudioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters";
-					Node encodeNodeAudioExtraParamsNode = (Node) this.xpath.compile(encodeNodeAudioExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
+					Node encodeNodeAudioExtraParamsNode = (Node) xpath.compile(encodeNodeAudioExtraParamsExpression).evaluate(document, XPathConstants.NODE);
 					
 					if(encodeNodeAudioExtraParamsNode != null && encodeNodeAudioExtraParamsNode.hasChildNodes())
 					{
 						String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
-						NodeList audioParams = (NodeList) this.xpath.compile(audioExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
+						NodeList audioParams = (NodeList) xpath.compile(audioExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
 						
 						ArrayList<IParam> extras = new ArrayList<IParam>(); 
 						for(int j=0;j<audioParams.getLength();j++)
 						{
 							String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";
-							String audioParamsKey = this.xpath.compile(audioParamsKeyExpression).evaluate(this.document);
+							String audioParamsKey = xpath.compile(audioParamsKeyExpression).evaluate(document);
 							
 							String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Value";
-							String audioParamsValue = this.xpath.compile(audioParamsValueExpression).evaluate(this.document);
+							String audioParamsValue = xpath.compile(audioParamsValueExpression).evaluate(document);
 							
 							extras.add(new Param(audioParamsKey, audioParamsValue));
 						}
@@ -566,7 +555,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				try
 				{
 					String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Properties/Property";
-					NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
+					NodeList outputflagNodes = (NodeList) xpath.compile(outputFlagsExpression).evaluate(document, XPathConstants.NODESET);
 					ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
 					for(int l=0;l<outputflagNodes.getLength();l++){
 					Node n = outputflagNodes.item(l);
@@ -586,7 +575,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				encodeList.addEncode(encode);
 			}
 			
-			/**** ad encodes list to transcode session object ***/
+			/**** add encodes list to transcode session object ***/
 			session.setEncodes(encodeList);
 			session.setEnabled(true);
 		}
@@ -595,6 +584,15 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 			session.setEnabled(false);
 			logger.error("Error parsing template " + ee.getMessage());
 		}
+		finally
+		{
+			builderFactory = null;
+			builder = null;
+			xpath = null;
+			document = null;
+		}
+		
+		return session;
 	}
 
 	public String getTemplate() {
@@ -605,15 +603,10 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 		this.templatePath = templatePath;
 	}
 
-	public void dispose() {
-		// TODO Auto-generated method stub
-		session = null;
-	}
-
 	@Override
 	public ITranscode getTranscodeConfig() {
 		// TODO Auto-generated method stub
-		return session;
+		return this.readTemplate();
 	}
 	 
 

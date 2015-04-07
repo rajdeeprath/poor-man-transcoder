@@ -10,14 +10,4 @@ public class NullDAOFactory extends AbstractDAOFactory {
 		return null;
 	}
 
-	
-	/***** Important!! Not to be used with prototype pattern ******/
-	@Override
-	public ITranscodeDao getTranscodeDao(String filename,
-			boolean lazyLoad) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-
 }

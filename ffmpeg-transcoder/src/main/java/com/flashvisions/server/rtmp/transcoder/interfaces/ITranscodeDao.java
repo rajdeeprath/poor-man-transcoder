@@ -5,5 +5,4 @@ public interface ITranscodeDao  {
 	public String getTemplate();
 	public void setTemplate(String templatePath);	
 	public ITranscode getTranscodeConfig();
-	public void readTemplate();
 }
