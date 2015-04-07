@@ -135,7 +135,6 @@ public class TranscodeSessionPool {
 		} 
 	    catch (MalformedTranscodeQueryException e) 
 	    {
-	    	logger.info(e.getMessage());
 	    	throw new TranscoderException("Unable to create a valid session " + e.getMessage());
 		}
 	    

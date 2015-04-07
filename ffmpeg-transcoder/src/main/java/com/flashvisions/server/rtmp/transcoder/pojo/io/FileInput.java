@@ -2,6 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import java.io.File;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaInput;
 
@@ -12,6 +13,10 @@ public class FileInput extends MediaInput implements IFileInput {
 	public FileInput(String source) {
 		super(source);
 		// TODO Auto-generated constructor stub
+	}
+	
+	public FileInput(String source, IContainer container){
+		super(source, container);
 	}
 
 	@Override
@@ -36,14 +41,6 @@ public class FileInput extends MediaInput implements IFileInput {
 	public boolean isStreamingMedia() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	protected void validateSource() {
-		// TODO Auto-generated method stub
-		this.setFile(new File(this.getSourcePath()));
-		this.setStreamName(this.getFile().getName());
-		super.validateSource();
 	}
 
 	

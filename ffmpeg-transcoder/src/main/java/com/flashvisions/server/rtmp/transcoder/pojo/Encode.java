@@ -1,35 +1,22 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Encode extends MutableObject implements IEncode  {
 
 	private String name;
-	private IMediaOutput output;
 	
 	private IVideo vConfig;
 	private IAudio aConfig;
 	
-	public ArrayList<IProperty> outputflags;
+	private ITranscodeOutput output;
 	
 	
-	
-	public ArrayList<IProperty> getOutputflags() {
-		return outputflags;
-	}
-
-
-	public void setOutputflags(ArrayList<IProperty> outputflags) {
-		this.outputflags = outputflags;
-	}
-
 
 	public IAudio getAudioConfig() {
 		return aConfig;
@@ -49,15 +36,6 @@ public class Encode extends MutableObject implements IEncode  {
 	public void setVideoConfig(IVideo vConfig) {
 		this.vConfig = vConfig;
 	}
-	
-	
-	public IMediaOutput getOutput() {
-		return output;
-	}
-	
-	public void setOutput(IMediaOutput output) {
-		this.output = output;
-	}
 
 
 	public String getName() {
@@ -67,6 +45,20 @@ public class Encode extends MutableObject implements IEncode  {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+
+	@Override
+	public ITranscodeOutput getOutput() {
+		// TODO Auto-generated method stub
+		return output;
+	}
+
+
+	@Override
+	public void setOutput(ITranscodeOutput output) {
+		// TODO Auto-generated method stub
+		this.output = output;
 	}
 	
 	

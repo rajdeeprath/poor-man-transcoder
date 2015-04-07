@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.vo.collection;
+package com.flashvisions.server.rtmp.transcoder.pojo.collection;
 
 import java.util.ArrayList;
 import java.util.List;

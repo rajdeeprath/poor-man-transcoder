@@ -29,39 +29,39 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.pojo.Param;
+import com.flashvisions.server.rtmp.transcoder.pojo.Container;
+import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Encode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.pojo.Transcode;
+import com.flashvisions.server.rtmp.transcoder.pojo.TranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.Audio;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.pojo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.KeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.pojo.video.Overlay;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.Video;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoCodec;
-import com.flashvisions.server.rtmp.transcoder.vo.collection.EncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.vo.collection.OverlayCollection;
+import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 @SuppressWarnings("unused")
 public class TemplateDao implements ITranscodeDao {
@@ -70,11 +70,7 @@ public class TemplateDao implements ITranscodeDao {
 	
 	private String templatePath;
 	private String templateName;
-	private File templateFile;
-	
-	
-	
-	private ITranscode transcodeObject;
+	private File templateFile;	
 	
 	
 	public TemplateDao(String templatePath)
@@ -84,7 +80,7 @@ public class TemplateDao implements ITranscodeDao {
 	
 	protected ITranscode readTemplate() 
 	{
-		ITranscode session = null;;
+		ITranscode session = null;
 		
 		DocumentBuilderFactory builderFactory = null;
 		DocumentBuilder builder = null;
@@ -141,10 +137,7 @@ public class TemplateDao implements ITranscodeDao {
 				String encodeNodeName = xpath.compile(encodeNodeNameExpression).evaluate(document);
 				encode.setName(encodeNodeName);
 				
-				String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/StreamName";
-				String encodeNodeOutputName = xpath.compile(encodeNodeOutputNameExpression).evaluate(document);
-				IMediaOutput output = new MediaOutput(encodeNodeOutputName, true); 
-				encode.setOutput(output);			
+						
 				
 				
 				/******************* Video codec information **************************************/
@@ -289,8 +282,7 @@ public class TemplateDao implements ITranscodeDao {
 				
 				
 				
-				
-				/**************** Overlays ************/
+				/*
 				
 				String overlayNodesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay";
 				NodeList overlayNodes = (NodeList) xpath.compile(overlayNodesExpression).evaluate(document, XPathConstants.NODESET);
@@ -331,8 +323,6 @@ public class TemplateDao implements ITranscodeDao {
 						overlay.setOpacity(overlayOpacity.intValue());
 						
 						
-						/******* location *****/
-						
 						String locationNodeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location";
 						Node locationNode = (Node) xpath.compile(overlayNodeExpression).evaluate(document, XPathConstants.NODE);
 						
@@ -348,7 +338,6 @@ public class TemplateDao implements ITranscodeDao {
 						Double locationNodeY = (Double) xpath.compile(locationNodeYExpression).evaluate(document, XPathConstants.NUMBER);
 						location.setX(locationNodeY.intValue());
 						
-						/******** evaluate overlay width *****/
 						
 						String locationNodeWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Width";
 						String locationNodeWidthContent = (String) xpath.compile(locationNodeWidthExpression).evaluate(document, XPathConstants.STRING);
@@ -356,8 +345,6 @@ public class TemplateDao implements ITranscodeDao {
 						int width = TemplateParseHelper.evaluateExpressionForInt(locationNodeWidthContent, "ImageWidth", overlay.getOverlayImageWidth());
 		                location.setWidth(width);
 						
-						
-						/******** evaluate overlay height *****/
 						
 						String locationNodeHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Overlays/Overlay["+(m+1)+"]/Location/Height";
 						String locationNodeHeightContent = (String) xpath.compile(locationNodeHeightExpression).evaluate(document, XPathConstants.STRING);
@@ -372,7 +359,6 @@ public class TemplateDao implements ITranscodeDao {
 						
 						overlay.setLocation(location);
 						
-						/*** add overlay to list  of overlays */
 						overlays.addOverlay(overlay);
 					}
 					catch(Exception w)
@@ -382,8 +368,8 @@ public class TemplateDao implements ITranscodeDao {
 					}
 				}
 				
-				/********* store all overlays ***/
 				video.setOverlays(overlays);
+				*/
 				
 				
 				
@@ -396,19 +382,20 @@ public class TemplateDao implements ITranscodeDao {
 					
 					if(encodeNodeVideoExtraParamsNode != null && encodeNodeVideoExtraParamsNode.hasChildNodes())
 					{
-						String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
+						String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Parameter";
 						NodeList videoParams = (NodeList) xpath.compile(videoExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
-						ArrayList<IParam> extras = new ArrayList<IParam>();
+						ArrayList<IParameter> extras = new ArrayList<IParameter>();
 						
 						for(int j=0;j<videoParams.getLength();j++)
 						{
-							String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Key";
+							String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Parameter["+(j+1)+"]/Key";
 							String videoParamsKey = xpath.compile(videoParamsKeyExpression).evaluate(document);
 							
-							String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Value";
+							String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Parameter["+(j+1)+"]/Value";
 							String videoParamsValue = xpath.compile(videoParamsValueExpression).evaluate(document);
 							
-							extras.add(new Param(videoParamsKey, videoParamsValue));
+							IParameter param = new Parameter(videoParamsKey, videoParamsValue);
+							extras.add(param);
 						}
 						
 						video.setExtraParams(extras);
@@ -417,8 +404,31 @@ public class TemplateDao implements ITranscodeDao {
 				catch(Exception e)
 				{
 					logger.info("Error in extra video params");
-					video.setExtraParams(new ArrayList<IParam>());
+					video.setExtraParams(new ArrayList<IParameter>());
 				}
+				
+				
+				
+				/******** Extra video properties ***********/
+				try
+				{
+					String videoPropertiesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Properties/Property";
+					NodeList videoPropertiesNodes = (NodeList) xpath.compile(videoPropertiesExpression).evaluate(document, XPathConstants.NODESET);
+					ArrayList<IProperty> videoProperties = new ArrayList<IProperty>(); 
+					for(int l=0;l<videoPropertiesNodes.getLength();l++){
+					Node n = videoPropertiesNodes.item(l);
+					String flag = n.getFirstChild().getNodeValue();
+					videoProperties.add(new Property(flag));
+					}
+					
+					video.setExtraProperties(videoProperties);
+				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra audio properties");
+					video.setExtraProperties(new ArrayList<IProperty>());
+				}
+				
 				
 				
 				/*** all ok with video configuration */
@@ -520,19 +530,20 @@ public class TemplateDao implements ITranscodeDao {
 					
 					if(encodeNodeAudioExtraParamsNode != null && encodeNodeAudioExtraParamsNode.hasChildNodes())
 					{
-						String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
+						String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Parameter";
 						NodeList audioParams = (NodeList) xpath.compile(audioExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
 						
-						ArrayList<IParam> extras = new ArrayList<IParam>(); 
+						ArrayList<IParameter> extras = new ArrayList<IParameter>(); 
 						for(int j=0;j<audioParams.getLength();j++)
 						{
-							String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";
+							String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Parameter["+(j+1)+"]/Key";
 							String audioParamsKey = xpath.compile(audioParamsKeyExpression).evaluate(document);
 							
-							String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Value";
+							String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Parameter["+(j+1)+"]/Value";
 							String audioParamsValue = xpath.compile(audioParamsValueExpression).evaluate(document);
 							
-							extras.add(new Param(audioParamsKey, audioParamsValue));
+							IParameter param = new Parameter(audioParamsKey, audioParamsValue);
+							extras.add(param);
 						}
 						audio.setExtraParams(extras);
 					}
@@ -540,7 +551,29 @@ public class TemplateDao implements ITranscodeDao {
 				catch(Exception e)
 				{
 					logger.info("Error in extra audio params");
-					audio.setExtraParams(new ArrayList<IParam>());
+					audio.setExtraParams(new ArrayList<IParameter>());
+				}
+				
+				
+				
+				/******** Extra audio properties ***********/
+				try
+				{
+					String audioPropertiesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Properties/Property";
+					NodeList audioPropertiesNodes = (NodeList) xpath.compile(audioPropertiesExpression).evaluate(document, XPathConstants.NODESET);
+					ArrayList<IProperty> audioProperties = new ArrayList<IProperty>(); 
+					for(int l=0;l<audioPropertiesNodes.getLength();l++){
+					Node n = audioPropertiesNodes.item(l);
+					String flag = n.getFirstChild().getNodeValue();
+					audioProperties.add(new Property(flag));
+					}
+					
+					audio.setExtraProperties(audioProperties);
+				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra audio properties");
+					audio.setExtraProperties(new ArrayList<IProperty>());
 				}
 				
 				
@@ -551,10 +584,38 @@ public class TemplateDao implements ITranscodeDao {
 				encode.setAudioConfig(audio);
 				
 				
-				/****************** look for output flags ****************/
+				
+				/*************************************************
+				 * **********look for output Properties***********
+				 ************************************************/
+				ITranscodeOutput encodeOutput = new TranscodeOutput();
+				
 				try
 				{
-					String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Properties/Property";
+					String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/StreamName";
+					String encodeNodeOutputName = xpath.compile(encodeNodeOutputNameExpression).evaluate(document);
+					
+					String encodeNodeOutputContainerExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Container";
+					String encodeNodeOutputContainer = xpath.compile(encodeNodeOutputContainerExpression).evaluate(document);
+					
+					IMediaOutput output = new MediaOutput(encodeNodeOutputName, true);
+					IOUtils.IdentifyOutput(output);
+					
+					if(!encodeNodeOutputContainer.equals("") && encodeNodeOutputContainer.length()>=3)
+					output.setContainer(new Container(Format.valueOf(encodeNodeOutputContainer.toUpperCase())));
+					 
+					encodeOutput.setMediaOutput(output);
+				}
+				catch(Exception e)
+				{
+					throw new TranscodeConfigurationException("Invalid output specified "+e.getMessage());
+				}
+				
+				
+				
+				try
+				{
+					String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Properties/Property";
 					NodeList outputflagNodes = (NodeList) xpath.compile(outputFlagsExpression).evaluate(document, XPathConstants.NODESET);
 					ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
 					for(int l=0;l<outputflagNodes.getLength();l++){
@@ -563,15 +624,20 @@ public class TemplateDao implements ITranscodeDao {
 					outputflags.add(new Property(flag));
 					}
 					
-					encode.setOutputflags(outputflags);
+					encodeOutput.setOutputProperties(outputflags);
 				}
 				catch(Exception e)
 				{
 					logger.info("Error in extra output properties");
-					encode.setOutputflags(new ArrayList<IProperty>());
-				}				
+					encodeOutput.setOutputProperties(new ArrayList<IProperty>());
+				}		
 				
-				/**** Add encode object to encodeslist *****/
+				/***** store output data *****/
+				encode.setOutput(encodeOutput);
+				
+				
+				/*******************************************
+				 **** Add encode object to encodeslist ****/
 				encodeList.addEncode(encode);
 			}
 			

@@ -1,16 +1,72 @@
 package com.flashvisions.server.rtmp.transcoder.utils;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.Container;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.FileOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.ContainerType;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
 
 public class IOUtils {
+	
+	public static void IdentifyInput(IMediaInput input) throws MediaIdentifyException
+	{
+		try
+		{
+			String source = input.getSourcePath();
+			URI uri = new URI(source);
+			
+			String protocol = uri.getScheme();
+			input.setProtocol(protocol);
+			
+			String medianame = (uri.getPath().contains("/"))?uri.getPath().substring(uri.getPath().lastIndexOf("/")+1):uri.getPath();
+			input.setStreamName(medianame);	
+			
+			
+			if(input.getContainer() == null)
+			input.setContainer(new Container(IOUtils.guessContainer(source)));
+			
+			
+			if(input.isFile()){
+			IFileInput in = (IFileInput) input;
+			in.setFile(new File(source));
+			}			
+		}
+		catch(Exception e)
+		{
+			throw new MediaIdentifyException("Unable to identify media " + e.getMessage());
+		}
+	}
+	
+	public static void IdentifyOutput(IMediaOutput output) throws MediaIdentifyException
+	{
+		try
+		{
+			String source = output.getSourcePath();
+			URI uri = new URI(source);
+			
+			String protocol = uri.getScheme();
+			output.setProtocol(protocol);
+			
+			String medianame = (uri.getPath().contains("/"))?uri.getPath().substring(uri.getPath().lastIndexOf("/")+1):uri.getPath();
+			output.setStreamName(medianame);
+			
+			if(output.getContainer() == null)
+			output.setContainer(new Container(IOUtils.guessContainer(source)));
+		}
+		catch(Exception e)
+		{
+			throw new MediaIdentifyException("Unable to identify media " + e.getMessage());
+		}
+	}
 	
 	public static boolean isRTMPCompatStream(IMediaInput input)
 	{
@@ -35,7 +91,7 @@ public class IOUtils {
 		}
 	}
 
-	public static ContainerType getContainer(String source) throws URISyntaxException
+	public static Format guessContainer(String source) throws URISyntaxException
 	{
 		try
 		{
@@ -49,56 +105,63 @@ public class IOUtils {
 				case RTMPE:
 				case RTMPS:
 				case RTMPT:
-				return ContainerType.FLV;
+				return Format.FLV;
 					
 				case RTP:
-				return ContainerType.RTP;
+				return Format.RTP;
 					
 				case RTSP:
-				return ContainerType.RTSP;
+				return Format.RTSP;
 				
 				case HTTP:
 				// possible hls or regular http file
 				String fileType = source.substring(source.lastIndexOf(".")+1);
-				switch(ContainerType.valueOf(fileType.toUpperCase()))
+				switch(Format.valueOf(fileType.toUpperCase()))
 				{
 					case M3U8:
-					return ContainerType.SSEGMENT;
+					return Format.SSEGMENT;
 					
 					default:
-					return ContainerType.valueOf(fileType.toUpperCase());						
+					return Format.valueOf(fileType.toUpperCase());						
 				}
 				
 				default:
-				return ContainerType.FLV;
+				return Format.FLV;
 			}
 		}
 		catch(Exception e)
 		{
 			// match for files types from supported filetypes
 			String fileType = source.substring(source.lastIndexOf(".")+1);
-			switch(ContainerType.valueOf(fileType.toUpperCase()))
+			switch(Format.valueOf(fileType.toUpperCase()))
 			{
 				case M3U8:
-				return ContainerType.SSEGMENT;
+				return Format.SSEGMENT;
 				
 				default:
-				return ContainerType.valueOf(fileType.toUpperCase());
+				return Format.valueOf(fileType.toUpperCase());
 			}
 		}
 	}
 	
-	public static IMediaOutput createOutputFromInput(IMediaInput in, IMediaOutput out){
+	public static IMediaOutput createOutputFromInput(IMediaInput in, IMediaOutput temp) throws URISyntaxException{
+		
+		IMediaOutput finalOutput = null;
+		IContainer container = null;
 		
 		String insource = in.getSourcePath();
 		String streamname = in.getStreamName();
 		String inapp = insource.substring(0, insource.indexOf(streamname)-1);
 		
-		String outsource = out.getSourcePath();
+		String outsource = temp.getSourcePath();
 		outsource = outsource.replace("SourceApplication", inapp);
 		outsource = outsource.replace("SourceStreamName", streamname);
 		
-		return (out.isStreamingMedia())?new StreamOutput(outsource):new FileOutput(outsource);
+		container = (temp.getContainer() == null)?new Container(guessContainer(outsource)):temp.getContainer();
+		finalOutput = (temp.isStreamingMedia())?new StreamOutput(outsource, container):new FileOutput(outsource, container);
+		finalOutput.setContainer(container);
+		
+		return finalOutput;
 	}
 	
 	

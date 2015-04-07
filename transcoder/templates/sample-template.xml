@@ -8,11 +8,10 @@
 			<Encode>
 				<Enable>true</Enable>
 				<!-- must be unique in this sequence of encodes -->
-				<Name>Stream 2 Stream</Name>
-				<StreamName>${SourceStreamName}.m3u8</StreamName>				
+				<Name>Stream 2 Stream</Name>								
 				<Video>
 					<!-- Any supported codec, PassThru, Disable, {codecname} -->
-					<Codec>PassThru</Codec>
+					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<FrameSize>
@@ -30,36 +29,22 @@
 						<Gop>24</Gop>
 						<IntervalMin>48</IntervalMin>
 					</KeyFrameInterval>
-					<Overlays>
-						<!-- only one supported for now -->
-						<!--<Overlay>
-							<Enable>false</Enable>
-							<Name>Brand Logo</Name>
-							<Index>0</Index>
-							<ImagePath>C:\\Users\\Rajdeep\\Documents\\GitHub\\rajdeep\\ffmpeg-transcoder\\transcoder\\images\\logo.png</ImagePath>
-							<Opacity>100</Opacity>
-							<Location>
-								<X>4</X>
-								<Y>4</Y>
-								<Width>${ImageWidth}</Width>
-								<Height>${ImageHeight}</Height>
-								<Align>TOPRIGHT</Align>
-							</Location>
-						</Overlay>
-						-->
-					</Overlays>
-					<!-- Extra params such as filters -->
+					
 					<Parameters>
-						<Param>
+						<Parameter>
 							<Key>profile:v</Key>
 							<Value>baseline</Value>
-						</Param>
+						</Parameter>
 					</Parameters>
+					
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
 				</Video>
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>PassThru</Codec>
+					<Codec>libvo_aacenc</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
@@ -69,25 +54,33 @@
 					<Channels>mono</Channels>
 					<!-- Extra params such as filters -->
 					<Parameters> 
-						<Param>
+						<!--<Parameter>
 							<Key></Key>
 							<Value></Value>
-						</Param>
+						</Parameter>-->
 					</Parameters>
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
 				</Audio>
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
-				
-				<Properties>
-					<Property>-segment_list</Property>
-					<Property>playlist.m3u8</Property>
-					<Property>-segment_list_flags</Property>
-					<Property>+live</Property>
-					<Property>-segment_time</Property>
-					<Property>10</Property>
-					<Property>ut%03d.ts</Property>
-				</Properties>
-				
+				<Output>
+						<StreamName>${SourceStreamName}.mp4</StreamName>
+						<!-- mp4, flv etc.. -->
+						<Container></Container>
+					<!--<Properties>
+							<Property>-bsf:v</Property>
+							<Property>h264_mp4toannexb</Property>
+							<Property>-segment_list</Property>
+							<Property>playlist.m3u8</Property>
+							<Property>-segment_list_flags</Property>
+							<Property>+live</Property>
+							<Property>-segment_time</Property>
+							<Property>10</Property>
+							<Property>ut%03d.ts</Property>
+					</Properties>-->
+				</Output>
 			</Encode>
 		</Encodes>
 	</Transcode>

@@ -1,17 +1,17 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 
-public class Param implements IParam {
+public class Parameter implements IParameter {
 
 	private String key;
-	private String value;
+	private Object value;
 	
-	public Param() {
+	public Parameter() {
 		
 	}
 	
-	public Param(String key, String value) {
+	public Parameter(String key, String value) {
 		this.key = key; this.value = value;
 	}
 	
@@ -26,12 +26,12 @@ public class Param implements IParam {
 		this.key = key;
 	}
 
-	public String getValue()
+	public Object getValue()
 	{
 		return value;
 	}
 
-	public void setValue(String value) 
+	public void setValue(Object value) 
 	{
 		this.value = value;
 	}

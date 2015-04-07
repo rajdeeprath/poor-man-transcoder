@@ -18,6 +18,7 @@ import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
 public class TemplateParseHelper {
 	
+	
 	private static final Map<String, String> VARIABLEMAP;
     static
     {

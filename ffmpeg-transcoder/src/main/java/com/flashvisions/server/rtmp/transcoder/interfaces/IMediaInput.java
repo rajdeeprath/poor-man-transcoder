@@ -7,6 +7,7 @@ public interface IMediaInput {
 	public void setContainer(IContainer container);
 	public String getSourcePath();
 	public void setSourcePath(String source);
+	public void setProtocol(String protocol);
 	public String getProtocol();
 	public boolean isFile();
 	public boolean isStreamingMedia();

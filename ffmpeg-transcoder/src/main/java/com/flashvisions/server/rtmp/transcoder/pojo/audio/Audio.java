@@ -2,12 +2,13 @@ package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
@@ -18,7 +19,8 @@ public class Audio extends MutableObject implements IAudio  {
 	private IAudioBitrate bitrate;
 	private IAudioSampleRate samplerate;
 	private IAudioChannel channel;
-	private ArrayList<IParam> extraParams;
+	private ArrayList<IParameter> extraParams;
+	private ArrayList<IProperty> extraProperties;
 
 
 	public ICodec getCodec() {
@@ -61,11 +63,25 @@ public class Audio extends MutableObject implements IAudio  {
 		this.channel = channel;
 	}
 
-	public ArrayList<IParam> getExtraParams() {
+	public ArrayList<IParameter> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<IParam> extraParams) {
+	public void setExtraParams(ArrayList<IParameter> extraParams) {
 		this.extraParams = extraParams;
 	}
+
+	@Override
+	public ArrayList<IProperty> getExtraProperties() {
+		// TODO Auto-generated method stub
+		return extraProperties;
+	}
+
+	@Override
+	public void setExtraProperties(ArrayList<IProperty> extraProperties) {
+		// TODO Auto-generated method stub
+		this.extraProperties = extraProperties;
+	}
+
+	
 }

@@ -18,8 +18,8 @@ public interface IVideo extends IMutable {
 	public void setBitrate(IVideoBitrate bitrate);
 	public IKeyFrameInterval getKeyFrameInterval();
 	public void setKeyFrameInterval(IKeyFrameInterval keyFrameInterval);
-	public IOverlayCollection getOverlays();
-	public void setOverlays(IOverlayCollection overlays);
-	public ArrayList<IParam> getExtraParams();
-	public void setExtraParams(ArrayList<IParam> extraParams);
+	public ArrayList<IParameter> getExtraParams();
+	public void setExtraParams(ArrayList<IParameter> extraParams);
+	public ArrayList<IProperty> getExtraProperties();
+	public void setExtraProperties(ArrayList<IProperty> extraProperties);
 }

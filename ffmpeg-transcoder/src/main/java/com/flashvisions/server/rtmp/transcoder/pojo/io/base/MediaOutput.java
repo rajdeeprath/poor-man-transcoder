@@ -1,20 +1,12 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.io.base;
 
-import java.net.URI;
 import java.util.ArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.Container;
-import com.flashvisions.server.rtmp.transcoder.pojo.Property;
-import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 
 public class MediaOutput implements IMediaOutput {
-
-	private static Logger logger = LoggerFactory.getLogger(MediaOutput.class);
 	
 	private boolean isTemplate;
 	
@@ -22,11 +14,16 @@ public class MediaOutput implements IMediaOutput {
 	private String protocol;
 	private String source;
 	private IContainer container;
-	private ArrayList<Property> outputFlags;
+	private ArrayList<IProperty> properties;
 	
 	
 	public MediaOutput(String source){
 		setSourcePath(source);
+	}
+	
+	public MediaOutput(String source, IContainer container){
+		setSourcePath(source);
+		setContainer(container);
 	}
 	
 	public MediaOutput(String source, boolean isTemplate){
@@ -56,7 +53,6 @@ public class MediaOutput implements IMediaOutput {
 	public void setSourcePath(String source) {
 		// TODO Auto-generated method stub
 		this.source = source;
-		if(!isTemplate)this.validateSource();
 	}
 
 	@Override
@@ -78,15 +74,15 @@ public class MediaOutput implements IMediaOutput {
 	}
 
 	@Override
-	public ArrayList<Property> getOutputFlags() {
+	public ArrayList<IProperty> getOutputFlags() {
 		// TODO Auto-generated method stub
-		return this.outputFlags;
+		return this.properties;
 	}
 
 	@Override
-	public void setOutputFlags(ArrayList<Property> outputFlags) {
+	public void setOutputFlags(ArrayList<IProperty> properties) {
 		// TODO Auto-generated method stub
-		this.outputFlags = outputFlags;
+		this.properties = properties;
 	}
 
 	@Override
@@ -104,25 +100,16 @@ public class MediaOutput implements IMediaOutput {
 	{
 		this.streamName = streamName;
 	}
-	
-	protected void validateSource()
-	{
-		try 
-		{
-			URI uri = new URI(this.source);
-			this.protocol = uri.getScheme();
-			this.streamName = uri.getPath().substring(uri.getPath().lastIndexOf("/")+1);
-			this.setContainer(new Container(IOUtils.getContainer(this.source)));
-		} 
-		catch (Exception e) 
-		{
-			logger.info(e.getMessage());
-		}
-	}
 
 	public boolean isTemplate() 
 	{
 		return this.isTemplate;
+	}
+
+	@Override
+	public void setProtocol(String protocol) {
+		// TODO Auto-generated method stub
+		this.protocol = protocol;
 	}
 
 }

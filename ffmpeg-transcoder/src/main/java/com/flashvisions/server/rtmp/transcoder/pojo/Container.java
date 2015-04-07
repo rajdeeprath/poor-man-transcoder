@@ -1,25 +1,25 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.ContainerType;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 
 public class Container implements IContainer {
 	
-	private ContainerType type;
+	private Format type;
 	
 
-	public Container(ContainerType type){
+	public Container(Format type){
 		this.setType(type);
 	}
 
 	@Override
-	public ContainerType getType() {
+	public Format getType() {
 		// TODO Auto-generated method stub
 		return type;
 	}
 
 	@Override
-	public void setType(ContainerType type) {
+	public void setType(Format type) {
 		// TODO Auto-generated method stub
 		this.type = type;
 	}

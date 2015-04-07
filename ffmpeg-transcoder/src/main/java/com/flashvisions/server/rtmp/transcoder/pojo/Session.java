@@ -1,7 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.exec.CommandLine;
@@ -23,12 +22,11 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.system.Server;
@@ -295,7 +293,6 @@ public class Session implements ISession {
 		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscode config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
-			logger.info(source.getSourcePath()+":"+source.getContainer());
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
@@ -304,30 +301,30 @@ public class Session implements ISession {
 			try
 			{
 					replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-					replacementMap.put("inputSource", source.getSourcePath());				
-					
+					replacementMap.put("inputSource", source.getSourcePath());
 									
 										
-					if(config.getEnabled())
-					{
+						if(!config.getEnabled())
+						throw new Exception("Transcode configuration disabled");
 						
 						/************************************************
 						 ********** Processing Inputs ****************
 						 ************************************************/
 						{
-							logger.info("Setting input source");
+							cmdLine.addArgument("-i");
+							cmdLine.addArgument("${inputSource}");							
 							
-							/* Building librtmp params string if protocol is rtmp based */
-							if(IOUtils.isRTMPCompatStream(source))
-							{
+							logger.info("Identifying input");
+							IOUtils.IdentifyInput(source);
+							
+							logger.info("Peparing librtmp");
+							if(IOUtils.isRTMPCompatStream(source)){
 								ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
 								String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
 								replacementMap.put("inputSource", libRtmpParamString);	
 							}
-							
-							cmdLine.addArgument("-i");
-							cmdLine.addArgument("${inputSource}");
 						}
+						
 						
 						
 						/************************************************
@@ -348,8 +345,8 @@ public class Session implements ISession {
 							
 								IVideo vConfig = encode.getVideoConfig();
 								IAudio aConfig = encode.getAudioConfig();
-								ArrayList<IProperty> outFlags = encode.getOutputflags();
-								IMediaOutput output = encode.getOutput();
+								ITranscodeOutput output = encode.getOutput();
+	
 								
 								
 								/************************************************
@@ -411,8 +408,8 @@ public class Session implements ISession {
 								 ********** Output configurations ****************
 								 ************************************************/
 								try
-								{
-									helper.buildOutputQuery(cmdLine, source, output, outFlags);
+								{								
+									helper.buildOutputQuery(cmdLine, source, output);
 								}
 								catch(Exception e)
 								{
@@ -423,17 +420,16 @@ public class Session implements ISession {
 							catch(Exception e)
 							{
 								logger.info("Error configuring encode. {cause: "+e.getMessage()+"} Skipping...");
+								throw new MalformedTranscodeQueryException(e);
 							}
 						}
 						
 						cmdLine.setSubstitutionMap(replacementMap);
-					}
-					
-					return cmdLine;
+						return cmdLine;
 			}
 			catch(Exception e)
 			{
-				logger.info("Error : " + e.getMessage());
+				logger.info("Error creating session : " + e.getMessage());
 				throw new MalformedTranscodeQueryException(e);
 			}
 			finally

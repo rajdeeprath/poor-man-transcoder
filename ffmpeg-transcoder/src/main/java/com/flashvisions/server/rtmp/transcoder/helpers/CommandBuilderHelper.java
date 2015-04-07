@@ -17,11 +17,9 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayIterator;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
@@ -32,33 +30,25 @@ public class CommandBuilderHelper {
 	private static Logger logger = LoggerFactory.getLogger(CommandBuilderHelper.class);
 	
 	
-	public void buildOutputQuery(CommandLine cmdLine, IMediaInput source, IMediaOutput output, ArrayList<IProperty> outFlags) throws Exception
+	public void buildOutputQuery(CommandLine cmdLine, IMediaInput input, ITranscodeOutput output) throws Exception
 	{
 		logger.info("Processing output destination for encode");
-		IMediaOutput destination = IOUtils.createOutputFromInput(source, output);
 		
-		logger.info("Output destination for encode"
-				+ " "
-				+ "Container :" 
-				+ destination.getContainer().toString()
-				+ " "
-				+ "Destination :" 
-				+ destination.getSourcePath());
+		IMediaOutput template = output.getMediaOutput();
+		ArrayList<IProperty> properties = output.getOutputProperties();
+		
+		IMediaOutput destination = IOUtils.createOutputFromInput(input, template);
 									
 		cmdLine.addArgument("-y");
-		
 		cmdLine.addArgument("-f");
-		cmdLine.addArgument(destination.getContainer().toString());
+		cmdLine.addArgument(destination.getContainer().toString());		
 		
 		
+		/***************** extra properties for output **************/
 		
-		/***************** extra flags for output **********************/
-		
-		if(!outFlags.isEmpty())
+		if(!properties.isEmpty())
 		{
-			logger.info("Parsing extra output flags for encode");
-			Iterator<IProperty> it = outFlags.iterator();
-			
+			Iterator<IProperty> it = properties.iterator();
 			while(it.hasNext())	{
 				cmdLine.addArgument(it.next().getData());
 			}
@@ -143,12 +133,12 @@ public class CommandBuilderHelper {
 			
 			/* Extra params such as filters */
 			logger.info("Setting extra audio params");
-			ArrayList<IParam> extraAudioParams = config.getExtraParams();
+			ArrayList<IParameter> extraAudioParams = config.getExtraParams();
 			Iterator<?> ita = extraAudioParams.iterator();
 			while(ita.hasNext()){
-				IParam prop = (IParam) ita.next();
+				IParameter prop = (IParameter) ita.next();
 				cmdLine.addArgument("-"+prop.getKey());
-				cmdLine.addArgument(prop.getValue());
+				cmdLine.addArgument(String.valueOf(prop.getValue()));
 			}
 		}
 	}
@@ -263,37 +253,15 @@ public class CommandBuilderHelper {
 			}
 			
 			
-			/* Overlays */
-			logger.info("Setting overlays");
-			IOverlayCollection overlays = config.getOverlays();
-			IOverlayIterator ito = overlays.iterator();
-			while(ito.hasNext())
-			{
-				IOverlay o = ito.next();
-				
-				if(!o.getEnabled())
-				{
-					// NO OP
-				}
-				else
-				{
-					// DO OP
-				}
-			}
-			
-			
 			/* Extra params such as filters */
 			logger.info("Setting extra video params");
-			ArrayList<IParam> extraVideoParams = config.getExtraParams();
-			Iterator<IParam> itv = extraVideoParams.iterator();
+			ArrayList<IParameter> extraVideoParams = config.getExtraParams();
+			Iterator<IParameter> itv = extraVideoParams.iterator();
 			while(itv.hasNext()){
-				IParam prop = (IParam) itv.next();
+				IParameter prop = (IParameter) itv.next();
 				cmdLine.addArgument("-"+prop.getKey());
-				cmdLine.addArgument(prop.getValue());
-			}
-			
+				cmdLine.addArgument(String.valueOf(prop.getValue()));
+			}		
 		}
 	}
-	
-	
 }

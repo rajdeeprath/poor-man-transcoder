@@ -2,12 +2,12 @@ package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
@@ -21,8 +21,9 @@ public class Video extends MutableObject implements IVideo  {
 	private IFrameRate framerate;
 	private IVideoBitrate bitrate;
 	private IKeyFrameInterval keyFrameInterval;
-	private IOverlayCollection overlays;
-	private ArrayList<IParam> extraParams;
+	private ArrayList<IParameter> extraParams;
+	private ArrayList<IProperty> extraProperties;
+	
 	
 
 	public ICodec getCodec() {
@@ -73,19 +74,23 @@ public class Video extends MutableObject implements IVideo  {
 		this.keyFrameInterval = keyFrameInterval;
 	}
 
-	public IOverlayCollection getOverlays() {
-		return overlays;
-	}
-
-	public void setOverlays(IOverlayCollection overlays) {
-		this.overlays = overlays;
-	}
-
-	public ArrayList<IParam> getExtraParams() {
+	public ArrayList<IParameter> getExtraParams() {
 		return extraParams;
 	}
 
-	public void setExtraParams(ArrayList<IParam> extraParams) {
+	public void setExtraParams(ArrayList<IParameter> extraParams) {
 		this.extraParams = extraParams;
+	}
+
+	@Override
+	public ArrayList<IProperty> getExtraProperties() {
+		// TODO Auto-generated method stub
+		return extraProperties;
+	}
+
+	@Override
+	public void setExtraProperties(ArrayList<IProperty> extraProperties) {
+		// TODO Auto-generated method stub
+		this.extraProperties = extraProperties;
 	}
 }
