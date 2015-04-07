@@ -3,7 +3,6 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -19,29 +18,18 @@ import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQuery
 import com.flashvisions.server.rtmp.transcoder.handler.SessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.SessionOutputStream;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IParam;
+import com.flashvisions.server.rtmp.transcoder.helpers.CommandBuilderHelper;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayIterator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.system.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
@@ -311,30 +299,40 @@ public class Session implements ISession {
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
-			
+			CommandBuilderHelper helper = new CommandBuilderHelper();
 			
 			try
 			{
 					replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-					replacementMap.put("inputSource", source.getSourcePath());
+					replacementMap.put("inputSource", source.getSourcePath());				
 					
-					
-					/* Building librtmp params string */
-					if(IOUtils.isRTMPCompatStream(source))
-					{
-						ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
-						String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
-						replacementMap.put("inputSource", libRtmpParamString);	
-					}					
+									
 										
 					if(config.getEnabled())
 					{
+						
+						/************************************************
+						 ********** Processing Inputs ****************
+						 ************************************************/
 						{
 							logger.info("Setting input source");
+							
+							/* Building librtmp params string if protocol is rtmp based */
+							if(IOUtils.isRTMPCompatStream(source))
+							{
+								ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
+								String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
+								replacementMap.put("inputSource", libRtmpParamString);	
+							}
+							
 							cmdLine.addArgument("-i");
 							cmdLine.addArgument("${inputSource}");
 						}
 						
+						
+						/************************************************
+						 ********** Processing Encodes ****************
+						 ************************************************/						
 						IEncodeCollection outputs = config.getEncodes();
 						IEncodeIterator iterator = outputs.iterator();
 						
@@ -353,6 +351,10 @@ public class Session implements ISession {
 								ArrayList<IProperty> outFlags = encode.getOutputflags();
 								IMediaOutput output = encode.getOutput();
 								
+								
+								/************************************************
+								 ********** Video configurations ****************
+								 ************************************************/
 								try
 								{
 									logger.info("Parsing video settings for encode");
@@ -362,144 +364,7 @@ public class Session implements ISession {
 																	
 									try
 									{
-										ICodec vcodec = vConfig.getCodec();
-										
-										if(!vcodec.getEnabled())
-										throw new Exception("Video codec disabled");
-									
-										if(vcodec.getSameAsSource())
-										{
-											// pass thru -> use same as source
-											cmdLine.addArgument("-codec:v");
-											cmdLine.addArgument("copy");
-										}
-										else
-										{
-											logger.info("Calculating new video settings");
-											
-											
-											logger.info("Setting codec");
-											cmdLine.addArgument("-codec:v");
-											cmdLine.addArgument(vcodec.getName());
-											
-											
-											logger.info("Setting codec implementation");
-											if(vcodec.getImplementation() != Codec.Implementation.NORMAL){
-											cmdLine.addArgument("-strict");
-											cmdLine.addArgument(vcodec.getImplementation().name().toLowerCase());
-											}
-											
-											
-											logger.info("Setting frame size");
-											IFrameSize framesize = vConfig.getFramesize();
-											if(framesize.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												cmdLine.addArgument("-s");
-												cmdLine.addArgument(framesize.getWidth()+"x"+framesize.getHeight());
-											}
-											
-											
-											logger.info("Setting frame rate");
-											IFrameRate framerate = vConfig.getFramerate();
-											if(framerate.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												cmdLine.addArgument("-r");
-												cmdLine.addArgument(String.valueOf(framerate.getFramerate()));
-											}
-											
-											
-											logger.info("Setting bitrate");
-											IVideoBitrate vbitrate = vConfig.getBitrate();
-											if(vbitrate.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												if(vbitrate.getAverage()>0)
-												{
-													logger.info("ABR enabled");
-													cmdLine.addArgument("-b:v");
-													cmdLine.addArgument(vbitrate.getAverage()+"k");
-												}
-												else
-												{
-													if(vbitrate.getMinimum()>0){
-														cmdLine.addArgument("-minrate");
-														cmdLine.addArgument(vbitrate.getMinimum()+"k");
-													}
-													
-													if(vbitrate.getMaximum()>0){
-														cmdLine.addArgument("-maxrate");
-														cmdLine.addArgument(vbitrate.getMaximum()+"k");
-													}
-													
-													if(vbitrate.getDeviceBuffer()>0){
-														cmdLine.addArgument("-bufsize");
-														cmdLine.addArgument(vbitrate.getDeviceBuffer()+"k");
-													}
-												}
-											}
-											
-											
-											logger.info("Setting keyframeinterval & gop");
-											IKeyFrameInterval keyframeinterval = vConfig.getKeyFrameInterval();
-											if(keyframeinterval.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												if(keyframeinterval.getGop()>0){
-												cmdLine.addArgument("-g");
-												cmdLine.addArgument(String.valueOf(keyframeinterval.getGop()));
-												}
-												
-												if(keyframeinterval.getMinimunInterval()>0){
-												cmdLine.addArgument("-keyint_min");
-												cmdLine.addArgument(String.valueOf(keyframeinterval.getMinimunInterval()));
-												}
-											}
-											
-											
-											/* Overlays */
-											logger.info("Setting overlays");
-											IOverlayCollection overlays = vConfig.getOverlays();
-											IOverlayIterator ito = overlays.iterator();
-											while(ito.hasNext())
-											{
-												IOverlay o = ito.next();
-												
-												if(!o.getEnabled())
-												{
-													// NO OP
-												}
-												else
-												{
-													// DO OP
-												}
-											}
-											
-											
-											/* Extra params such as filters */
-											logger.info("Setting extra video params");
-											ArrayList<IParam> extraVideoParams = vConfig.getExtraParams();
-											Iterator<IParam> itv = extraVideoParams.iterator();
-											while(itv.hasNext()){
-												IParam prop = (IParam) itv.next();
-												cmdLine.addArgument("-"+prop.getKey());
-												cmdLine.addArgument(prop.getValue());
-											}
-											
-										}
+										helper.buildVideoQuery(cmdLine, vConfig);
 									}
 									catch(Exception e)
 									{
@@ -514,100 +379,20 @@ public class Session implements ISession {
 								
 								
 								
-								
 								/************************************************
 								 ********** Audio configurations ****************
 								 ************************************************/
 								try
 								{
+									logger.info("Parsing audio settings for encode");
+									
 									if(!aConfig.getEnabled())
 									throw new Exception("Audio configuration disabled");
-									
-									logger.info("Parsing audio settings for encode");
+																	
 									
 									try
 									{
-										ICodec acodec = aConfig.getCodec();
-										
-										if(!acodec.getEnabled())
-										throw new Exception("Audio codec disabled");
-									
-										if(acodec.getSameAsSource())
-										{
-											// pass thru -> use same as source
-											cmdLine.addArgument("-codec:a");
-											cmdLine.addArgument("copy");
-										}
-										else
-										{
-											// new encode params
-											logger.info("Setting audio codec");
-											cmdLine.addArgument("-codec:a");
-											cmdLine.addArgument(acodec.getName());
-											
-											
-											logger.info("Setting codec implementation");
-											if(acodec.getImplementation() != null && acodec.getImplementation() != Codec.Implementation.NORMAL){
-											cmdLine.addArgument("-strict");
-											cmdLine.addArgument(acodec.getImplementation().name().toLowerCase());
-											}
-											
-											
-											logger.info("Setting audio bitrate");
-											IAudioBitrate abitrate = aConfig.getBitrate();
-											if(abitrate.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												if(abitrate.getBitrate()>0) {
-													cmdLine.addArgument("-b:a");
-													cmdLine.addArgument(abitrate.getBitrate()+"k");
-												}
-											}
-											
-											
-											logger.info("Setting audio samplerate");
-											IAudioSampleRate asamplerate = aConfig.getSamplerate();
-											if(asamplerate.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												if(asamplerate.getSamplerate()>0){
-												cmdLine.addArgument("-ar");
-												cmdLine.addArgument(String.valueOf(asamplerate.getSamplerate()));
-												}
-											}
-											
-											
-											logger.info("Setting audio channel");
-											IAudioChannel achannel = aConfig.getChannel();
-											if(achannel.getSameAsSource())
-											{
-												// NO OP
-											}
-											else
-											{
-												if(achannel.getChannels()>0){
-												cmdLine.addArgument("-ac");
-												cmdLine.addArgument(String.valueOf(achannel.getChannels()));
-												}
-											}
-											
-											
-											/* Extra params such as filters */
-											logger.info("Setting extra audio params");
-											ArrayList<IParam> extraAudioParams = aConfig.getExtraParams();
-											Iterator<?> ita = extraAudioParams.iterator();
-											while(ita.hasNext()){
-												IParam prop = (IParam) ita.next();
-												cmdLine.addArgument("-"+prop.getKey());
-												cmdLine.addArgument(prop.getValue());
-											}
-										}
+										helper.buildAudioQuery(cmdLine, aConfig);
 									}
 									catch(Exception e)
 									{
@@ -621,53 +406,23 @@ public class Session implements ISession {
 								}
 								
 								
-								/********************* output build ***************************/
 								
-								logger.info("Processing output destination for encode");
-								
+								/************************************************
+								 ********** Output configurations ****************
+								 ************************************************/
 								try
 								{
-									IMediaOutput destination = IOUtils.createOutputFromInput(this.source, output);
-									
-									logger.info("Output destination for encode"
-											+ " "
-											+ "Container :" 
-											+ destination.getContainer().toString()
-											+ " "
-											+ "Destination :" 
-											+ destination.getSourcePath());
-																
-									cmdLine.addArgument("-y");
-									
-									cmdLine.addArgument("-f");
-									cmdLine.addArgument(destination.getContainer().toString());
-									
-									
-									
-									/***************** extra flags for output **********************/
-									
-									if(!outFlags.isEmpty())
-									{
-										logger.info("Parsing extra output flags for encode");
-										Iterator<IProperty> it = outFlags.iterator();
-										
-										while(it.hasNext())	{
-											cmdLine.addArgument(it.next().getData());
-										}
-									}
-									
-									
-									cmdLine.addArgument(destination.getSourcePath());
+									helper.buildOutputQuery(cmdLine, source, output, outFlags);
 								}
 								catch(Exception e)
 								{
-									logger.info("Error evaluating output");
+									logger.info("Error building output");
 									throw(e);
 								}
 							}
 							catch(Exception e)
 							{
-								logger.info("Disabled encode configuration. {"+e.getMessage()+"} Skipping...");
+								logger.info("Error configuring encode. {cause: "+e.getMessage()+"} Skipping...");
 							}
 						}
 						
@@ -681,8 +436,10 @@ public class Session implements ISession {
 				logger.info("Error : " + e.getMessage());
 				throw new MalformedTranscodeQueryException(e);
 			}
+			finally
+			{
+				helper = null;
+			}
 		}
-
-		
 	}
 }
