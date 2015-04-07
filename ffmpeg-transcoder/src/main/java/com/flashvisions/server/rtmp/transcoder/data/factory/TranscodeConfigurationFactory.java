@@ -13,7 +13,7 @@ public class TranscodeConfigurationFactory {
 	private AbstractDAOFactory daoFactory;
 	private static Map<String, ITranscode> prototypes = null;;
 	
-	public TranscodeConfigurationFactory(SingletonEnforcer e){
+	private TranscodeConfigurationFactory(){
 		prototypes = new HashMap<String, ITranscode>();
 	}
 	
@@ -29,6 +29,11 @@ public class TranscodeConfigurationFactory {
 	{
 		ITranscode config;
 		
+		ITranscodeDao dao = this.daoFactory.getTranscodeDao(template);
+		config = dao.getTranscodeConfig();
+		return config;
+		
+		/*
 		if(prototypes.containsKey(template))
 		{
 			config = prototypes.get(template);
@@ -40,15 +45,14 @@ public class TranscodeConfigurationFactory {
 			config = dao.getTranscodeConfig();
 			prototypes.put(template, config);
 			return config;
-		}		
+		}	
+		*/	
 	}
 
 	/** @throws IllegalAccessException ******/ 
 	public static TranscodeConfigurationFactory getInstance()
 	{
-		if(instance == null) instance = new TranscodeConfigurationFactory(new SingletonEnforcer());
+		if(instance == null) instance = new TranscodeConfigurationFactory();
 		return instance;
 	}
 }
-
-class SingletonEnforcer{}

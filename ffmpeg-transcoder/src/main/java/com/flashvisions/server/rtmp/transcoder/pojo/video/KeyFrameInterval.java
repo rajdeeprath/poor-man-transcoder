@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class KeyFrameInterval extends PassThruProperty implements IKeyFrameInterval  {
+public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterval  {
 
 	private int gop;
 	private int minimunInterval;

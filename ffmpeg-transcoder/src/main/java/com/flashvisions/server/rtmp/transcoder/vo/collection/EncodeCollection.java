@@ -15,7 +15,7 @@ public class EncodeCollection implements IEncodeCollection  {
 	{
 		encodeList = new ArrayList<IEncode>();
 	}
-	
+
 	public void addEncode(IEncode e) 
 	{
 		// TODO Auto-generated method stub

@@ -10,5 +10,4 @@ public interface ITranscode extends IMutable {
 	public void setDescription(String description);
 	public IEncodeCollection getEncodes();
 	public void setEncodes(IEncodeCollection encodes);
-	public ITranscode clone();
 }

@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.pojo.io;
+package com.flashvisions.server.rtmp.transcoder.pojo.io.base;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -7,36 +7,56 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
+import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
-public class MediaInput implements IMediaInput {
+public class MediaOutput implements IMediaOutput {
 
-	private static Logger logger = LoggerFactory.getLogger(MediaInput.class);
+	private static Logger logger = LoggerFactory.getLogger(MediaOutput.class);
+	
+	private boolean isTemplate;
 	
 	private String streamName;
 	private String protocol;
 	private String source;
 	private IContainer container;
-	private ArrayList<IProperty> inputFlags;
+	private ArrayList<Property> outputFlags;
 	
-	public MediaInput(String source){
+	
+	public MediaOutput(String source){
+		setSourcePath(source);
+	}
+	
+	public MediaOutput(String source, boolean isTemplate){
+		this.isTemplate = isTemplate ;
 		setSourcePath(source);
 	}
 	
 	@Override
+	public IContainer getContainer() {
+		// TODO Auto-generated method stub
+		return container;
+	}
+
+	@Override
+	public void setContainer(IContainer container) {
+		// TODO Auto-generated method stub
+		this.container = container;
+	}
+
+	@Override
 	public String getSourcePath() {
 		// TODO Auto-generated method stub
-		return this.source;
+		return source;
 	}
 
 	@Override
 	public void setSourcePath(String source) {
 		// TODO Auto-generated method stub
 		this.source = source;
-		this.validateSource();
+		if(!isTemplate)this.validateSource();
 	}
 
 	@Override
@@ -58,15 +78,15 @@ public class MediaInput implements IMediaInput {
 	}
 
 	@Override
-	public ArrayList<IProperty> getInputFlags() {
+	public ArrayList<Property> getOutputFlags() {
 		// TODO Auto-generated method stub
-		return this.inputFlags;
+		return this.outputFlags;
 	}
 
 	@Override
-	public void setInputFlags(ArrayList<IProperty> inputFlags) {
+	public void setOutputFlags(ArrayList<Property> outputFlags) {
 		// TODO Auto-generated method stub
-		this.inputFlags = inputFlags;
+		this.outputFlags = outputFlags;
 	}
 
 	@Override
@@ -74,31 +94,17 @@ public class MediaInput implements IMediaInput {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public IContainer getContainer() {
-		// TODO Auto-generated method stub
-		return this.container;
-	}
-
-	@Override
-	public void setContainer(IContainer container) {
-		// TODO Auto-generated method stub		
-		this.container = container;
-	}
-
-	@Override
-	public String getStreamName() {
-		// TODO Auto-generated method stub
+	
+	public String getStreamName() 
+	{
 		return streamName;
 	}
 
-	@Override
-	public void setStreamName(String streamName) {
-		// TODO Auto-generated method stub
+	public void setStreamName(String streamName) 
+	{
 		this.streamName = streamName;
 	}
-
+	
 	protected void validateSource()
 	{
 		try 
@@ -113,4 +119,10 @@ public class MediaInput implements IMediaInput {
 			logger.info(e.getMessage());
 		}
 	}
+
+	public boolean isTemplate() 
+	{
+		return this.isTemplate;
+	}
+
 }

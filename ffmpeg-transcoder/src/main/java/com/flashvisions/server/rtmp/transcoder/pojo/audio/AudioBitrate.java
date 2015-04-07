@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class AudioBitrate extends PassThruProperty implements IAudioBitrate 
+public class AudioBitrate extends PassThruObject implements IAudioBitrate 
 {
 	private int bitrate;
 	

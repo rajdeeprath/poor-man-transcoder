@@ -2,7 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.base;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IPassThru;
 
-public abstract class PassThru extends TranscoderProperty implements IPassThru {
+public abstract class PassThru extends TranscoderEntity implements IPassThru {
 
 	private boolean sameAsSource;
 	

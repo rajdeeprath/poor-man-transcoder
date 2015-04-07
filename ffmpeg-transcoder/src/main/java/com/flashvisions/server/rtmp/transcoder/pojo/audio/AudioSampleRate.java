@@ -1,13 +1,15 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class AudioSampleRate extends PassThruProperty implements IAudioSampleRate
+public class AudioSampleRate extends PassThruObject implements IAudioSampleRate
 {
 	private int samplerate;
 	
+
 	
+
 	public AudioSampleRate(boolean sameAsSource) {
 		this.setSameAsSource(sameAsSource);
 		this.samplerate = -1;

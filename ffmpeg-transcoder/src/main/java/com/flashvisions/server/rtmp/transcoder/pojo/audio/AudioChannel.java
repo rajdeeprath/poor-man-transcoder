@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class AudioChannel extends PassThruProperty implements IAudioChannel  {
+public class AudioChannel extends PassThruObject implements IAudioChannel  {
 	
 	private int channels = 2;
 	private ChannelType type;

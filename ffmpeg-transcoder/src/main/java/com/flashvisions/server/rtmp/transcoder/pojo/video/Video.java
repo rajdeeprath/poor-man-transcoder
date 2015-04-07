@@ -11,9 +11,9 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
-public class Video extends Mutable implements IVideo  {
+public class Video extends MutableObject implements IVideo  {
 
 	private ICodec codec;
 	private Implementation codecImplementation;

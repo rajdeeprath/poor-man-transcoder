@@ -2,13 +2,13 @@ package com.flashvisions.server.rtmp.transcoder.decorator;
 
 import com.flashvisions.server.rtmp.transcoder.decorator.PropertyDecorator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IPassThru;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderEntity;
 
 public class PassThruDecorator extends PropertyDecorator implements IPassThru {
 
 	private boolean sameAsSource;
 	
-	public PassThruDecorator(ITranscoderProperty property)
+	public PassThruDecorator(ITranscoderEntity property)
 	{
 		super(property);
 	}

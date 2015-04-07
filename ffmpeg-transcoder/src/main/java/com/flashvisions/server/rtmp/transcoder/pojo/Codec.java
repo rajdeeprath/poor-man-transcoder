@@ -2,9 +2,9 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMutable;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class Codec extends PassThruProperty implements ICodec, IMutable {
+public class Codec extends PassThruObject implements ICodec, IMutable {
 	
 	public static enum Type {
         PASSTHRU, DISABLE

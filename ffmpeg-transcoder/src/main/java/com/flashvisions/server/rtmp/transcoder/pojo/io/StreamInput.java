@@ -2,6 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamInput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaInput;
 
 public class StreamInput extends MediaInput implements IStreamInput {
 

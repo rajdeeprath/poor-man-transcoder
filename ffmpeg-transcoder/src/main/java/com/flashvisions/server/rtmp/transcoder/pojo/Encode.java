@@ -7,9 +7,9 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
-public class Encode extends Mutable implements IEncode  {
+public class Encode extends MutableObject implements IEncode  {
 
 	private String name;
 	private IMediaOutput output;

@@ -1,6 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
 
 public class FileOutput extends MediaOutput implements IFileOutput {
 	

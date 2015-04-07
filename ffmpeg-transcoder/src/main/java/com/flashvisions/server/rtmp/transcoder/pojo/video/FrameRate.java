@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class FrameRate extends PassThruProperty implements IFrameRate {
+public class FrameRate extends PassThruObject implements IFrameRate {
 	
 	private int framerate;
 

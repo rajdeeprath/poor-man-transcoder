@@ -1,18 +1,13 @@
 package com.flashvisions.server.rtmp.transcoder.decorator;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderProperty;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderEntity;
 
-public abstract class PropertyDecorator implements ITranscoderProperty {
+public abstract class PropertyDecorator implements ITranscoderEntity {
  
-	protected ITranscoderProperty property;
+	protected ITranscoderEntity property;
 	
-	public PropertyDecorator(ITranscoderProperty property){
+	public PropertyDecorator(ITranscoderEntity property){
 		this.property = property;
 	}
-	
-	@Override
-	public String aboutMe() {
-		// TODO Auto-generated method stub
-		return this.property.aboutMe();
-	}
+
 }

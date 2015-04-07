@@ -7,14 +7,13 @@ import java.io.ObjectOutputStream;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
-public class Transcode extends Mutable implements ITranscode  {
+public class Transcode extends MutableObject implements ITranscode  {
 	
 	public String label;	
 	public String description;
 	public IEncodeCollection encodes;
-	
 	
 	public String getLabel() 
 	{

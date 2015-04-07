@@ -7,9 +7,9 @@ import uk.co.jaimon.SimpleImageInfo;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlay;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IOverlayLocation;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
-public class Overlay extends Mutable implements IOverlay {
+public class Overlay extends MutableObject implements IOverlay {
 	
 
 public static class Location implements IOverlayLocation{

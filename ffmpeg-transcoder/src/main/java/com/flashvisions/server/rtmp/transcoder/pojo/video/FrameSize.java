@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class FrameSize extends PassThruProperty implements IFrameSize  {
+public class FrameSize extends PassThruObject implements IFrameSize  {
 	
 	private int width = 0;
 	private int height = 0;

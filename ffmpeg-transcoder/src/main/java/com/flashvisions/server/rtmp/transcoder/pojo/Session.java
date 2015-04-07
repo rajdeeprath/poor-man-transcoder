@@ -370,8 +370,8 @@ public class Session implements ISession {
 										if(vcodec.getSameAsSource())
 										{
 											// pass thru -> use same as source
-											cmdLine.addArgument("-codec:copy");
-											cmdLine.addArgument(vcodec.getName());
+											cmdLine.addArgument("-codec:v");
+											cmdLine.addArgument("copy");
 										}
 										else
 										{
@@ -620,16 +620,8 @@ public class Session implements ISession {
 									cmdLine.addArgument("-an");
 								}
 								
-								if(!outFlags.isEmpty())
-								{
-									logger.info("Parsing extra output flags for encode");
-									Iterator<IProperty> it = outFlags.iterator();
-									
-									while(it.hasNext())	{
-										cmdLine.addArgument(it.next().getData());
-									}
-								}
 								
+								/********************* output build ***************************/
 								
 								logger.info("Processing output destination for encode");
 								
@@ -650,6 +642,21 @@ public class Session implements ISession {
 									cmdLine.addArgument("-f");
 									cmdLine.addArgument(destination.getContainer().toString());
 									
+									
+									
+									/***************** extra flags for output **********************/
+									
+									if(!outFlags.isEmpty())
+									{
+										logger.info("Parsing extra output flags for encode");
+										Iterator<IProperty> it = outFlags.iterator();
+										
+										while(it.hasNext())	{
+											cmdLine.addArgument(it.next().getData());
+										}
+									}
+									
+									
 									cmdLine.addArgument(destination.getSourcePath());
 								}
 								catch(Exception e)
@@ -663,7 +670,6 @@ public class Session implements ISession {
 								logger.info("Disabled encode configuration. {"+e.getMessage()+"} Skipping...");
 							}
 						}
-						
 						
 						cmdLine.setSubstitutionMap(replacementMap);
 					}

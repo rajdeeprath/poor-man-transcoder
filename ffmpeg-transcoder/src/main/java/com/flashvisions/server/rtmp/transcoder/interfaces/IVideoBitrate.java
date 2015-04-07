@@ -1,6 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-public interface IVideoBitrate extends IPassThru {
+public interface IVideoBitrate extends IPassThruObject {
 
 	public int getAverage();
 	public void setAverage(int average);

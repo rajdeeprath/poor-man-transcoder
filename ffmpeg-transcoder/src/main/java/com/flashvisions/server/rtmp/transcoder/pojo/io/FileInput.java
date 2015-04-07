@@ -3,6 +3,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 import java.io.File;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaInput;
 
 public class FileInput extends MediaInput implements IFileInput {
 

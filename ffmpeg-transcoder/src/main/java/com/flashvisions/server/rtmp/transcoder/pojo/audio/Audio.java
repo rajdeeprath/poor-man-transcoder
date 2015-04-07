@@ -9,9 +9,9 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.Mutable;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
-public class Audio extends Mutable implements IAudio  {
+public class Audio extends MutableObject implements IAudio  {
 
 	private ICodec codec;
 	private Implementation codecImplementation;

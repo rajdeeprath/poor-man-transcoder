@@ -52,7 +52,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.KeyFrameInterval;
@@ -153,96 +153,150 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/StreamName";
 				String encodeNodeOutputName = this.xpath.compile(encodeNodeOutputNameExpression).evaluate(this.document);
 				IMediaOutput output = new MediaOutput(encodeNodeOutputName, true); 
-				encode.setOutput(output);
-				
+				encode.setOutput(output);			
 				
 				
 				/******************* Video codec information **************************************/
 				IVideo video = new Video();
-				
-				String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
-				String encodeNodeVideoCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
-				String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
-				String encodeNodeVideoCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
-				video.setCodec(new VideoCodec(encodeNodeVideoCodec, encodeNodeVideoCodecImplementation));
-				
-				
-				String encodeNodeVideoFrameSizeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize";
-				Node encodeNodeVideoFrameSizeNode = (Node) this.xpath.compile(encodeNodeVideoFrameSizeExpression).evaluate(this.document, XPathConstants.NODE);
+			
+				try
+				{
+					String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
+					String encodeNodeVideoCodec = this.xpath.compile(encodeNodeVideoCodecExpression).evaluate(this.document);
+					String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
+					String encodeNodeVideoCodecImplementation = this.xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(this.document);
+					video.setCodec(new VideoCodec(encodeNodeVideoCodec, encodeNodeVideoCodecImplementation));
+				}
+				catch(Exception e)
+				{
+					throw new TranscodeConfigurationException("Invalid video codec specified");
+				}
 				
 				
 				/***** Width / Height *******/
-				
-				if(encodeNodeVideoFrameSizeNode != null && encodeNodeVideoFrameSizeNode.hasChildNodes()) {
-					String encodeNodeVideoFrameWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Width";
-					Double encodeNodeVideoFrameWidth = (Double) this.xpath.compile(encodeNodeVideoFrameWidthExpression).evaluate(this.document, XPathConstants.NUMBER);
-					String encodeNodeVideoFrameHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Height";
-					Double encodeNodeVideoFrameHeight = (Double) this.xpath.compile(encodeNodeVideoFrameHeightExpression).evaluate(this.document, XPathConstants.NUMBER);
-				
-					// check for valid width height combination.. then
-					video.setFramesize(new FrameSize(encodeNodeVideoFrameWidth.intValue(), encodeNodeVideoFrameHeight.intValue()));
-				
-				}else {
+				try	
+				{	
+					String encodeNodeVideoFrameSizeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize";
+					Node encodeNodeVideoFrameSizeNode = (Node) this.xpath.compile(encodeNodeVideoFrameSizeExpression).evaluate(this.document, XPathConstants.NODE);
+					
+					if(encodeNodeVideoFrameSizeNode != null && encodeNodeVideoFrameSizeNode.hasChildNodes()) 
+					{
+						String encodeNodeVideoFrameWidthExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Width";
+						Double encodeNodeVideoFrameWidth = (Double) this.xpath.compile(encodeNodeVideoFrameWidthExpression).evaluate(this.document, XPathConstants.NUMBER);
+						String encodeNodeVideoFrameHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Height";
+						Double encodeNodeVideoFrameHeight = (Double) this.xpath.compile(encodeNodeVideoFrameHeightExpression).evaluate(this.document, XPathConstants.NUMBER);
+						int width = encodeNodeVideoFrameWidth.intValue();
+						int height = encodeNodeVideoFrameHeight.intValue();
+						
+						if(width<=0 || height<=0)
+						throw new TranscodeConfigurationException("Invalid width / height combination");
+								
+						video.setFramesize(new FrameSize(width, height));
+					
+					}
+					else 
+					{
+						video.setFramesize(new FrameSize(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Invalid frame size specified. Following source...");
 					video.setFramesize(new FrameSize(true));
 				}
 				
 				
 				/***** Frame-Rate *******/
 				
-				String encodeNodeVideoFrameRateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameRate";
-				String encodeNodeVideoFrameRate = this.xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(this.document);
-				if(encodeNodeVideoFrameRate != null) {
-					int encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
-					if(encodeFrameRate <= 0 || encodeFrameRate >= 100)
-					throw new IllegalArgumentException("Invalid framerate");
-					
-					video.setFramerate(new FrameRate(encodeFrameRate));
-				}else {
+				try
+				{
+					String encodeNodeVideoFrameRateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameRate";
+					String encodeNodeVideoFrameRate = this.xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(this.document);
+					if(encodeNodeVideoFrameRate != null) 
+					{
+						int encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
+						if(encodeFrameRate <= 0 || encodeFrameRate >= 100)
+						throw new TranscodeConfigurationException("Invalid framerate");
+						
+						video.setFramerate(new FrameRate(encodeFrameRate));
+					}
+					else 
+					{
+						video.setFramerate(new FrameRate(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Invalid frame rate specified. Following source...");
 					video.setFramerate(new FrameRate(true));
 				}
 				
 				
 				
-				String encodeNodeVideoBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate";
-				Node encodeNodeVideoBitrateNode = (Node) this.xpath.compile(encodeNodeVideoBitrateExpression).evaluate(this.document, XPathConstants.NODE);
-				if(encodeNodeVideoBitrateNode != null && encodeNodeVideoBitrateNode.hasChildNodes()){
-					
-					String encodeNodeVideoBitrateAvgExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Average";
-					int encodeNodeVideoBitrateAverage = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(this.document));
-					
-					String encodeNodeVideoBitrateMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Min";
-					int encodeNodeVideoBitrateMin = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(this.document));
-					
-					String encodeNodeVideoBitrateMaxExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Max";
-					int encodeNodeVideoBitrateMax = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(this.document));
-					
-					String encodeNodeVideoBitrateBufferExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Buffer";
-					int encodeNodeVideoBitrateBuffer = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(this.document));
-					
-					video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateAverage, encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
-				}else {
+				try
+				{
+					String encodeNodeVideoBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate";
+					Node encodeNodeVideoBitrateNode = (Node) this.xpath.compile(encodeNodeVideoBitrateExpression).evaluate(this.document, XPathConstants.NODE);
+					if(encodeNodeVideoBitrateNode != null && encodeNodeVideoBitrateNode.hasChildNodes())
+					{
+						String encodeNodeVideoBitrateAvgExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Average";
+						int encodeNodeVideoBitrateAverage = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(this.document));
+						
+						String encodeNodeVideoBitrateMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Min";
+						int encodeNodeVideoBitrateMin = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(this.document));
+						
+						String encodeNodeVideoBitrateMaxExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Max";
+						int encodeNodeVideoBitrateMax = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(this.document));
+						
+						String encodeNodeVideoBitrateBufferExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Buffer";
+						int encodeNodeVideoBitrateBuffer = Integer.parseInt(this.xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(this.document));
+						
+						video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateAverage, encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
+					}
+					else 
+					{
+						video.setBitrate(new VideoBitrate(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Invalid video bitrate(s) settings. Following source...");
 					video.setBitrate(new VideoBitrate(true));
 				}
 				
 				
 				
-				String encodeNodeVideoKeyFrameIntervalExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval";
-				Node encodeNodeVideoKeyFrameIntervalNode = (Node) this.xpath.compile(encodeNodeVideoBitrateExpression).evaluate(this.document, XPathConstants.NODE);
-				if(encodeNodeVideoKeyFrameIntervalNode != null && encodeNodeVideoKeyFrameIntervalNode.hasChildNodes()){
-					String encodeNodeVideoKeyFrameIntervalGopExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/Gop";
-					String encodeNodeVideoGop = this.xpath.compile(encodeNodeVideoKeyFrameIntervalGopExpression).evaluate(this.document);
-					if(encodeNodeVideoGop == null) throw new TranscodeConfigurationException("Invalid gop size");
-					int encodeNodeVideoKFIGop = Integer.parseInt(encodeNodeVideoGop);
-					
-					String encodeNodeVideoKeyFrameIntervalMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/IntervalMin";
-					String encodeNodeVideoKeyFrameIntervalMin = this.xpath.compile(encodeNodeVideoKeyFrameIntervalMinExpression).evaluate(this.document);
-					if(encodeNodeVideoKeyFrameIntervalMin == null) throw new TranscodeConfigurationException("Invalid min keyframeinterval");
-					int encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
-					
-					video.setKeyFrameInterval(new KeyFrameInterval(encodeNodeVideoKFIGop, encodeNodeVideoKFIMin));
-				}else{
+				
+				try
+				{
+					String encodeNodeVideoKeyFrameIntervalExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval";
+					Node encodeNodeVideoKeyFrameIntervalNode = (Node) this.xpath.compile(encodeNodeVideoKeyFrameIntervalExpression).evaluate(this.document, XPathConstants.NODE);
+					if(encodeNodeVideoKeyFrameIntervalNode != null && encodeNodeVideoKeyFrameIntervalNode.hasChildNodes())
+					{
+						String encodeNodeVideoKeyFrameIntervalGopExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/Gop";
+						String encodeNodeVideoGop = this.xpath.compile(encodeNodeVideoKeyFrameIntervalGopExpression).evaluate(this.document);
+						if(encodeNodeVideoGop == null) throw new TranscodeConfigurationException("Invalid gop size");
+						int encodeNodeVideoKFIGop = Integer.parseInt(encodeNodeVideoGop);
+						
+						String encodeNodeVideoKeyFrameIntervalMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/IntervalMin";
+						String encodeNodeVideoKeyFrameIntervalMin = this.xpath.compile(encodeNodeVideoKeyFrameIntervalMinExpression).evaluate(this.document);
+						if(encodeNodeVideoKeyFrameIntervalMin == null) throw new TranscodeConfigurationException("Invalid min keyframeinterval");
+						int encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
+						
+						video.setKeyFrameInterval(new KeyFrameInterval(encodeNodeVideoKFIGop, encodeNodeVideoKFIMin));
+					}
+					else
+					{
+						video.setKeyFrameInterval(new KeyFrameInterval(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Invalid video keyframe/gop settings. Following source...");
 					video.setKeyFrameInterval(new KeyFrameInterval(true));
 				}
+				
+				
 				
 				
 				/**************** Overlays ************/
@@ -344,37 +398,45 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				
 				/******** Extra video flags ***********/
 				
-				String encodeNodeVideoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters";
-				Node encodeNodeVideoExtraParamsNode = (Node) this.xpath.compile(encodeNodeVideoExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
-				
-				if(encodeNodeVideoExtraParamsNode != null && encodeNodeVideoExtraParamsNode.hasChildNodes())
+				try
 				{
-					String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
-					NodeList videoParams = (NodeList) this.xpath.compile(videoExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
+					String encodeNodeVideoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters";
+					Node encodeNodeVideoExtraParamsNode = (Node) this.xpath.compile(encodeNodeVideoExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
 					
-					ArrayList<IParam> extras = new ArrayList<IParam>();
-					
-					for(int j=0;j<videoParams.getLength();j++)
+					if(encodeNodeVideoExtraParamsNode != null && encodeNodeVideoExtraParamsNode.hasChildNodes())
 					{
-						String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Key";
-						String videoParamsKey = this.xpath.compile(videoParamsKeyExpression).evaluate(this.document);
+						String videoExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param";
+						NodeList videoParams = (NodeList) this.xpath.compile(videoExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
+						ArrayList<IParam> extras = new ArrayList<IParam>();
 						
-						String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Value";
-						String videoParamsValue = this.xpath.compile(videoParamsValueExpression).evaluate(this.document);
+						for(int j=0;j<videoParams.getLength();j++)
+						{
+							String videoParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Key";
+							String videoParamsKey = this.xpath.compile(videoParamsKeyExpression).evaluate(this.document);
+							
+							String videoParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Parameters/Param["+(j+1)+"]/Value";
+							String videoParamsValue = this.xpath.compile(videoParamsValueExpression).evaluate(this.document);
+							
+							extras.add(new Param(videoParamsKey, videoParamsValue));
+						}
 						
-						extras.add(new Param(videoParamsKey, videoParamsValue));
+						video.setExtraParams(extras);
 					}
-					
-					video.setExtraParams(extras);
 				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra video params");
+					video.setExtraParams(new ArrayList<IParam>());
+				}
+				
 				
 				/*** all ok with video configuration */
 				video.setEnabled(true);
 				
-				
-				
 				/**** store video configuration into encode object *****/
 				encode.setVideoConfig(video);
+				
+				
 				
 				
 				
@@ -382,88 +444,143 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 				 * ******************************************************************************/
 				IAudio audio = new Audio();
 				
-				String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
-				String encodeNodeAudioCodec = this.xpath.compile(encodeNodeAudioCodecExpression).evaluate(this.document);
-				String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
-				String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(this.document);
-				audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
-				
-				
-				/* Use set bitrate or else follow from source */
-				String encodeNodeAudioBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Bitrate";
-				String encodeNodeAudioBitrate = this.xpath.compile(encodeNodeAudioBitrateExpression).evaluate(this.document);
-				if(encodeNodeAudioBitrate != null && Integer.parseInt(encodeNodeAudioBitrate)>0){
-				audio.setBitrate(new AudioBitrate(Integer.parseInt(encodeNodeAudioBitrate)));
-				}else {
-				audio.setBitrate(new AudioBitrate(true));
+				try
+				{
+					String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
+					String encodeNodeAudioCodec = this.xpath.compile(encodeNodeAudioCodecExpression).evaluate(this.document);
+					String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
+					String encodeNodeAudioCodecImplementation = this.xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(this.document);
+					audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
+				}
+				catch(Exception e)
+				{
+					throw new TranscodeConfigurationException("Invalid audio codec specified");
 				}
 				
 				
-				/* Use set samplerate or else follow from source */
-				String encodeNodeAudioSamplerateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/SampleRate";
-				String encodeNodeAudioSampleRate = this.xpath.compile(encodeNodeAudioSamplerateExpression).evaluate(this.document);
-				if(encodeNodeAudioSampleRate != null && Integer.parseInt(encodeNodeAudioSampleRate)>0){
-				audio.setSamplerate(new AudioSampleRate(Integer.parseInt(encodeNodeAudioSampleRate)));
-				}else{
-				audio.setSamplerate(new AudioSampleRate(true));
+				
+				try
+				{
+					String encodeNodeAudioBitrateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Bitrate";
+					String encodeNodeAudioBitrate = this.xpath.compile(encodeNodeAudioBitrateExpression).evaluate(this.document);
+					if(encodeNodeAudioBitrate != null && Integer.parseInt(encodeNodeAudioBitrate)>0)
+					{
+						audio.setBitrate(new AudioBitrate(Integer.parseInt(encodeNodeAudioBitrate)));
+					}
+					else 
+					{
+						audio.setBitrate(new AudioBitrate(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Improper audio bitrate. Following source");
+					audio.setBitrate(new AudioBitrate(true));
 				}
 				
 				
-				/* Use set channel type or else follow from source */
-				String encodeNodeAudioChannelTypeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Channels";
-				String encodeNodeAudioChannelType = this.xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(this.document);
-				if(encodeNodeAudioChannelType != null){
-				audio.setChannel(new AudioChannel(encodeNodeAudioChannelType));
-				}else{
-				audio.setChannel(new AudioChannel(true));
+				try
+				{
+					String encodeNodeAudioSamplerateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/SampleRate";
+					String encodeNodeAudioSampleRate = this.xpath.compile(encodeNodeAudioSamplerateExpression).evaluate(this.document);
+					if(encodeNodeAudioSampleRate != null && Integer.parseInt(encodeNodeAudioSampleRate)>0)
+					{
+						audio.setSamplerate(new AudioSampleRate(Integer.parseInt(encodeNodeAudioSampleRate)));
+					}
+					else
+					{
+						audio.setSamplerate(new AudioSampleRate(true));
+					}
 				}
+				catch(Exception e)
+				{
+					logger.info("Improper audio sample rate. Following source");
+					audio.setSamplerate(new AudioSampleRate(true));
+				}
+				
+				
+				
+				try
+				{
+					String encodeNodeAudioChannelTypeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Channels";
+					String encodeNodeAudioChannelType = this.xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(this.document);
+					if(encodeNodeAudioChannelType != null)
+					{
+						audio.setChannel(new AudioChannel(encodeNodeAudioChannelType));
+					}
+					else
+					{
+						audio.setChannel(new AudioChannel(true));
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Improper audio channel. Following source");
+					audio.setChannel(new AudioChannel(true));
+				}
+				
+				
 				
 				
 				/******** Extra audio flags ***********/
 				
-				String encodeNodeAudioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters";
-				Node encodeNodeAudioExtraParamsNode = (Node) this.xpath.compile(encodeNodeAudioExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
-				
-				if(encodeNodeAudioExtraParamsNode != null && encodeNodeAudioExtraParamsNode.hasChildNodes())
+				try
 				{
-					String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
-					NodeList audioParams = (NodeList) this.xpath.compile(audioExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
+					String encodeNodeAudioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters";
+					Node encodeNodeAudioExtraParamsNode = (Node) this.xpath.compile(encodeNodeAudioExtraParamsExpression).evaluate(this.document, XPathConstants.NODE);
 					
-					ArrayList<IParam> extras = new ArrayList<IParam>(); 
-					for(int j=0;j<audioParams.getLength();j++)
+					if(encodeNodeAudioExtraParamsNode != null && encodeNodeAudioExtraParamsNode.hasChildNodes())
 					{
-						String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";
-						String audioParamsKey = this.xpath.compile(audioParamsKeyExpression).evaluate(this.document);
+						String audioExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param";
+						NodeList audioParams = (NodeList) this.xpath.compile(audioExtraParamsExpression).evaluate(this.document, XPathConstants.NODESET);
 						
-						String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Value";
-						String audioParamsValue = this.xpath.compile(audioParamsValueExpression).evaluate(this.document);
-						
-						extras.add(new Param(audioParamsKey, audioParamsValue));
+						ArrayList<IParam> extras = new ArrayList<IParam>(); 
+						for(int j=0;j<audioParams.getLength();j++)
+						{
+							String audioParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Key";
+							String audioParamsKey = this.xpath.compile(audioParamsKeyExpression).evaluate(this.document);
+							
+							String audioParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Parameters/Param["+(j+1)+"]/Value";
+							String audioParamsValue = this.xpath.compile(audioParamsValueExpression).evaluate(this.document);
+							
+							extras.add(new Param(audioParamsKey, audioParamsValue));
+						}
+						audio.setExtraParams(extras);
 					}
-					audio.setExtraParams(extras);
 				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra audio params");
+					audio.setExtraParams(new ArrayList<IParam>());
+				}
+				
 				
 				/*** all ok with audio configuration */
 				audio.setEnabled(true);
-				
 				
 				/**** store audio configuration into encode object *****/
 				encode.setAudioConfig(audio);
 				
 				
 				/****************** look for output flags ****************/
-				String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Properties/Property";
-				NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
-				ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
-				for(int l=0;l<outputflagNodes.getLength();l++){
-				Node n = outputflagNodes.item(l);
-				String flag = n.getFirstChild().getNodeValue();
-				outputflags.add(new Property(flag));
+				try
+				{
+					String outputFlagsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Properties/Property";
+					NodeList outputflagNodes = (NodeList) this.xpath.compile(outputFlagsExpression).evaluate(this.document, XPathConstants.NODESET);
+					ArrayList<IProperty> outputflags = new ArrayList<IProperty>(); 
+					for(int l=0;l<outputflagNodes.getLength();l++){
+					Node n = outputflagNodes.item(l);
+					String flag = n.getFirstChild().getNodeValue();
+					outputflags.add(new Property(flag));
+					}
+					
+					encode.setOutputflags(outputflags);
 				}
-				
-				/**** store any extra output flags *****/
-				encode.setOutputflags(outputflags);
-				
+				catch(Exception e)
+				{
+					logger.info("Error in extra output properties");
+					encode.setOutputflags(new ArrayList<IProperty>());
+				}				
 				
 				/**** Add encode object to encodeslist *****/
 				encodeList.addEncode(encode);
@@ -473,7 +590,7 @@ public class TemplateDao implements ITranscodeDao, IDisposable {
 			session.setEncodes(encodeList);
 			session.setEnabled(true);
 		}
-		catch(TranscodeConfigurationException | IllegalArgumentException | SAXException | IOException | ParserConfigurationException | XPathExpressionException | IllegalAccessException ee)
+		catch(TranscodeConfigurationException | IllegalArgumentException | SAXException | IOException | ParserConfigurationException | XPathExpressionException ee)
 		{
 			session.setEnabled(false);
 			logger.error("Error parsing template " + ee.getMessage());

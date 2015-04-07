@@ -1,9 +1,9 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruProperty;
+import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
-public class VideoBitrate extends PassThruProperty implements IVideoBitrate 
+public class VideoBitrate extends PassThruObject implements IVideoBitrate 
 {
 	private int minimum;
 	private int maximum;

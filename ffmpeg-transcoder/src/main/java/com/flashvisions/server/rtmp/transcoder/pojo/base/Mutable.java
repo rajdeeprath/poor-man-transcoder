@@ -2,7 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.base;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMutable;
 
-public abstract class Mutable extends TranscoderProperty implements IMutable 
+public abstract class Mutable extends TranscoderEntity implements IMutable 
 {
 	private boolean enabled;
 	
