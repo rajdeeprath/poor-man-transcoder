@@ -6,12 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 
-public class SessionDestroyer extends ShutdownHookProcessDestroyer {
+public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 
-	private static Logger logger = LoggerFactory.getLogger(SessionDestroyer.class);
+	private static Logger logger = LoggerFactory.getLogger(TranscodeSessionDestroyer.class);
 	private ISession session;
 	
-	public SessionDestroyer(ISession session){
+	public TranscodeSessionDestroyer(ISession session){
 		this.setSession(session);
 	}
 	
@@ -19,7 +19,7 @@ public class SessionDestroyer extends ShutdownHookProcessDestroyer {
 	@Override
 	public boolean add(Process process) {
 		// TODO Auto-generated method stub
-		logger.info("adding process " + process);
+		logger.info("adding process");
 		this.session.setProcess(process);
 		return super.add(process);
 	}
@@ -33,7 +33,7 @@ public class SessionDestroyer extends ShutdownHookProcessDestroyer {
 	@Override
 	public boolean remove(Process process) {
 		// TODO Auto-generated method stub
-		logger.info("removing process " + process.toString());
+		logger.info("removing process");
 		this.session.setProcess(null);
 		return super.remove(process);
 	}

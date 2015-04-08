@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
+import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
@@ -56,7 +57,7 @@ public class TranscodeSessionPool {
 	  }
 	  
 	  // !!! for future use
-	  protected ISession create(IMediaInput input, ITranscode transcode) throws MalformedTranscodeQueryException
+	  protected ISession create(IMediaInput input, ITranscode transcode) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  // need to add template name to transcode object else session signature wont be created
 		  ISession session = Session.Builder.newSession()
@@ -68,7 +69,7 @@ public class TranscodeSessionPool {
 		  return session;
 	  }
 
-	  protected ISession create(IMediaInput input, String usingTemplate) throws MalformedTranscodeQueryException
+	  protected ISession create(IMediaInput input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  logger.info("Creating new object");
 		  ISession session = Session.Builder.newSession()
@@ -133,7 +134,7 @@ public class TranscodeSessionPool {
 	    	t = create(input, usingTemplate);
 	    	sessionMap.put(t.getSignature(), t);
 		} 
-	    catch (MalformedTranscodeQueryException e) 
+	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
 	    {
 	    	throw new TranscoderException("Unable to create a valid session " + e.getMessage());
 		}

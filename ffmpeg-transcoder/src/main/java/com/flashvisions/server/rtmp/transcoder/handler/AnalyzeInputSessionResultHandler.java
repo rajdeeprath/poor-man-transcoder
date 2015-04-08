@@ -3,20 +3,21 @@ package com.flashvisions.server.rtmp.transcoder.handler;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
+import com.flashvisions.server.rtmp.transcoder.interfaces.AnalyzeInputSessionResultCallback;
 
-public class SessionResultHandler extends DefaultExecuteResultHandler {
+public class AnalyzeInputSessionResultHandler extends DefaultExecuteResultHandler {
 
-	private static Logger logger = LoggerFactory.getLogger(SessionResultHandler.class);
 	private ExecuteWatchdog watchdog;
-	private ISession session;
+	private AnalyzeInputSessionResultCallback callback;
 	
-	public SessionResultHandler(ExecuteWatchdog watchdog, ISession session){
+	public AnalyzeInputSessionResultHandler(ExecuteWatchdog watchdog){
 		this.setWatchdog(watchdog);
-		this.setSession(session);
+	}
+	
+	public AnalyzeInputSessionResultHandler(ExecuteWatchdog watchdog, AnalyzeInputSessionResultCallback callback){
+		this.setWatchdog(watchdog);
+		this.setCallback(callback);
 	}
 	
 	private void setWatchdog(ExecuteWatchdog watchdog) {
@@ -44,35 +45,32 @@ public class SessionResultHandler extends DefaultExecuteResultHandler {
 	@Override
 	public void onProcessComplete(int exitValue) {
 		// TODO Auto-generated method stub
-		logger.info("Process complete exitValue : " + exitValue);
+		if(this.callback != null) 
+		this.callback.onAnalyzeProcessComplete(exitValue);
+		
 		super.onProcessComplete(exitValue);
 	}
 
 	@Override
 	public void onProcessFailed(ExecuteException e) {
 		// TODO Auto-generated method stub
+		if(this.callback != null) 
+		this.callback.onAnalyzeProcessFailed(e, watchdog);
+		
 		super.onProcessFailed(e);
-		
-		if(watchdog != null && watchdog.killedProcess())
-		logger.error("Process timed out");
-		else
-		logger.error("Process failed : " + e.getMessage());
-		
-		// destroy parent session
-		//this.session.dispose();
-		//this.session = null;
 	}
 	
 	public ExecuteWatchdog getWatchdog() {
 		return watchdog;
 	}
+	
 
-	public ISession getSession() {
-		return session;
+	public AnalyzeInputSessionResultCallback getCallback() {
+		return callback;
 	}
 
-	public void setSession(ISession session) {
-		this.session = session;
+	public void setCallback(AnalyzeInputSessionResultCallback callback) {
+		this.callback = callback;
 	}
 
 }

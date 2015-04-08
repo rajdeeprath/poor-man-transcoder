@@ -599,7 +599,7 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeOutputContainer = xpath.compile(encodeNodeOutputContainerExpression).evaluate(document);
 					
 					IMediaOutput output = new MediaOutput(encodeNodeOutputName, true);
-					IOUtils.IdentifyOutput(output);
+					//IOUtils.IdentifyOutput(output);
 					
 					if(!encodeNodeOutputContainer.equals("") && encodeNodeOutputContainer.length()>=3)
 					output.setContainer(new Container(Format.valueOf(encodeNodeOutputContainer.toUpperCase())));

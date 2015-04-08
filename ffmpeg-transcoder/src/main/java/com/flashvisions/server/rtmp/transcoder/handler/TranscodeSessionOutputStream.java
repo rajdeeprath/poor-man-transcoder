@@ -8,26 +8,39 @@ import org.apache.commons.exec.LogOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
+import com.flashvisions.server.rtmp.transcoder.pojo.Session;
 
-public class SessionOutputStream extends LogOutputStream {
 
-	private static Logger logger = LoggerFactory.getLogger(SessionOutputStream.class);
-	
-	private static final int QUEUE_SIZE = 10;
+public class TranscodeSessionOutputStream extends LogOutputStream {
+
+	private static Logger logger = LoggerFactory.getLogger(Session.class);
+	private TranscodeSessionDataCallback callback;
+	private static final int QUEUE_SIZE = 50;
 	private final Queue<String> lines = new LinkedList<String>();
 	private long lastOutputTime = 0;
 	
+	public TranscodeSessionOutputStream(){
+		
+	}
+	
+	public TranscodeSessionOutputStream(TranscodeSessionDataCallback callback){
+		this.callback = callback;
+	}
 	
 	@Override
 	protected void processLine(String line, int level) {
 		
 		if(lines.size()>QUEUE_SIZE){
-			lines.remove();
-		}	
+		lines.remove();}
 		
 		lines.add(line);
-		lastOutputTime = System.currentTimeMillis();		
+		lastOutputTime = System.currentTimeMillis();
+		
 		logger.info(line);
+		
+		if(this.callback != null)
+		this.callback.onTranscodeProcessData(lines, lastOutputTime);
 	}
 	
 	/* Estimates if process is running by checking if there was output in last 3 seconds */
