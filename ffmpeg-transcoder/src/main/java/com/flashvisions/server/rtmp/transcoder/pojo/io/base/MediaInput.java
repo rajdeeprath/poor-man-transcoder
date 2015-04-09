@@ -6,14 +6,14 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 
-public class MediaInput implements IMediaInput {
+public class MediaInput extends Media implements IMediaInput {
 
 	
 	private String streamName;
 	private String protocol;
 	private String source;
 	private IContainer container;
-	private ArrayList<IProperty> inputFlags;
+	private ArrayList<IProperty> flags;
 	
 	public MediaInput(String source, IContainer container){
 		setSourcePath(source);
@@ -55,15 +55,15 @@ public class MediaInput implements IMediaInput {
 	}
 
 	@Override
-	public ArrayList<IProperty> getInputFlags() {
+	public ArrayList<IProperty> getReadFlags() {
 		// TODO Auto-generated method stub
-		return this.inputFlags;
+		return this.flags;
 	}
 
 	@Override
-	public void setInputFlags(ArrayList<IProperty> inputFlags) {
+	public void setReadFlags(ArrayList<IProperty> inputFlags) {
 		// TODO Auto-generated method stub
-		this.inputFlags = inputFlags;
+		this.flags = inputFlags;
 	}
 
 	@Override

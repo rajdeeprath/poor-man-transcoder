@@ -1,12 +1,14 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.io.base;
 
+import java.util.ArrayList;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 
-public class MediaOutput implements IMediaOutput {
+public class MediaOutput extends Media implements IMediaOutput {
 	
-	private boolean isTemplate;
-	
+	private ArrayList<IProperty> flags;
 	private String streamName;
 	private String protocol;
 	private String source;
@@ -30,7 +32,6 @@ public class MediaOutput implements IMediaOutput {
 	}
 	
 	public MediaOutput(String source, boolean isTemplate){
-		this.isTemplate = isTemplate ;
 		setSourcePath(source);
 	}
 	
@@ -92,15 +93,22 @@ public class MediaOutput implements IMediaOutput {
 		this.streamName = streamName;
 	}
 
-	public boolean isTemplate() 
-	{
-		return this.isTemplate;
-	}
-
 	@Override
 	public void setProtocol(String protocol) {
 		// TODO Auto-generated method stub
 		this.protocol = protocol;
+	}
+
+	@Override
+	public ArrayList<IProperty> getWriteFlags() {
+		// TODO Auto-generated method stub
+		return flags;
+	}
+
+	@Override
+	public void setWriteFlags(ArrayList<IProperty> writeFlags) {
+		// TODO Auto-generated method stub
+		this.flags = writeFlags;
 	}
 
 }
