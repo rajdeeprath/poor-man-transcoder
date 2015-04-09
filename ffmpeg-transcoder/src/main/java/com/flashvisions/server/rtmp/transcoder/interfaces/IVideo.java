@@ -2,7 +2,6 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 
 public interface IVideo extends IMutable {
 
@@ -10,8 +9,6 @@ public interface IVideo extends IMutable {
 	public void setCodec(ICodec codec);
 	public IFrameSize getFramesize();
 	public void setFramesize(IFrameSize framesize);
-	public Implementation getCodecImplementation();
-	public void setCodecImplementation(Implementation codecImplementation);
 	public IFrameRate getFramerate();
 	public void setFramerate(IFrameRate framerate);
 	public IVideoBitrate getBitrate();

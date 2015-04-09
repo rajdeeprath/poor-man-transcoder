@@ -114,6 +114,7 @@ public static class Location implements IOverlayLocation{
 				throw new IllegalArgumentException("Invalid alignment constant " + alignment);
 			}
 		}
+		
 	}
 
 	private String label;

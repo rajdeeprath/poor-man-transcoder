@@ -21,4 +21,11 @@ public class Property implements IProperty {
 	public void setData(String data) {
 		this.data = data;
 	}
+
+	public IProperty clone() {
+		// TODO Auto-generated method stub
+		return (IProperty) new Property(this.data);
+	}
+	
+	
 }

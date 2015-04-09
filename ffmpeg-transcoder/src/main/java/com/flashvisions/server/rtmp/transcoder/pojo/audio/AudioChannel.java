@@ -6,12 +6,18 @@ import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 public class AudioChannel extends PassThruObject implements IAudioChannel  {
 	
 	private int channels = 2;
-	private ChannelType type;
+	private String type;
 	
 	
 	public static enum ChannelType {
         MONO, STEREO
     }
+	
+	public AudioChannel(IAudioChannel object)
+	{
+		this.setSameAsSource(object.getSameAsSource());
+		this.type = object.getChannelType();
+	}
 	
 	public AudioChannel(String type) throws IllegalAccessException{
 		
@@ -30,10 +36,6 @@ public class AudioChannel extends PassThruObject implements IAudioChannel  {
 		}
 	}
 	
-	public AudioChannel(ChannelType type){
-		this.type = type;
-	}
-	
 	public AudioChannel(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		this.type = null;
@@ -44,28 +46,31 @@ public class AudioChannel extends PassThruObject implements IAudioChannel  {
 		return channels;
 	}
 
-	public ChannelType getChannelType() 
-	{
+	@Override
+	public String getChannelType() {
+		// TODO Auto-generated method stub
 		return type;
 	}
 
-	public void setChannelType(ChannelType type) throws IllegalAccessException 
-	{
-		switch(type)
+	@Override
+	public void setChannelType(String type) throws IllegalAccessException {
+		// TODO Auto-generated method stub
+		try
 		{
-			case MONO:
-			channels = 1;
-			break;
-			
-			case STEREO:
-			channels = 2;
-			break;
-			
-			default:
+			switch(ChannelType.valueOf(type.toUpperCase()))
+			{
+				case MONO:
+				channels = 1;
+				break;
+				
+				case STEREO:
+				channels = 2;
+				break;
+			}
+		}
+		catch(Exception e)
+		{
 			throw new IllegalAccessException("Invalid channel type");
 		}
-		
-		this.type = type;
-	}
-
+	}	
 }

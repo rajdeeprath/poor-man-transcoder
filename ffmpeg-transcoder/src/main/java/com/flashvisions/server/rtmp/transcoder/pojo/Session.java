@@ -8,7 +8,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,14 +16,10 @@ import com.flashvisions.server.rtmp.transcoder.data.factory.LibRtmpConfiguration
 import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
-import com.flashvisions.server.rtmp.transcoder.handler.AnalyzeInputSessionOutputStream;
-import com.flashvisions.server.rtmp.transcoder.handler.AnalyzeInputSessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionOutputStream;
 import com.flashvisions.server.rtmp.transcoder.helpers.CommandBuilderHelper;
-import com.flashvisions.server.rtmp.transcoder.interfaces.AnalyzeInputSessionDataCallback;
-import com.flashvisions.server.rtmp.transcoder.interfaces.AnalyzeInputSessionResultCallback;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
@@ -42,7 +37,11 @@ import com.flashvisions.server.rtmp.transcoder.system.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
-public class Session implements ISession, TranscodeSessionResultCallback, TranscodeSessionDataCallback, AnalyzeInputSessionResultCallback, AnalyzeInputSessionDataCallback {
+/**
+ * @author Rajdeep
+ *
+ */
+public class Session implements ISession, TranscodeSessionResultCallback, TranscodeSessionDataCallback {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
@@ -51,13 +50,9 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	
 	private DefaultExecutor executor;
 	private CommandLine cmdLine;
-	private CommandLine analyzeCmdLine;
 	
 	private TranscodeSessionOutputStream outstream;
-	private AnalyzeInputSessionOutputStream analyzeStream;
-	
 	private TranscodeSessionResultHandler resultHandler;
-	private AnalyzeInputSessionResultHandler analyzeResultHandler;
 	
 	private long executonTimeout;
 	private ExecuteWatchdog watchdog;
@@ -73,7 +68,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		this.config = builder.config;
 		this.source = builder.source;
 		this.cmdLine = builder.cmdLine;	
-		this.analyzeCmdLine = builder.analyzeCmdLine;
 		
 		this.executor = new DefaultExecutor();
 		
@@ -118,34 +112,11 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		startTranscode();
 	}
 	
-	protected void startAnalyze()
-	{
-		// TODO Auto-generated method stub
-		try 
-		{	logger.info("Analyze command " + this.analyzeCmdLine);
-			
-			this.analyzeStream = new AnalyzeInputSessionOutputStream();
-			this.analyzeResultHandler = new AnalyzeInputSessionResultHandler(this.watchdog, this);
-			
-			this.executor.setStreamHandler(new PumpStreamHandler(this.analyzeStream));
-			this.executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
-			this.executor.setWatchdog(this.watchdog);
-			this.executor.setExitValue(0);
-			
-			this.executor.execute(this.analyzeCmdLine, this.analyzeResultHandler);
-		} 
-		catch (Exception e) 
-		{
-			logger.info("Error starting analyze " + e.getMessage());
-		}
-	}
-	
 	protected void startTranscode()
 	{
 		// TODO Auto-generated method stub
 		try 
-		{
-			
+		{	
 			this.outstream = new TranscodeSessionOutputStream();
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
 			
@@ -167,12 +138,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	{
 		return stopTranscode();
 	}
-	
-	protected boolean stopAnalyze()
-	{
-		return true;
-	}	
-	
+
 	protected boolean stopTranscode()
 	{
 		try
@@ -216,30 +182,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.info(String.valueOf(data));
-	}
-	
-
-	@Override
-	public void onAnalyzeInputProcessData(Object data, long timestamp) {
-		// TODO Auto-generated method stub
-		logger.info(String.valueOf(data));
-	}
-
-	@Override
-	public void onAnalyzeProcessComplete(int exitValue) {
-		// TODO Auto-generated method stub
-		logger.error("Analysis completed with exitValue"+exitValue);
-	}
-
-	@Override
-	public void onAnalyzeProcessFailed(ExecuteException e,	ExecuteWatchdog watchdog) {
-		// TODO Auto-generated method stub
-		if(watchdog != null && watchdog.killedProcess())
-		logger.error("Analysis timed out");
-		else
-		logger.error("Analysis failed : " + e.getMessage());
-	}
-	
+	}	
 	
 	@Override
 	public void dispose() {
@@ -302,7 +245,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		private ILibRtmpConfig librtmpConfig;
 		private String signature;
 		
-		private CommandLine analyzeCmdLine;
 		private CommandLine cmdLine;
 		private Server serverType;
 		
@@ -342,7 +284,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			this.identifyInput();
 			this.config = (this.templateFile != null)?this.buildTranscodeConfigFromTemplate(this.templateFile):this.config;
 			this.cmdLine = buildExecutableCommand(this.source, this.config);
-			this.analyzeCmdLine = buildAnalyzeCommand(this.source);
 			this.signature = SessionUtil.generateSessionSignature(source.getSourcePath(), templateFile);
 			this.session = new Session(this);						
 			return this.session;
@@ -373,39 +314,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			
 			return configFactory.getTranscodeConfiguration(templateFile);
 		}
-		
-		protected CommandLine buildAnalyzeCommand(IMediaInput source) throws MalformedTranscodeQueryException
-		{
-			try
-			{
-				logger.info("Building analyze command");
-				
-				HashMap<String, Object> replacementMap = new HashMap<String, Object>();
-				CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
-				
-				replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-				replacementMap.put("inputSource", source.getSourcePath());
-				
-				cmdLine.addArgument("-re");
-				cmdLine.addArgument("-i");
-				cmdLine.addArgument("${inputSource}");
-				
-				if(IOUtils.isRTMPCompatStream(source)){
-					ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
-					String libRtmpParamString = this.buildLibRtmpString(librtmpConfig);
-					replacementMap.put("inputSource", libRtmpParamString);	
-				}
-				
-				cmdLine.setSubstitutionMap(replacementMap);
-				return cmdLine;
-			}
-			catch(Exception e)
-			{
-				logger.info("Error configuring analyze command");
-				throw new MalformedTranscodeQueryException(e);
-			}
-		}
-		
 		
 		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscode config) throws MalformedTranscodeQueryException{
 			

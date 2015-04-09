@@ -7,6 +7,12 @@ public class AudioBitrate extends PassThruObject implements IAudioBitrate
 {
 	private int bitrate;
 	
+	/************ Copy constructor *********/
+	public AudioBitrate(IAudioBitrate object){
+		this.setSameAsSource(object.getSameAsSource());
+		this.bitrate = object.getBitrate();
+	}
+	
 	public AudioBitrate(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		this.bitrate = -1;
@@ -29,5 +35,4 @@ public class AudioBitrate extends PassThruObject implements IAudioBitrate
 	{
 		this.bitrate = bitrate;
 	}	
-	
 }

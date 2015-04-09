@@ -21,6 +21,13 @@ public class Codec extends PassThruObject implements ICodec, IMutable {
 	public Codec(){
 		
 	}
+	
+	public Codec(ICodec object){
+		this.setSameAsSource(object.getSameAsSource());
+		this.setEnabled(object.getEnabled());
+		this.setImplementation(object.getImplementation());
+		this.name = object.getName();
+	}
 
 	public Codec(String name){
 		if(validateCodec(name))
@@ -30,6 +37,11 @@ public class Codec extends PassThruObject implements ICodec, IMutable {
 	public Codec(String name, String implementation){
 		if(validateCodec(name)) this.name = name;
 		validateImplementation(implementation); 
+	}
+	
+	public Codec(String name, Implementation implementation){
+		this.name = name;
+		this.implementation = implementation; 
 	}
 
 	public String getName() {
@@ -105,6 +117,5 @@ public class Codec extends PassThruObject implements ICodec, IMutable {
 			setImplementation(Implementation.NORMAL);
 			break;
 		}
-	}	
-
+	}
 }

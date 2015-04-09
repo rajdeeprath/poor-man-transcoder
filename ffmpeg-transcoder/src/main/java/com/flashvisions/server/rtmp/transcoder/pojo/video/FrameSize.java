@@ -12,6 +12,12 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 		
 	}
 	
+	public FrameSize(IFrameSize object){
+		this.setSameAsSource(object.getSameAsSource());
+		this.width = object.getWidth();
+		this.height = object.getHeight();
+	}
+	
 	public FrameSize(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		this.width = -1;
@@ -46,5 +52,4 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 		// TODO Auto-generated method stub
 		this.height = height;
 	}
-
 }

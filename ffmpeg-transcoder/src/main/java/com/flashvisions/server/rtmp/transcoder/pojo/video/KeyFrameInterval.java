@@ -13,6 +13,12 @@ public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterva
 		
 	}
 	
+	public KeyFrameInterval(IKeyFrameInterval object){
+		this.setSameAsSource(object.getSameAsSource());
+		this.gop = object.getGop();
+		this.minimunInterval = object.getMinimunInterval();
+	}
+	
 	public KeyFrameInterval(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		this.gop = -1;
@@ -43,5 +49,4 @@ public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterva
 	{
 		this.gop = gop;
 	}
-
 }

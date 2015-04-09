@@ -1,10 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.io.base;
 
-import java.util.ArrayList;
-
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 
 public class MediaOutput implements IMediaOutput {
 	
@@ -14,8 +11,14 @@ public class MediaOutput implements IMediaOutput {
 	private String protocol;
 	private String source;
 	private IContainer container;
-	private ArrayList<IProperty> properties;
 	
+	
+	public MediaOutput(IMediaOutput object){
+		this.setSourcePath(object.getSourcePath());
+		this.setStreamName(object.getStreamName());
+		this.setProtocol(object.getProtocol());
+		this.setContainer(object.getContainer());
+	}
 	
 	public MediaOutput(String source){
 		setSourcePath(source);
@@ -71,18 +74,6 @@ public class MediaOutput implements IMediaOutput {
 	public boolean isStreamingMedia() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public ArrayList<IProperty> getOutputFlags() {
-		// TODO Auto-generated method stub
-		return this.properties;
-	}
-
-	@Override
-	public void setOutputFlags(ArrayList<IProperty> properties) {
-		// TODO Auto-generated method stub
-		this.properties = properties;
 	}
 
 	@Override

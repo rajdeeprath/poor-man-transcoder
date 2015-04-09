@@ -4,6 +4,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 
@@ -20,11 +21,13 @@ public class AudioCodec extends Codec {
 		super();
 	}
 	
-	public AudioCodec(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
+	public AudioCodec(ICodec object) {
+		super(object);
 	}
 	
+	public AudioCodec(String name) {
+		super(name);
+	}
 
 	public AudioCodec(String name, String implementation){
 		super(name, implementation);

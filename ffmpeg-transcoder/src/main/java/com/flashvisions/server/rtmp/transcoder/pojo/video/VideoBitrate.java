@@ -15,6 +15,16 @@ public class VideoBitrate extends PassThruObject implements IVideoBitrate
 		
 	}
 	
+	
+	public VideoBitrate(IVideoBitrate object){
+		this.setSameAsSource(object.getSameAsSource());
+		
+		this.minimum = object.getMinimum();
+		this.maximum = object.getMaximum();
+		this.deviceBuffer = object.getDeviceBuffer();
+		this.average = object.getAverage();
+	}
+	
 	public VideoBitrate(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		
@@ -64,5 +74,6 @@ public class VideoBitrate extends PassThruObject implements IVideoBitrate
 	public void setAverage(int average) {
 		// TODO Auto-generated method stub
 		this.average = average;
-	}
+	}	
+	
 }

@@ -11,6 +11,7 @@ public class TranscodeOutput implements ITranscodeOutput{
 	private IMediaOutput output;
 	public ArrayList<IProperty> extraProperties;
 
+
 	@Override
 	public IMediaOutput getMediaOutput() {
 		// TODO Auto-generated method stub

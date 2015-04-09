@@ -10,13 +10,11 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Video extends MutableObject implements IVideo  {
 
 	private ICodec codec;
-	private Implementation codecImplementation;
 	private IFrameSize framesize;
 	private IFrameRate framerate;
 	private IVideoBitrate bitrate;
@@ -40,14 +38,6 @@ public class Video extends MutableObject implements IVideo  {
 
 	public void setFramesize(IFrameSize framesize) {
 		this.framesize = framesize;
-	}
-
-	public Implementation getCodecImplementation() {
-		return codecImplementation;
-	}
-
-	public void setCodecImplementation(Implementation codecImplementation) {
-		this.codecImplementation = codecImplementation;
 	}
 
 	public IFrameRate getFramerate() {
@@ -93,4 +83,6 @@ public class Video extends MutableObject implements IVideo  {
 		// TODO Auto-generated method stub
 		this.extraProperties = extraProperties;
 	}
+
+	
 }

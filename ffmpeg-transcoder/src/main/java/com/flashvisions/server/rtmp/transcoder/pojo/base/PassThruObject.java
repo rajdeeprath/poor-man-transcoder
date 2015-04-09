@@ -18,5 +18,4 @@ public abstract class PassThruObject extends TranscoderEntity implements IPassTh
 		// TODO Auto-generated method stub
 		return sameAsSource;
 	}
-
 }

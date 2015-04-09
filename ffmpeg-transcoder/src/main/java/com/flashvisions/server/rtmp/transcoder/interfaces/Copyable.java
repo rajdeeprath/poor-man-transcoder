@@ -1,5 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-public interface ITranscoderEntity {
+public interface Copyable {
 	
 }

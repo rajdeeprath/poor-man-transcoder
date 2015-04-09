@@ -18,5 +18,4 @@ public abstract class MutableObject extends TranscoderEntity implements IMutable
 		// TODO Auto-generated method stub
 		this.enabled = enabled;
 	}
-
 }

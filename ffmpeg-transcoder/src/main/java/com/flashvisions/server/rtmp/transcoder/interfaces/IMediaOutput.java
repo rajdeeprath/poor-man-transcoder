@@ -1,8 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-import java.util.ArrayList;
-
-
 public interface IMediaOutput {
 	public IContainer getContainer();
 	public void setContainer(IContainer container);
@@ -12,8 +9,6 @@ public interface IMediaOutput {
 	public void setProtocol(String protocol);
 	public boolean isFile();
 	public boolean isStreamingMedia();
-	public ArrayList<IProperty> getOutputFlags();
-	public void setOutputFlags(ArrayList<IProperty> properties);
 	public String getStreamName();
 	public void setStreamName(String streamName);
 	public boolean isTemplate();

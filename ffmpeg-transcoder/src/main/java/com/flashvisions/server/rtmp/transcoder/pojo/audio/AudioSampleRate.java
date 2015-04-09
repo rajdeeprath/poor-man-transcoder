@@ -7,8 +7,16 @@ public class AudioSampleRate extends PassThruObject implements IAudioSampleRate
 {
 	private int samplerate;
 	
+	/*************** Copy constructor ************/
+	public AudioSampleRate(IAudioSampleRate object) {
+		this.setSameAsSource(object.getSameAsSource());
+		this.samplerate = object.getSamplerate();
+	}
 
-	
+	public AudioSampleRate(boolean sameAsSource, int samplerate) {
+		this.setSameAsSource(sameAsSource);
+		this.samplerate = samplerate;
+	}
 
 	public AudioSampleRate(boolean sameAsSource) {
 		this.setSameAsSource(sameAsSource);
@@ -28,5 +36,4 @@ public class AudioSampleRate extends PassThruObject implements IAudioSampleRate
 	{
 		this.samplerate = samplerate;
 	}
-	
-}
+}	

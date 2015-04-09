@@ -10,6 +10,11 @@ public class FrameRate extends PassThruObject implements IFrameRate {
 	public FrameRate(){
 	}
 	
+	public FrameRate(IFrameRate object){
+		this.setSameAsSource(object.getSameAsSource());
+		this.framerate = object.getFramerate();
+	}
+	
 	public FrameRate(int framerate){
 		this.framerate = framerate;
 	}
@@ -27,6 +32,5 @@ public class FrameRate extends PassThruObject implements IFrameRate {
 	public void setFramerate(int framerate) 
 	{
 		this.framerate = framerate;
-	} 
-
+	}
 }

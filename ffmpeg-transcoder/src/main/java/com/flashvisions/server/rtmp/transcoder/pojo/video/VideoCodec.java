@@ -3,6 +3,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 
@@ -17,6 +18,10 @@ public class VideoCodec extends Codec {
 	
 	public VideoCodec(){
 		super();
+	}
+	
+	public VideoCodec(ICodec codec) {
+		super(codec);
 	}
 
 	public VideoCodec(String name) {
@@ -59,6 +64,4 @@ public class VideoCodec extends Codec {
 		
 		return valid;
 	}
-	
-
 }
