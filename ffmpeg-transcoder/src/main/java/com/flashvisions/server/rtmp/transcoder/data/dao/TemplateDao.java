@@ -92,7 +92,7 @@ public class TemplateDao implements ITranscodeDao {
 		{
 			logger.debug("preparing new transcode session");
 			
-			session = new Transcode();
+			
 			
 			this.templateFile = new File(this.templatePath);
 			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
@@ -110,13 +110,13 @@ public class TemplateDao implements ITranscodeDao {
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
 			String name = xpath.compile(templateNameExpression).evaluate(document);
-			session.setLabel(name);
+			//session.setLabel(name);
 			
 			
 			/****************** template description ****************/
 			String templateDescriptionExpression = "/Template/Transcode/Description";
 			String description = xpath.compile(templateDescriptionExpression).evaluate(document);
-			session.setDescription(description);
+			//session.setDescription(description);
 			
 			
 			/****************** look for encode objects ****************/
@@ -136,7 +136,6 @@ public class TemplateDao implements ITranscodeDao {
 				String encodeNodeNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Name";
 				String encodeNodeName = xpath.compile(encodeNodeNameExpression).evaluate(document);
 				encode.setName(encodeNodeName);
-				
 						
 				
 				
@@ -642,8 +641,13 @@ public class TemplateDao implements ITranscodeDao {
 			}
 			
 			/**** add encodes list to transcode session object ***/
-			session.setEncodes(encodeList);
-			session.setEnabled(true);
+			
+			session = Transcode.Builder.newTranscode()
+					.withLabel(name)
+					.withDescription(description)
+					.usingEncodes(encodeList)
+					.asValid(true)
+					.build();
 		}
 		catch(TranscodeConfigurationException | IllegalArgumentException | SAXException | IOException | ParserConfigurationException | XPathExpressionException ee)
 		{

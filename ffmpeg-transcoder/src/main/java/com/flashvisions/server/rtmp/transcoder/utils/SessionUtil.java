@@ -66,12 +66,6 @@ public class SessionUtil {
 	
 	public static ITranscode cloneTranscodeConfiguration(ITranscode original)
 	{
-		ITranscode dolly = new Transcode();
-		
-		dolly.setLabel(original.getLabel());
-		dolly.setDescription(original.getDescription());
-		dolly.setEnabled(original.getEnabled());
-		
 		IEncodeCollection dollyEncodes = new EncodeCollection();
 		IEncodeCollection originalEncodes =  original.getEncodes();
 		IEncodeIterator et = originalEncodes.iterator();
@@ -146,7 +140,13 @@ public class SessionUtil {
 			dollyEncodes.addEncode(cencode);
 		}
 		
-		dolly.setEncodes(dollyEncodes);
+		
+		ITranscode dolly = Transcode.Builder.newTranscode()
+							.withLabel(original.getLabel())
+							.withDescription(original.getDescription())
+							.usingEncodes(dollyEncodes)
+							.asValid(original.getEnabled())
+							.build();
 		
 		return dolly;
 	}

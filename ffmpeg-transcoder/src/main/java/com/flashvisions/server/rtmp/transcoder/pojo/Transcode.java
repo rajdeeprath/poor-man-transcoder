@@ -1,19 +1,21 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Transcode extends MutableObject implements ITranscode  {
 	
-	public String label;	
-	public String description;
-	public IEncodeCollection encodes;
+	private String label;	
+	private String description;
+	private IEncodeCollection encodes;
+	
+	private Transcode(Builder builder){
+		this.label = builder.label;
+		this.description = builder.description;
+		this.encodes = builder.encodes;
+		this.setEnabled(builder.enabled);
+	}
 	
 	public String getLabel() 
 	{
@@ -28,8 +30,7 @@ public class Transcode extends MutableObject implements ITranscode  {
 	public String getDescription() 
 	{
 		return description;
-	}
-	
+	}	
 	
 	public void setDescription(String description) 
 	{
@@ -44,42 +45,43 @@ public class Transcode extends MutableObject implements ITranscode  {
 	public void setEncodes(IEncodeCollection encodes) 
 	{
 		this.encodes = encodes;
-	}	
+	}
 	
-	public ITranscode clone()
+	public static class Builder
 	{
-		ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
-        ByteArrayOutputStream bos = null;
-        Transcode clone = null;
-        
-        try
-        {
-	        bos = new ByteArrayOutputStream(); 
-	        oos = new ObjectOutputStream(bos); 
-	        oos.writeObject(this);   
-	        oos.flush();               
-	        ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray()); 
-	        ois = new ObjectInputStream(bin);
-	        clone = (Transcode) ois.readObject(); 
-        }
-        catch(Exception e)
-        {
-        	e.printStackTrace();
-        	clone = null;
-        }
-        finally
-        {
-        	if(ois != null)
-        	ois = null;
-        	
-        	if(oos != null)
-        	oos = null;
-        	
-        	if(bos != null)
-        	bos = null;
-        }
-        
-        return clone;
+		private boolean enabled;
+		private String label;	
+		private String description;
+		private IEncodeCollection encodes;
+		
+		public static Builder newTranscode(){
+			return new Builder();
+		}
+		
+		public Builder asValid(boolean valid)
+		{
+			this.enabled = valid;
+			return this;
+		}
+		
+		public Builder withLabel(String label){
+			this.label = label;
+			return this;
+		}
+		
+		public Builder withDescription(String description){
+			this.description = description;
+			return this;
+		}
+		
+		public Builder usingEncodes(IEncodeCollection encodes){
+			this.encodes = encodes;
+			return this;
+		}
+		
+		public ITranscode build()
+		{
+			return new Transcode(this);
+		}
 	}
 }

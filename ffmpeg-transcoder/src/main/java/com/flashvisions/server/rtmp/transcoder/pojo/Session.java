@@ -77,6 +77,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
 		this.signature = builder.signature;
 		
+		logger.info("Session :"+Session.id);
 		logger.info("Command :" + this.cmdLine.toString());
 	}
 
