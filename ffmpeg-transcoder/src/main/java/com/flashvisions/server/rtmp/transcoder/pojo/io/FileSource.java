@@ -4,18 +4,18 @@ import java.io.File;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaInput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaSource;
 
-public class FileInput extends MediaInput implements IFileInput {
+public class FileSource extends MediaSource implements IFileInput {
 
 	File file;
 	
-	public FileInput(String source) {
+	public FileSource(String source) {
 		super(source);
 		// TODO Auto-generated constructor stub
 	}
 	
-	public FileInput(String source, IContainer container){
+	public FileSource(String source, IContainer container){
 		super(source, container);
 	}
 

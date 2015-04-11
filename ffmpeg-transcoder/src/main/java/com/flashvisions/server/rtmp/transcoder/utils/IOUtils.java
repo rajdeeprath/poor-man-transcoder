@@ -10,8 +10,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.FileOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.FileDestination;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamDestination;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
 
@@ -158,7 +158,7 @@ public class IOUtils {
 		outsource = outsource.replace("SourceStreamName", streamname);
 		
 		container = (temp.getContainer() == null)?new Container(guessContainer(outsource)):temp.getContainer();
-		finalOutput = (temp.isStreamingMedia())?new StreamOutput(outsource, container):new FileOutput(outsource, container);
+		finalOutput = (temp.isStreamingMedia())?new StreamDestination(outsource, container):new FileDestination(outsource, container);
 		finalOutput.setContainer(container);
 		
 		return finalOutput;

@@ -32,8 +32,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
-import com.flashvisions.server.rtmp.transcoder.system.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
@@ -47,6 +47,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	
 	private ITranscode config;
 	private IMediaInput source;
+	private String workingDirectoryPath;
 	
 	private DefaultExecutor executor;
 	private CommandLine cmdLine;
@@ -72,7 +73,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		this.executor = new DefaultExecutor();
 		
 		// set locally not globally -|
-		this.executor.setWorkingDirectory(new File(Globals.getEnv(Globals.Vars.WORKING_DIRECTORY)));
+		this.workingDirectoryPath = (builder.workingDirectoryPath.equals(null))?Globals.getEnv(Globals.getEnv(Globals.Vars.WORKING_DIRECTORY)):builder.workingDirectoryPath;
+		this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
 		this.signature = builder.signature;
@@ -81,7 +83,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		logger.info("Command :" + this.cmdLine.toString());
 	}
 
-	
 	
 	@Override
 	public long getId() {
@@ -240,6 +241,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 				
 		private ITranscode config;
 		private String templateFile;
+		private String workingDirectoryPath;
 		
 		private IMediaInput source;
 		private ISession session;	
@@ -262,6 +264,11 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		
 		public Builder usingMediaInput(IMediaInput source){
 			this.source = source;
+			return this;
+		}
+		
+		public Builder setWorkingDirectory(String workingDirectoryPath){
+			this.workingDirectoryPath = workingDirectoryPath;
 			return this;
 		}
 		

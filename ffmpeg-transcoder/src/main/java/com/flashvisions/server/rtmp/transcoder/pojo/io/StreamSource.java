@@ -3,16 +3,16 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IStreamInput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaInput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaSource;
 
-public class StreamInput extends MediaInput implements IStreamInput {
+public class StreamSource extends MediaSource implements IStreamInput {
 
-	public StreamInput(String source) {
+	public StreamSource(String source) {
 		super(source);
 		// TODO Auto-generated constructor stub
 	}
 	
-	public StreamInput(String source, IContainer container){
+	public StreamSource(String source, IContainer container){
 		super(source, container);
 	}
 

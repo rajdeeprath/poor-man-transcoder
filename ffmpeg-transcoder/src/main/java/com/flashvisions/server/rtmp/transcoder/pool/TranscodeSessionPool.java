@@ -13,7 +13,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
-import com.flashvisions.server.rtmp.transcoder.system.Server;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 public class TranscodeSessionPool {

@@ -3,7 +3,7 @@ package com.flashvisions.server.rtmp.transcoder.data.factory;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.librtmp.Red5LibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.librtmp.WowzaLibRtmpConfig;
-import com.flashvisions.server.rtmp.transcoder.system.Server;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 
 public class LibRtmpConfigurationFactory {
 	

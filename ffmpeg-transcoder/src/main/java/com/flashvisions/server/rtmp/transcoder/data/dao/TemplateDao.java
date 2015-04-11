@@ -53,7 +53,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.collection.EncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaDestination;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
@@ -597,7 +597,7 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeOutputContainerExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Container";
 					String encodeNodeOutputContainer = xpath.compile(encodeNodeOutputContainerExpression).evaluate(document);
 					
-					IMediaOutput output = new MediaOutput(encodeNodeOutputName, true);
+					IMediaOutput output = new MediaDestination(encodeNodeOutputName, true);
 					//IOUtils.IdentifyOutput(output);
 					
 					if(!encodeNodeOutputContainer.equals("") && encodeNodeOutputContainer.length()>=3)

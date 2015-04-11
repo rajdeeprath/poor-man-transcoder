@@ -22,7 +22,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.collection.EncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaDestination;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.KeyFrameInterval;
@@ -132,7 +132,7 @@ public class SessionUtil {
 			ArrayList<IProperty> oProperties = coutput.getOutputProperties();
 			for(IProperty p : oProperties) cProperties.add(p.clone());
 			
-			ooutput.setMediaOutput(new MediaOutput(coutput.getMediaOutput()));
+			ooutput.setMediaOutput(new MediaDestination(coutput.getMediaOutput()));
 			ooutput.setOutputProperties(cProperties);
 			
 			/******************************************/

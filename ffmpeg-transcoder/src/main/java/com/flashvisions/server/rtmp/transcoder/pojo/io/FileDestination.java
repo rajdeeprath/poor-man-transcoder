@@ -2,19 +2,19 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileOutput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaOutput;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaDestination;
 
-public class FileOutput extends MediaOutput implements IFileOutput {
+public class FileDestination extends MediaDestination implements IFileOutput {
 	
-	public FileOutput(String source) {
+	public FileDestination(String source) {
 		super(source);
 	}
 	
-	public FileOutput(String source, IContainer container){
+	public FileDestination(String source, IContainer container){
 		super(source, container);
 	}
 	
-	public FileOutput(String source, boolean isTemplate){
+	public FileDestination(String source, boolean isTemplate){
 		super(source,isTemplate);
 	}
 
