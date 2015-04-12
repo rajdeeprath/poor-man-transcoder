@@ -1,38 +1,61 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class AudioBitrate extends PassThruObject implements IAudioBitrate 
 {
-	private int bitrate;
+	private static final String key = "-b:a";
+	private Object value;
 	
 	/************ Copy constructor *********/
 	public AudioBitrate(IAudioBitrate object){
 		this.setSameAsSource(object.getSameAsSource());
-		this.bitrate = object.getBitrate();
+		this.value = object.getValue();
 	}
 	
 	public AudioBitrate(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
-		this.bitrate = -1;
+		this.value = 0;
 	}
 	
-	public AudioBitrate(int bitrate){
-		this.bitrate = bitrate;
+	public AudioBitrate(Object bitrate){
+		this.value = bitrate;
 	}
 	
 	public AudioBitrate(){
 		
 	}
 
-	public int getBitrate() 
-	{
-		return bitrate;
+	@Override
+	public String getKey() {
+		// TODO Auto-generated method stub
+		return AudioBitrate.key;
 	}
 
-	public void setBitrate(int bitrate) 
-	{
-		this.bitrate = bitrate;
-	}	
+	@Override
+	public void setKey(String key) {
+		// TODO Auto-generated method stub
+		// NO OP
+	}
+
+	@Override
+	public Object getValue() {
+		// TODO Auto-generated method stub
+		return this.value;
+	}
+
+	@Override
+	public void setValue(Object value) {
+		// TODO Auto-generated method stub
+		this.value = value;
+	}
+
+	@Override
+	public IParameter clone() {
+		// TODO Auto-generated method stub
+		return new AudioBitrate(this.getValue());
+	}
+	
 }

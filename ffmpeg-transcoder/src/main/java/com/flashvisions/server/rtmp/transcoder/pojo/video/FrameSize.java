@@ -1,12 +1,32 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
+
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Range;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class FrameSize extends PassThruObject implements IFrameSize  {
 	
-	private int width = 0;
-	private int height = 0;
+	private static final String key = "-s"; 
+	
+	
+	@NotNull
+	@Range(min = 1, max = 2000, message = "")
+	private Object width = 0;
+	
+	@NotNull
+	@Range(min = 1, max = 2000, message = "")
+	private Object height = 0;
+	
+	@Size(min = 3, max = 9)
+	private Object value;
+	
 	
 	public FrameSize(){
 		
@@ -20,36 +40,66 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 	
 	public FrameSize(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
-		this.width = -1;
-		this.height = -1;
+		this.width = 0;
+		this.height = 0;
 	}
 	
-	public FrameSize(int width, int height){
+	public FrameSize(Object width, Object height){
 		this.width = width;
 		this.height = height;
 	}
 
-	public int getWidth() 
+	public Object getWidth() 
 	{
 		// TODO Auto-generated method stub
 		return width;
 	}
 
-	public void setWidth(int width) 
+	public void setWidth(Object width) 
 	{
 		// TODO Auto-generated method stub
 		this.width = width;
 	}
 
-	public int getHeight() 
+	public Object getHeight() 
 	{
 		// TODO Auto-generated method stub
 		return height;
 	}
 
-	public void setHeight(int height) 
+	public void setHeight(Object height) 
 	{
 		// TODO Auto-generated method stub
 		this.height = height;
+	}
+
+	@Override
+	public String getKey() {
+		// TODO Auto-generated method stub
+		return FrameSize.key;
+	}
+
+	@Override
+	public void setKey(String key) {
+		// TODO Auto-generated method stub
+		// NO OP
+	}
+
+	@Override
+	public Object getValue() {
+		// TODO Auto-generated method stub
+		return this.width+"x"+this.height;
+	}
+
+	@Override
+	public void setValue(Object value) {
+		// TODO Auto-generated method stub
+		this.value = value;
+	}
+
+	@Override
+	public IParameter clone() {
+		// TODO Auto-generated method stub
+		return new FrameSize(this.width, this.height);
 	}
 }

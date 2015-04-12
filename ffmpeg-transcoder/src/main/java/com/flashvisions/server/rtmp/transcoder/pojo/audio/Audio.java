@@ -2,6 +2,9 @@ package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import java.util.ArrayList;
 
+import javax.validation.constraints.NotNull;
+
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -9,17 +12,29 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Audio extends MutableObject implements IAudio  {
 
+	@NotNull
 	private ICodec codec;
-	private Implementation codecImplementation;
+	
+	@NotNull
+	private ICodecImplementation codecImplementation;
+	
+	@NotNull
 	private IAudioBitrate bitrate;
+	
+	@NotNull
 	private IAudioSampleRate samplerate;
+	
+	@NotNull
 	private IAudioChannel channel;
+	
+	@NotNull
 	private ArrayList<IParameter> extraParams;
+	
+	@NotNull
 	private ArrayList<IProperty> extraProperties;
 
 
@@ -29,14 +44,6 @@ public class Audio extends MutableObject implements IAudio  {
 
 	public void setCodec(ICodec codec) {
 		this.codec = codec;
-	}
-
-	public Implementation getCodecImplementation() {
-		return codecImplementation;
-	}
-
-	public void setCodecImplementation(Implementation codecImplementation) {
-		this.codecImplementation = codecImplementation;
 	}
 
 	public IAudioBitrate getBitrate() {
@@ -81,6 +88,18 @@ public class Audio extends MutableObject implements IAudio  {
 	public void setExtraProperties(ArrayList<IProperty> extraProperties) {
 		// TODO Auto-generated method stub
 		this.extraProperties = extraProperties;
+	}
+
+	@Override
+	public ICodecImplementation getImplementation() {
+		// TODO Auto-generated method stub
+		return this.codecImplementation;
+	}
+
+	@Override
+	public void setImplementation(ICodecImplementation implementation) {
+		// TODO Auto-generated method stub
+		this.codecImplementation = implementation;
 	}
 
 	

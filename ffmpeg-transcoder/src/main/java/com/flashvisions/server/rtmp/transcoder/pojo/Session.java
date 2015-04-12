@@ -35,7 +35,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResult
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
-import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 /**
  * @author Rajdeep
@@ -58,8 +57,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	private long executonTimeout;
 	private ExecuteWatchdog watchdog;
 	
-	private Process proc;
-	private String signature; 
 	private static long id;
 	
 	private Session(Builder builder) 
@@ -72,12 +69,11 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		
 		this.executor = new DefaultExecutor();
 		
-		// set locally not globally -|
-		this.workingDirectoryPath = (builder.workingDirectoryPath.equals(null))?Globals.getEnv(Globals.getEnv(Globals.Vars.WORKING_DIRECTORY)):builder.workingDirectoryPath;
+		// set this locally not globally -|
+		this.workingDirectoryPath = (builder.workingDirectoryPath == null || builder.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):builder.workingDirectoryPath;
 		this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
-		this.signature = builder.signature;
 		
 		logger.info("Session :"+Session.id);
 		logger.info("Command :" + this.cmdLine.toString());
@@ -90,11 +86,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		return id;
 	}
 	
-	@Override
-	public String getSignature() {
-		// TODO Auto-generated method stub
-		return signature;
-	}
 
 	@Override
 	public IMediaInput getInputSource() {
@@ -220,16 +211,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		finally{}
 	}
 
-	
-	public Process getProcess() {
-		return proc;
-	}
-
-
-	public void setProcess(Process proc) {
-		this.proc = proc;
-	}
-
 
 	/***************** Session Builder *********************/
 	
@@ -246,7 +227,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		private IMediaInput source;
 		private ISession session;	
 		private ILibRtmpConfig librtmpConfig;
-		private String signature;
 		
 		private CommandLine cmdLine;
 		private Server serverType;
@@ -292,7 +272,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			this.identifyInput();
 			this.config = (this.templateFile != null)?this.buildTranscodeConfigFromTemplate(this.templateFile):this.config;
 			this.cmdLine = buildExecutableCommand(this.source, this.config);
-			this.signature = SessionUtil.generateSessionSignature(source.getSourcePath(), templateFile);
 			this.session = new Session(this);						
 			return this.session;
 		}
@@ -344,16 +323,15 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 						 ********** Processing Inputs ****************
 						 ************************************************/
 						{
-							cmdLine.addArgument("-re");
-							cmdLine.addArgument("-i");
-							cmdLine.addArgument("${inputSource}");
-							
-							
 							logger.info("Peparing librtmp");
 							if(IOUtils.isRTMPCompatStream(source)){
 								ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
-								replacementMap.put("inputSource", buildLibRtmpString(librtmpConfig));	
+								cmdLine.addArgument("-re");
+								replacementMap.put("inputSource", buildLibRtmpString(librtmpConfig));
 							}
+							
+							cmdLine.addArgument("-i");
+							cmdLine.addArgument("${inputSource}");
 						}
 						
 						

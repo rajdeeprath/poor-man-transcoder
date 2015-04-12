@@ -10,8 +10,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +34,11 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
@@ -40,6 +50,8 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.CodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
 import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
@@ -55,9 +67,15 @@ import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.collection.EncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaDestination;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.AverageBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.DeviceBuffer;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.FrameSize;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.Gop;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.KeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.MaximumBitrate;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.MinKeyframeInterval;
+import com.flashvisions.server.rtmp.transcoder.pojo.video.MinimumBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.Video;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoCodec;
@@ -67,10 +85,11 @@ import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 public class TemplateDao implements ITranscodeDao {
 
 	private static Logger logger = LoggerFactory.getLogger(TemplateDao.class);
+	private static Validator validator;
 	
 	private String templatePath;
 	private String templateName;
-	private File templateFile;	
+	private File templateFile;
 	
 	
 	public TemplateDao(String templatePath)
@@ -103,6 +122,9 @@ public class TemplateDao implements ITranscodeDao {
 			builder = builderFactory.newDocumentBuilder();
 			xpath = XPathFactory.newInstance().newXPath();
 			document = builder.parse(new FileInputStream(this.templateFile.getAbsolutePath()));
+			
+			ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();  
+			validator = validatorFactory.getValidator();  
 			
 			logger.debug("Updating document with expression variables");
 			TemplateParseHelper.updateDocumentWithVariables(document, xpath);
@@ -146,14 +168,30 @@ public class TemplateDao implements ITranscodeDao {
 				{
 					String encodeNodeVideoCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Codec";
 					String encodeNodeVideoCodec = xpath.compile(encodeNodeVideoCodecExpression).evaluate(document);
-					String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
-					String encodeNodeVideoCodecImplementation = xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(document);
-					video.setCodec(new VideoCodec(encodeNodeVideoCodec, encodeNodeVideoCodecImplementation));
+					
+					ICodec videocodec = new VideoCodec(encodeNodeVideoCodec);
+					video.setCodec(videocodec);
 				}
 				catch(Exception e)
 				{
 					throw new TranscodeConfigurationException("Invalid video codec specified");
 				}
+				
+				
+				
+				try
+				{
+					String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
+					String encodeNodeVideoCodecImplementation = xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(document);
+					
+					ICodecImplementation codecImpl = new CodecImplementation(encodeNodeVideoCodecImplementation);
+					video.setImplementation(codecImpl);
+				}
+				catch(Exception e)
+				{
+					throw new TranscodeConfigurationException("Invalid video codec implementation specified");
+				}
+				
 				
 				
 				/***** Width / Height *******/
@@ -168,13 +206,11 @@ public class TemplateDao implements ITranscodeDao {
 						Double encodeNodeVideoFrameWidth = (Double) xpath.compile(encodeNodeVideoFrameWidthExpression).evaluate(document, XPathConstants.NUMBER);
 						String encodeNodeVideoFrameHeightExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameSize/Height";
 						Double encodeNodeVideoFrameHeight = (Double) xpath.compile(encodeNodeVideoFrameHeightExpression).evaluate(document, XPathConstants.NUMBER);
-						int width = encodeNodeVideoFrameWidth.intValue();
-						int height = encodeNodeVideoFrameHeight.intValue();
-						
-						if(width<=0 || height<=0)
-						throw new TranscodeConfigurationException("Invalid width / height combination");
+						Integer width = encodeNodeVideoFrameWidth.intValue();
+						Integer height = encodeNodeVideoFrameHeight.intValue();
+						IFrameSize dimension = new FrameSize(width, height);
 								
-						video.setFramesize(new FrameSize(width, height));
+						video.setFramesize(dimension);
 					
 					}
 					else 
@@ -197,11 +233,10 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeVideoFrameRate = xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(document);
 					if(encodeNodeVideoFrameRate != null) 
 					{
-						int encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
-						if(encodeFrameRate <= 0 || encodeFrameRate >= 100)
-						throw new TranscodeConfigurationException("Invalid framerate");
+						Integer encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
+						IFrameRate fps = new FrameRate(encodeFrameRate);
 						
-						video.setFramerate(new FrameRate(encodeFrameRate));
+						video.setFramerate(fps);
 					}
 					else 
 					{
@@ -223,18 +258,31 @@ public class TemplateDao implements ITranscodeDao {
 					if(encodeNodeVideoBitrateNode != null && encodeNodeVideoBitrateNode.hasChildNodes())
 					{
 						String encodeNodeVideoBitrateAvgExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Average";
-						int encodeNodeVideoBitrateAverage = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(document));
+						Integer encodeNodeVideoBitrateAverage = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateAvgExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Min";
-						int encodeNodeVideoBitrateMin = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(document));
+						Integer encodeNodeVideoBitrateMin = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMinExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateMaxExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Max";
-						int encodeNodeVideoBitrateMax = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(document));
+						Integer encodeNodeVideoBitrateMax = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateMaxExpression).evaluate(document));
 						
 						String encodeNodeVideoBitrateBufferExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Bitrate/Buffer";
-						int encodeNodeVideoBitrateBuffer = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(document));
+						Integer encodeNodeVideoBitrateBuffer = Integer.parseInt(xpath.compile(encodeNodeVideoBitrateBufferExpression).evaluate(document));
 						
-						video.setBitrate(new VideoBitrate(encodeNodeVideoBitrateAverage, encodeNodeVideoBitrateMin, encodeNodeVideoBitrateMax, encodeNodeVideoBitrateBuffer));
+						IParameter avgBitrate = new AverageBitrate(encodeNodeVideoBitrateAverage);
+						IParameter minBitrate = new MinimumBitrate(encodeNodeVideoBitrateMin);
+						IParameter maxBitrate = new MaximumBitrate(encodeNodeVideoBitrateMax);
+						IParameter deviceBuffer = new DeviceBuffer(encodeNodeVideoBitrateBuffer);
+						IVideoBitrate bitrate = new VideoBitrate(avgBitrate, minBitrate, maxBitrate, deviceBuffer);
+						
+						Set<ConstraintViolation <IVideoBitrate>> constraintViolations = validator.validate(bitrate);  
+						//@ Validating video bitrate object
+						if(constraintViolations.size()>0){
+						 for(ConstraintViolation<IVideoBitrate> constraintViolation : constraintViolations){  
+						  throw new Exception(constraintViolation.getMessage());
+						 }}
+						
+						video.setBitrate(bitrate);
 					}
 					else 
 					{
@@ -243,7 +291,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Invalid video bitrate(s) settings. Following source...");
+					logger.info("Invalid video bitrate(s) settings.{"+e.getMessage()+"} Following source...");
 					video.setBitrate(new VideoBitrate(true));
 				}
 				
@@ -259,14 +307,14 @@ public class TemplateDao implements ITranscodeDao {
 						String encodeNodeVideoKeyFrameIntervalGopExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/Gop";
 						String encodeNodeVideoGop = xpath.compile(encodeNodeVideoKeyFrameIntervalGopExpression).evaluate(document);
 						if(encodeNodeVideoGop == null) throw new TranscodeConfigurationException("Invalid gop size");
-						int encodeNodeVideoKFIGop = Integer.parseInt(encodeNodeVideoGop);
+						Integer encodeNodeVideoKFIGop = Integer.parseInt(encodeNodeVideoGop);
 						
 						String encodeNodeVideoKeyFrameIntervalMinExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/KeyFrameInterval/IntervalMin";
 						String encodeNodeVideoKeyFrameIntervalMin = xpath.compile(encodeNodeVideoKeyFrameIntervalMinExpression).evaluate(document);
 						if(encodeNodeVideoKeyFrameIntervalMin == null) throw new TranscodeConfigurationException("Invalid min keyframeinterval");
-						int encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
+						Integer encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
 						
-						video.setKeyFrameInterval(new KeyFrameInterval(encodeNodeVideoKFIGop, encodeNodeVideoKFIMin));
+						video.setKeyFrameInterval(new KeyFrameInterval(new Gop(encodeNodeVideoKFIGop), new MinKeyframeInterval(encodeNodeVideoKFIMin)));
 					}
 					else
 					{
@@ -430,8 +478,26 @@ public class TemplateDao implements ITranscodeDao {
 				
 				
 				
-				/*** all ok with video configuration */
-				video.setEnabled(true);
+				try
+				{
+					Set<ConstraintViolation <IVideo>> constraintViolations = validator.validate(video);  
+					
+					//@ Validating VideoBitrate object
+					if(constraintViolations.size()>0){
+					 for(ConstraintViolation<IVideo> constraintViolation : constraintViolations){  
+					  throw new Exception(constraintViolation.getMessage());
+					 }}
+					
+					video.setEnabled(true);
+				}
+				catch(Exception e)
+				{
+					logger.info("Video Config Error : " + e.getMessage()+". Disabling video processing for this {Encode} " + encode.getName() + " configuration.");
+					video.setEnabled(false);
+				}
+				
+				
+				
 				
 				/**** store video configuration into encode object *****/
 				encode.setVideoConfig(video);
@@ -448,9 +514,23 @@ public class TemplateDao implements ITranscodeDao {
 				{
 					String encodeNodeAudioCodecExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Codec";
 					String encodeNodeAudioCodec = xpath.compile(encodeNodeAudioCodecExpression).evaluate(document);
+					
+					ICodec acodec = new AudioCodec(encodeNodeAudioCodec);
+					audio.setCodec(acodec);
+				}
+				catch(Exception e)
+				{
+					throw new TranscodeConfigurationException("Invalid audio codec specified");
+				}
+				
+				
+				try
+				{
 					String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
 					String encodeNodeAudioCodecImplementation = xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(document);
-					audio.setCodec(new AudioCodec(encodeNodeAudioCodec, encodeNodeAudioCodecImplementation));
+					
+					ICodecImplementation codecImpl = new CodecImplementation(encodeNodeAudioCodecImplementation);
+					audio.setImplementation(codecImpl);
 				}
 				catch(Exception e)
 				{
@@ -506,7 +586,8 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeAudioChannelType = xpath.compile(encodeNodeAudioChannelTypeExpression).evaluate(document);
 					if(encodeNodeAudioChannelType != null)
 					{
-						audio.setChannel(new AudioChannel(encodeNodeAudioChannelType));
+						IAudioChannel channel = new AudioChannel(encodeNodeAudioChannelType);
+						audio.setChannel(channel);
 					}
 					else
 					{
@@ -515,7 +596,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Improper audio channel. Following source");
+					logger.info("Audio channel error :"+e.getMessage()+" Following source");
 					audio.setChannel(new AudioChannel(true));
 				}
 				

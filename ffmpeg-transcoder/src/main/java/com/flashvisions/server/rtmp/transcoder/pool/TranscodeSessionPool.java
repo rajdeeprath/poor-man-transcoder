@@ -24,6 +24,7 @@ public class TranscodeSessionPool {
 	  private Server operatingServer; 
 	  private Hashtable<ISession, Long> locked, unlocked;
 	  private Hashtable<String, ISession> sessionMap;
+	  private Hashtable<ISession, String> templateMap;
 	  
 	  
 	  public long getSessionExpirationTime() 
@@ -54,6 +55,7 @@ public class TranscodeSessionPool {
 		  this.locked = new Hashtable<ISession, Long>();
 		  this.unlocked = new Hashtable<ISession, Long>();
 		  this.sessionMap = new Hashtable<String, ISession>();
+		  this.templateMap = new Hashtable<ISession, String>();
 	  }
 	  
 	  // !!! for future use
@@ -86,15 +88,23 @@ public class TranscodeSessionPool {
 	  public boolean validate(IMediaInput input, String usingTemplate, ISession available)
 	  {
 		  String requestSignature = SessionUtil.generateSessionSignature(input.getSourcePath(), usingTemplate);
-		  return available.getSignature().equals(requestSignature);
+		  return getSignature(available).equals(requestSignature);
 	  }
 
 	  public void expire(ISession session)
 	  {
 		  logger.info("Expiring object " + session.getId());
-		  sessionMap.remove(session.getSignature());
+		  sessionMap.remove(getSignature(session));
+		  templateMap.remove(session);
 		  session.dispose();
 		  session = null;
+	  }
+	  
+	  public String getSignature(ISession session)
+	  {
+		  String template = templateMap.get(session);
+		  String input = session.getInputSource().getSourcePath();
+		  return SessionUtil.generateSessionSignature(input, template);
 	  }
 
 	  public synchronized ISession checkOut(IMediaInput input, String usingTemplate) throws TranscoderException 
@@ -132,7 +142,8 @@ public class TranscodeSessionPool {
 	    try 
 	    {
 	    	t = create(input, usingTemplate);
-	    	sessionMap.put(t.getSignature(), t);
+	    	templateMap.put(t, usingTemplate);
+	    	sessionMap.put(getSignature(t), t);
 		} 
 	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
 	    {

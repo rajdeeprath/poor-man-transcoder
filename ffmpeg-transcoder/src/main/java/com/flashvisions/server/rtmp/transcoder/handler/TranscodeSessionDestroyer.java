@@ -20,7 +20,6 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean add(Process process) {
 		// TODO Auto-generated method stub
 		logger.info("adding process");
-		this.session.setProcess(process);
 		return super.add(process);
 	}
 
@@ -34,7 +33,6 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean remove(Process process) {
 		// TODO Auto-generated method stub
 		logger.info("removing process");
-		this.session.setProcess(null);
 		return super.remove(process);
 	}
 

@@ -4,40 +4,33 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
+import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
 
-public class FrameRate extends PassThruObject implements IFrameRate {
-	
-	private static final String key = "-r"; 
+public class MinKeyframeInterval extends Parameter implements IParameter {
+
+	private static final String key = "-keyint_min"; 
 	
 	@NotNull
-	@Range(min = 1, max = 90, message = "")
+    @Range(min = 0, max = 120)
 	private Object value;
-
-	public FrameRate(){
+	
+	public MinKeyframeInterval(){
+		
 	}
 	
-	public FrameRate(IFrameRate object){
-		this.setSameAsSource(object.getSameAsSource());
+	public MinKeyframeInterval(MinKeyframeInterval object){
 		this.value = object.getValue();
 	}
 	
-	public FrameRate(Object framerate){
-		this.value = framerate;
+	public MinKeyframeInterval(Object value){
+		this.value = value;
 	}
 	
-	public FrameRate(boolean sameAsSource){
-		this.setSameAsSource(sameAsSource);
-		this.value = 0;
-	}
-
-
 	@Override
 	public String getKey() {
 		// TODO Auto-generated method stub
-		return FrameRate.key;
+		return MinKeyframeInterval.key;
 	}
 
 	@Override
@@ -61,6 +54,7 @@ public class FrameRate extends PassThruObject implements IFrameRate {
 	@Override
 	public IParameter clone() {
 		// TODO Auto-generated method stub
-		return new FrameRate(this.value);
+		return new MinKeyframeInterval(this.value);
 	}
+
 }

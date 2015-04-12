@@ -1,14 +1,24 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
+import javax.validation.constraints.NotNull;
+
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class VideoBitrate extends PassThruObject implements IVideoBitrate 
 {
-	private int minimum;
-	private int maximum;
-	private int average;
-	private int deviceBuffer;
+	@NotNull
+	private IParameter minimum;
+	
+	@NotNull
+	private IParameter maximum;
+	
+	@NotNull
+	private IParameter average;
+	
+	@NotNull
+	private IParameter deviceBuffer;
 	
 	
 	public VideoBitrate(){
@@ -19,59 +29,60 @@ public class VideoBitrate extends PassThruObject implements IVideoBitrate
 	public VideoBitrate(IVideoBitrate object){
 		this.setSameAsSource(object.getSameAsSource());
 		
-		this.minimum = object.getMinimum();
-		this.maximum = object.getMaximum();
-		this.deviceBuffer = object.getDeviceBuffer();
-		this.average = object.getAverage();
+		this.average = (AverageBitrate) object.getAverage();
+		this.minimum = (MinimumBitrate) object.getMinimum();
+		this.maximum = (MaximumBitrate) object.getMaximum();
+		this.deviceBuffer = (DeviceBuffer) object.getDeviceBuffer();		
 	}
 	
 	public VideoBitrate(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
 		
-		this.minimum = -1;
-		this.maximum = -1;
-		this.deviceBuffer = -1;
+		this.minimum = new MinimumBitrate(0);
+		this.maximum = new MaximumBitrate(0);
+		this.average = new AverageBitrate(0);
+		this.deviceBuffer = new DeviceBuffer(0);
 	}
 	
-	public VideoBitrate(int average, int minimum, int maximum, int deviceBuffer){
+	public VideoBitrate(IParameter average, IParameter minimum, IParameter maximum, IParameter deviceBuffer){
 		this.average = average;
 		this.minimum = minimum;
 		this.maximum = maximum;
 		this.deviceBuffer = deviceBuffer;
 	}
 	
-	public int getMinimum() {
+	public IParameter getMinimum() {
 		return minimum;
 	}
 	
-	public void setMinimum(int minimum) {
+	public void setMinimum(IParameter minimum) {
 		this.minimum = minimum;
 	}
 	
-	public int getMaximum() {
+	public IParameter getMaximum() {
 		return maximum;
 	}
 	
-	public void setMaximum(int maximum) {
+	public void setMaximum(IParameter maximum) {
 		this.maximum = maximum;
 	}
 	
-	public int getDeviceBuffer() {
+	public IParameter getDeviceBuffer() {
 		return deviceBuffer;
 	}
 	
-	public void setDeviceBuffer(int deviceBuffer) {
+	public void setDeviceBuffer(IParameter deviceBuffer) {
 		this.deviceBuffer = deviceBuffer;
 	}
 
 	@Override
-	public int getAverage() {
+	public IParameter getAverage() {
 		// TODO Auto-generated method stub
 		return average;
 	}
 
 	@Override
-	public void setAverage(int average) {
+	public void setAverage(IParameter average) {
 		// TODO Auto-generated method stub
 		this.average = average;
 	}	

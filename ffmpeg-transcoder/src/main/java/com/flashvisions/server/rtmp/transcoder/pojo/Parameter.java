@@ -5,13 +5,13 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 public class Parameter implements IParameter {
 
 	private String key;
-	private String value;
+	private Object value;
 	
 	public Parameter() {
 		
 	}
 	
-	public Parameter(String key, String value) {
+	public Parameter(String key, Object value) {
 		this.key = key; this.value = value;
 	}
 	
@@ -26,12 +26,12 @@ public class Parameter implements IParameter {
 		this.key = key;
 	}
 
-	public String getValue()
+	public Object getValue()
 	{
 		return value;
 	}
 
-	public void setValue(String value) 
+	public void setValue(Object value) 
 	{
 		this.value = value;
 	}

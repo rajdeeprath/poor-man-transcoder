@@ -1,39 +1,62 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class AudioSampleRate extends PassThruObject implements IAudioSampleRate
 {
-	private int samplerate;
+	private static final String key = "-ar";
+	private Object value;
 	
 	/*************** Copy constructor ************/
 	public AudioSampleRate(IAudioSampleRate object) {
 		this.setSameAsSource(object.getSameAsSource());
-		this.samplerate = object.getSamplerate();
+		this.value = object.getValue();
 	}
 
-	public AudioSampleRate(boolean sameAsSource, int samplerate) {
+	public AudioSampleRate(boolean sameAsSource, Object samplerate) {
 		this.setSameAsSource(sameAsSource);
-		this.samplerate = samplerate;
+		this.value = samplerate;
 	}
 
 	public AudioSampleRate(boolean sameAsSource) {
 		this.setSameAsSource(sameAsSource);
-		this.samplerate = -1;
+		this.value = -10;
 	}
 	
-	public AudioSampleRate(int samplerate) {
-		this.samplerate = samplerate;
+	public AudioSampleRate(Object samplerate) {
+		this.value = samplerate;
 	}
 
-	public int getSamplerate() 
-	{
-		return samplerate;
+
+	@Override
+	public String getKey() {
+		// TODO Auto-generated method stub
+		return AudioSampleRate.key;
 	}
 
-	public void setSamplerate(int samplerate) 
-	{
-		this.samplerate = samplerate;
+	@Override
+	public void setKey(String key) {
+		// TODO Auto-generated method stub
+		// NO OP
+	}
+
+	@Override
+	public Object getValue() {
+		// TODO Auto-generated method stub
+		return this.value;
+	}
+
+	@Override
+	public void setValue(Object value) {
+		// TODO Auto-generated method stub
+		this.value = value;
+	}
+
+	@Override
+	public IParameter clone() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }	

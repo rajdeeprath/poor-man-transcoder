@@ -1,20 +1,15 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 
 public class VideoCodec extends Codec {
 	
-	private static Logger logger = LoggerFactory.getLogger(VideoCodec.class);
+	private static final String key = "-codec:v";
 	
-	
-	public static enum Type {
-		LIBX264, FLV, LIBTHEORA, H263, FLASHSV, MPEG4
-    }
 	
 	public VideoCodec(){
 		super();
@@ -24,44 +19,27 @@ public class VideoCodec extends Codec {
 		super(codec);
 	}
 
-	public VideoCodec(String name) {
+	public VideoCodec(Object name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
-	
 
-	public VideoCodec(String name, String implementation){
-		super(name, implementation);
+	@Override
+	public String getKey() {
+		// TODO Auto-generated method stub
+		return VideoCodec.key;
 	}
 
 	@Override
-	protected boolean validateCodec(String codecName) 
-	{
-		boolean valid = false;
-		
-		try
-		{
-			super.validateCodec(codecName);
-		}
-		catch(Exception e)
-		{
-			try
-			{
-				switch(Type.valueOf(codecName.toUpperCase()))
-				{	
-					default:
-					valid = true;
-					break;
-				}
-			}
-			catch(Exception ee)
-			{
-				super.setEnabled(false);
-				logger.info("Invalid codec : " + codecName);
-			}
-		}
-		
-		
-		return valid;
+	public void setKey(String key) {
+		// TODO Auto-generated method stub
+		//NO OP 
 	}
+	
+	@Override
+	public IParameter clone() {
+		// TODO Auto-generated method stub
+		return new VideoCodec(this.getValue());
+	}
+	
 }

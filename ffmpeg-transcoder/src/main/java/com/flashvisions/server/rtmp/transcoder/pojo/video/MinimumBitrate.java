@@ -4,40 +4,34 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
-import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
+import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
 
-public class FrameRate extends PassThruObject implements IFrameRate {
-	
-	private static final String key = "-r"; 
+public class MinimumBitrate extends Parameter implements IParameter {
+
+	private static final String key = "-minrate"; 
 	
 	@NotNull
-	@Range(min = 1, max = 90, message = "")
+	@Range(min = 0, max = 5000, message = "{com.flashvisions.server.rtmp.transcoder.validation.video.bitrate.invalid.minimum}")
 	private Object value;
-
-	public FrameRate(){
+	
+	
+	public MinimumBitrate(){
+		
 	}
 	
-	public FrameRate(IFrameRate object){
-		this.setSameAsSource(object.getSameAsSource());
-		this.value = object.getValue();
+	public MinimumBitrate(Object value){
+		this.value = value;
 	}
 	
-	public FrameRate(Object framerate){
-		this.value = framerate;
+	public MinimumBitrate(MinimumBitrate object){
+		this.value = object.value;
 	}
 	
-	public FrameRate(boolean sameAsSource){
-		this.setSameAsSource(sameAsSource);
-		this.value = 0;
-	}
-
-
 	@Override
 	public String getKey() {
 		// TODO Auto-generated method stub
-		return FrameRate.key;
+		return MinimumBitrate.key;
 	}
 
 	@Override
@@ -61,6 +55,8 @@ public class FrameRate extends PassThruObject implements IFrameRate {
 	@Override
 	public IParameter clone() {
 		// TODO Auto-generated method stub
-		return new FrameRate(this.value);
+		return new MinimumBitrate(this.value);
 	}
+
+
 }

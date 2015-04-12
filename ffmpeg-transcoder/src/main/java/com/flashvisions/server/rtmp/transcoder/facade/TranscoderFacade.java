@@ -19,6 +19,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	
 	private static TranscoderContext context;
 	private static volatile ITranscoderFacade instance;
+	private static boolean bootstrap = false;
 	
 	private TranscoderFacade(){
 		context = new TranscoderContext();
@@ -44,11 +45,16 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		// TODO Auto-generated method stub		
 		try
 		{
+			if(!bootstrap)
 			new TranscoderBootStrap().execute(context);
 		}
 		catch(Exception e)
 		{
 			logger.info(e.getMessage());
+		}
+		finally
+		{
+			bootstrap = true;
 		}
 	}
 
@@ -117,6 +123,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	
 	@Override
 	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException {
+		
 		// TODO Auto-generated method stub
 		TranscodeSessionPool pool = context.getPool();
 		ISession session = pool.checkOut(input, usingTemplate);

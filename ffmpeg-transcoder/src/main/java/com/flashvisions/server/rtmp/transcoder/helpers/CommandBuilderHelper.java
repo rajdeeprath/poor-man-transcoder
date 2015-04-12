@@ -12,6 +12,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
@@ -22,7 +23,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class CommandBuilderHelper {
@@ -50,7 +51,7 @@ public class CommandBuilderHelper {
 		{
 			Iterator<IProperty> it = properties.iterator();
 			while(it.hasNext())	{
-				cmdLine.addArgument(it.next().getData());
+			cmdLine.addArgument(it.next().getData(), true);
 			}
 		}
 		
@@ -60,31 +61,31 @@ public class CommandBuilderHelper {
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception
 	{
+		final String DASH = "-";
 		ICodec acodec = config.getCodec();
 		
 		if(!acodec.getEnabled())
 		throw new Exception("Audio codec disabled");
+		
 	
 		if(acodec.getSameAsSource())
 		{
 			// pass thru -> use same as source
-			cmdLine.addArgument("-codec:a");
-			cmdLine.addArgument("copy");
+			cmdLine.addArgument(acodec.getKey());
+			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
 		}
 		else
 		{
 			// new encode params
 			logger.info("Setting audio codec");
-			cmdLine.addArgument("-codec:a");
-			cmdLine.addArgument(acodec.getName());
+			cmdLine.addArgument(acodec.getKey());
+			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
 			
-			
-			logger.info("Setting codec implementation");
-			if(acodec.getImplementation() != null && acodec.getImplementation() != Codec.Implementation.NORMAL){
-			cmdLine.addArgument("-strict");
-			cmdLine.addArgument(acodec.getImplementation().name().toLowerCase());
+			ICodecImplementation impl = config.getImplementation();
+			if(!CodecImplementation.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
+			cmdLine.addArgument(impl.getKey());
+			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
-			
 			
 			logger.info("Setting audio bitrate");
 			IAudioBitrate abitrate = config.getBitrate();
@@ -94,9 +95,9 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				if(abitrate.getBitrate()>0) {
-					cmdLine.addArgument("-b:a");
-					cmdLine.addArgument(abitrate.getBitrate()+"k");
+				if((Integer)abitrate.getValue()>0) {
+				cmdLine.addArgument(abitrate.getKey());
+				cmdLine.addArgument(String.valueOf(abitrate.getValue())+"k");
 				}
 			}
 			
@@ -109,9 +110,9 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				if(asamplerate.getSamplerate()>0){
-				cmdLine.addArgument("-ar");
-				cmdLine.addArgument(String.valueOf(asamplerate.getSamplerate()));
+				if((Integer)asamplerate.getValue()>0){
+				cmdLine.addArgument(asamplerate.getKey());
+				cmdLine.addArgument(String.valueOf(asamplerate.getValue()));
 				}
 			}
 			
@@ -124,8 +125,8 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				if(achannel.getChannels()>0){
-				cmdLine.addArgument("-ac");
+				if((Integer)achannel.getChannels()>0){
+				cmdLine.addArgument(achannel.getKey());
 				cmdLine.addArgument(String.valueOf(achannel.getChannels()));
 				}
 			}
@@ -137,7 +138,7 @@ public class CommandBuilderHelper {
 			Iterator<?> ita = extraAudioParams.iterator();
 			while(ita.hasNext()){
 				IParameter prop = (IParameter) ita.next();
-				cmdLine.addArgument("-"+prop.getKey());
+				cmdLine.addArgument(DASH+prop.getKey());
 				cmdLine.addArgument(String.valueOf(prop.getValue()));
 			}
 		}
@@ -145,6 +146,7 @@ public class CommandBuilderHelper {
 	
 	public void buildVideoQuery(CommandLine cmdLine, IVideo config) throws Exception
 	{
+		final String DASH = "-";
 		ICodec vcodec = config.getCodec();
 		
 		if(!vcodec.getEnabled())
@@ -153,25 +155,23 @@ public class CommandBuilderHelper {
 		if(vcodec.getSameAsSource())
 		{
 			// pass thru -> use same as source
-			cmdLine.addArgument("-codec:v");
-			cmdLine.addArgument("copy");
+			cmdLine.addArgument(vcodec.getKey());
+			cmdLine.addArgument(String.valueOf(vcodec.getValue()).toLowerCase());
 		}
 		else
 		{
 			logger.info("Calculating new video settings");
 			
-			
 			logger.info("Setting codec");
-			cmdLine.addArgument("-codec:v");
-			cmdLine.addArgument(vcodec.getName());
+			cmdLine.addArgument(vcodec.getKey());
+			cmdLine.addArgument(String.valueOf(vcodec.getValue()));
 			
 			
-			logger.info("Setting codec implementation");
-			if(vcodec.getImplementation() != Codec.Implementation.NORMAL){
-			cmdLine.addArgument("-strict");
-			cmdLine.addArgument(vcodec.getImplementation().name().toLowerCase());
+			ICodecImplementation impl = config.getImplementation();
+			if(!CodecImplementation.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
+			cmdLine.addArgument(impl.getKey());
+			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
-			
 			
 			logger.info("Setting frame size");
 			IFrameSize framesize = config.getFramesize();
@@ -181,8 +181,8 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				cmdLine.addArgument("-s");
-				cmdLine.addArgument(framesize.getWidth()+"x"+framesize.getHeight());
+				cmdLine.addArgument(framesize.getKey());
+				cmdLine.addArgument(String.valueOf(framesize.getValue()));
 			}
 			
 			
@@ -194,8 +194,8 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				cmdLine.addArgument("-r");
-				cmdLine.addArgument(String.valueOf(framerate.getFramerate()));
+				cmdLine.addArgument(framerate.getKey());
+				cmdLine.addArgument(String.valueOf(framerate.getValue()));
 			}
 			
 			
@@ -207,27 +207,31 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				if(vbitrate.getAverage()>0)
-				{
+				IParameter avgBitrate = vbitrate.getAverage();
+				if(((Integer)avgBitrate.getValue() > 0)){
 					logger.info("ABR enabled");
-					cmdLine.addArgument("-b:v");
-					cmdLine.addArgument(vbitrate.getAverage()+"k");
+					cmdLine.addArgument(avgBitrate.getKey());
+					cmdLine.addArgument(avgBitrate.getValue()+"k");
 				}
 				else
 				{
-					if(vbitrate.getMinimum()>0){
-						cmdLine.addArgument("-minrate");
-						cmdLine.addArgument(vbitrate.getMinimum()+"k");
+					logger.info("VBR enabled");
+					IParameter minBitrate = vbitrate.getMinimum();
+					if(((Integer)minBitrate.getValue() > 0)){
+					cmdLine.addArgument(minBitrate.getKey());
+					cmdLine.addArgument(minBitrate.getValue()+"k");
 					}
 					
-					if(vbitrate.getMaximum()>0){
-						cmdLine.addArgument("-maxrate");
-						cmdLine.addArgument(vbitrate.getMaximum()+"k");
+					IParameter maxBitrate = vbitrate.getMaximum();
+					if(((Integer)maxBitrate.getValue() > 0)){
+					cmdLine.addArgument(maxBitrate.getKey());
+					cmdLine.addArgument(maxBitrate.getValue()+"k");
 					}
 					
-					if(vbitrate.getDeviceBuffer()>0){
-						cmdLine.addArgument("-bufsize");
-						cmdLine.addArgument(vbitrate.getDeviceBuffer()+"k");
+					IParameter deviceBuffer = vbitrate.getDeviceBuffer();
+					if(((Integer)deviceBuffer.getValue() > 0)){
+					cmdLine.addArgument(deviceBuffer.getKey());
+					cmdLine.addArgument(deviceBuffer.getValue()+"k");
 					}
 				}
 			}
@@ -241,14 +245,20 @@ public class CommandBuilderHelper {
 			}
 			else
 			{
-				if(keyframeinterval.getGop()>0){
-				cmdLine.addArgument("-g");
-				cmdLine.addArgument(String.valueOf(keyframeinterval.getGop()));
+				IParameter gop = keyframeinterval.getGop();
+				if((Integer)gop.getValue()>0)
+				{
+					IParameter g = (IParameter) gop;
+					cmdLine.addArgument(g.getKey());
+					cmdLine.addArgument(String.valueOf(g.getValue()));
 				}
 				
-				if(keyframeinterval.getMinimunInterval()>0){
-				cmdLine.addArgument("-keyint_min");
-				cmdLine.addArgument(String.valueOf(keyframeinterval.getMinimunInterval()));
+				
+				IParameter minkfi = keyframeinterval.getMinimunInterval();
+				{
+					IParameter kfi_min = (IParameter) minkfi;
+					cmdLine.addArgument(kfi_min.getKey());
+					cmdLine.addArgument(String.valueOf(kfi_min.getValue()));
 				}
 			}
 			
@@ -259,9 +269,16 @@ public class CommandBuilderHelper {
 			Iterator<IParameter> itv = extraVideoParams.iterator();
 			while(itv.hasNext()){
 				IParameter prop = (IParameter) itv.next();
-				cmdLine.addArgument("-"+prop.getKey());
+				cmdLine.addArgument(DASH+prop.getKey());
 				cmdLine.addArgument(String.valueOf(prop.getValue()));
 			}		
 		}
 	}
+	
+	public static  <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
+		  for (E e : enumClass.getEnumConstants()) {
+		    if(e.name().equalsIgnoreCase(value)) { return true; }
+		  }
+		  return false;
+		}
 }

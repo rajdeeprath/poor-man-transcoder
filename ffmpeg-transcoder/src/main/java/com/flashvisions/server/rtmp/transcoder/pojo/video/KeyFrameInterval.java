@@ -5,8 +5,8 @@ import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterval  {
 
-	private int gop;
-	private int minimunInterval;
+	private Gop gop;
+	private MinKeyframeInterval minimunInterval;
 	
 	
 	public KeyFrameInterval(){
@@ -21,31 +21,31 @@ public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterva
 	
 	public KeyFrameInterval(boolean sameAsSource){
 		this.setSameAsSource(sameAsSource);
-		this.gop = -1;
-		this.minimunInterval = -1;
+		this.gop = new Gop(0);
+		this.minimunInterval = new MinKeyframeInterval(0);
 	}
 
-	public KeyFrameInterval(int gop, int minimunInterval){
+	public KeyFrameInterval(Gop gop, MinKeyframeInterval minimunInterval){
 		this.gop = gop;
 		this.minimunInterval = minimunInterval;
 	}
 	
-	public int getMinimunInterval() 
+	public MinKeyframeInterval getMinimunInterval() 
 	{
 		return minimunInterval;
 	}
 	
-	public void setMinimunInterval(int minimunInterval) 
+	public void setMinimunInterval(MinKeyframeInterval minimunInterval) 
 	{
 		this.minimunInterval = minimunInterval;
 	}
 
-	public int getGop() 
+	public Gop getGop() 
 	{
 		return gop;
 	}
 
-	public void setGop(int gop) 
+	public void setGop(Gop gop) 
 	{
 		this.gop = gop;
 	}

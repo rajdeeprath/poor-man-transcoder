@@ -2,6 +2,9 @@ package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import java.util.ArrayList;
 
+import javax.validation.constraints.NotNull;
+
+import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
@@ -11,15 +14,34 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoBitrate;
 
 public class Video extends MutableObject implements IVideo  {
 
+	@NotNull
 	private ICodec codec;
+	
+	@NotNull
+	private ICodecImplementation codecImplementation;
+	
+	@NotNull
 	private IFrameSize framesize;
+	
+	@NotNull
 	private IFrameRate framerate;
+	
+	@NotNull
+	@ValidVideoBitrate
 	private IVideoBitrate bitrate;
+	
+	@NotNull
 	private IKeyFrameInterval keyFrameInterval;
+	
+	@NotNull
 	private ArrayList<IParameter> extraParams;
+	
+	
+	@NotNull
 	private ArrayList<IProperty> extraProperties;
 	
 	
@@ -84,5 +106,16 @@ public class Video extends MutableObject implements IVideo  {
 		this.extraProperties = extraProperties;
 	}
 
+	@Override
+	public ICodecImplementation getImplementation() {
+		// TODO Auto-generated method stub
+		return this.codecImplementation;
+	}
+
+	@Override
+	public void setImplementation(ICodecImplementation implementation) {
+		// TODO Auto-generated method stub
+		this.codecImplementation = implementation;
+	}
 	
 }

@@ -29,7 +29,7 @@ public class InitializeEnvironment implements Command {
 			if(ctx.getFFmpegPath().equals(null))
 			throw new IOException("Please specify ffmpeg executable path");
 			Globals.addEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH, ctx.getFFmpegPath());
-			logger.info("Ffmpeg binary " + ctx.getFFmpegPath());
+			logger.info("Ffmpeg binary " + Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
 			
 			File home = new File(ctx.getHomeDirectory());
 			if(!home.exists()) 

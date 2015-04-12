@@ -7,6 +7,8 @@ public interface IVideo extends IMutable {
 
 	public ICodec getCodec();
 	public void setCodec(ICodec codec);
+	public ICodecImplementation getImplementation();
+	public void setImplementation(ICodecImplementation implementation);
 	public IFrameSize getFramesize();
 	public void setFramesize(IFrameSize framesize);
 	public IFrameRate getFramerate();

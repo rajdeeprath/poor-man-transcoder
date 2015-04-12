@@ -44,7 +44,7 @@
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>libvo_aacenc</Codec>
+					<Codec>Copy</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->

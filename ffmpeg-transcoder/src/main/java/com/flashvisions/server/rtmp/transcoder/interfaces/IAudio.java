@@ -2,14 +2,12 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec.Implementation;
-
 public interface IAudio extends IMutable {
 
 	public ICodec getCodec();
 	public void setCodec(ICodec codec);
-	public Implementation getCodecImplementation();
-	public void setCodecImplementation(Implementation codecImplementation);
+	public ICodecImplementation getImplementation();
+	public void setImplementation(ICodecImplementation implementation);
 	public IAudioBitrate getBitrate();
 	public void setBitrate(IAudioBitrate bitrate);
 	public IAudioSampleRate getSamplerate();
