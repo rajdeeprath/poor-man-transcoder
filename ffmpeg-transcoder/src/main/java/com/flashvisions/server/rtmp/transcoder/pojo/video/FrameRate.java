@@ -13,7 +13,7 @@ public class FrameRate extends PassThruObject implements IFrameRate {
 	private static final String key = "-r"; 
 	
 	@NotNull
-	@Range(min = 1, max = 90, message = "")
+	@Range(min = 1, max = 60, message = "")
 	private Object value;
 
 	public FrameRate(){

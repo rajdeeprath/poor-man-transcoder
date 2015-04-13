@@ -4,15 +4,16 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.AudioCodecs;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecOptions;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.VideoCodecs;
-import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoCodec;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidAudioCodec;
 
-public class VideoCodecValidator implements ConstraintValidator<ValidVideoCodec, ICodec> {
+public class AudioCodecValidator implements ConstraintValidator<ValidAudioCodec, ICodec> {
 
-	ValidVideoCodec constrain;
+	ValidAudioCodec constrain;
+	
 	@Override
-	public void initialize(ValidVideoCodec constrain) {
+	public void initialize(ValidAudioCodec constrain) {
 		// TODO Auto-generated method stub
 		this.constrain = constrain;
 	}
@@ -27,10 +28,10 @@ public class VideoCodecValidator implements ConstraintValidator<ValidVideoCodec,
 		{
 			String codecName = (String) codec.getValue();
 			
-			if(!isInEnum(codecName, CodecOptions.class) && !isInEnum(codecName, VideoCodecs.class))
+			if(!isInEnum(codecName, CodecOptions.class) && !isInEnum(codecName, AudioCodecs.class))
 			{
 				valid = false;
-				message = "{com.flashvisions.server.rtmp.transcoder.validation.video.codec.invalid.generic}";
+				message = "{com.flashvisions.server.rtmp.transcoder.validation.audio.codec.invalid.generic}";
 			}
 			
 			if(!valid) {
@@ -45,12 +46,11 @@ public class VideoCodecValidator implements ConstraintValidator<ValidVideoCodec,
 		
 		return valid;
 	}
-	
+
 	public <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
 		  for (E e : enumClass.getEnumConstants()) {
 		    if(e.name().equalsIgnoreCase(value)) { return true; }
 		  }
 		  return false;
 		}
-
 }

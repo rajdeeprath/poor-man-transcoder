@@ -23,7 +23,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementation;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementations;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class CommandBuilderHelper {
@@ -82,7 +82,7 @@ public class CommandBuilderHelper {
 			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
 			
 			ICodecImplementation impl = config.getImplementation();
-			if(!CodecImplementation.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
+			if(!CodecImplementations.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
 			cmdLine.addArgument(impl.getKey());
 			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
@@ -168,7 +168,7 @@ public class CommandBuilderHelper {
 			
 			
 			ICodecImplementation impl = config.getImplementation();
-			if(!CodecImplementation.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
+			if(!CodecImplementations.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
 			cmdLine.addArgument(impl.getKey());
 			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
@@ -274,11 +274,4 @@ public class CommandBuilderHelper {
 			}		
 		}
 	}
-	
-	public static  <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
-		  for (E e : enumClass.getEnumConstants()) {
-		    if(e.name().equalsIgnoreCase(value)) { return true; }
-		  }
-		  return false;
-		}
 }

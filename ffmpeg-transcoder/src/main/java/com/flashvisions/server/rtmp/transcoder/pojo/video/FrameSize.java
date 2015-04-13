@@ -17,11 +17,11 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 	
 	
 	@NotNull
-	@Range(min = 1, max = 2000, message = "")
+	@Range(min = 1, max = 3840, message = "")
 	private Object width = 0;
 	
 	@NotNull
-	@Range(min = 1, max = 2000, message = "")
+	@Range(min = 1, max = 2040, message = "")
 	private Object height = 0;
 	
 	@Size(min = 3, max = 9)
@@ -94,7 +94,7 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 	@Override
 	public void setValue(Object value) {
 		// TODO Auto-generated method stub
-		this.value = value;
+		// NO OP
 	}
 
 	@Override

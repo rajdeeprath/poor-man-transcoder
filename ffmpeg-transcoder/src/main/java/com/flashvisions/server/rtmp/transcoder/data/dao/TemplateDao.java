@@ -34,7 +34,9 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
@@ -132,13 +134,11 @@ public class TemplateDao implements ITranscodeDao {
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
 			String name = xpath.compile(templateNameExpression).evaluate(document);
-			//session.setLabel(name);
 			
 			
 			/****************** template description ****************/
 			String templateDescriptionExpression = "/Template/Transcode/Description";
 			String description = xpath.compile(templateDescriptionExpression).evaluate(document);
-			//session.setDescription(description);
 			
 			
 			/****************** look for encode objects ****************/
@@ -220,7 +220,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Invalid frame size specified. Following source...");
+					logger.info("Invalid frame size specified. {"+e.getMessage()+"} Following source...");
 					video.setFramesize(new FrameSize(true));
 				}
 				
@@ -245,7 +245,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Invalid frame rate specified. Following source...");
+					logger.info("Invalid frame rate specified. {"+e.getMessage()+"} Following source...");
 					video.setFramerate(new FrameRate(true));
 				}
 				
@@ -274,13 +274,6 @@ public class TemplateDao implements ITranscodeDao {
 						IParameter maxBitrate = new MaximumBitrate(encodeNodeVideoBitrateMax);
 						IParameter deviceBuffer = new DeviceBuffer(encodeNodeVideoBitrateBuffer);
 						IVideoBitrate bitrate = new VideoBitrate(avgBitrate, minBitrate, maxBitrate, deviceBuffer);
-						
-						Set<ConstraintViolation <IVideoBitrate>> constraintViolations = validator.validate(bitrate);  
-						//@ Validating video bitrate object
-						if(constraintViolations.size()>0){
-						 for(ConstraintViolation<IVideoBitrate> constraintViolation : constraintViolations){  
-						  throw new Exception(constraintViolation.getMessage());
-						 }}
 						
 						video.setBitrate(bitrate);
 					}
@@ -314,7 +307,8 @@ public class TemplateDao implements ITranscodeDao {
 						if(encodeNodeVideoKeyFrameIntervalMin == null) throw new TranscodeConfigurationException("Invalid min keyframeinterval");
 						Integer encodeNodeVideoKFIMin = Integer.parseInt(encodeNodeVideoKeyFrameIntervalMin);
 						
-						video.setKeyFrameInterval(new KeyFrameInterval(new Gop(encodeNodeVideoKFIGop), new MinKeyframeInterval(encodeNodeVideoKFIMin)));
+						KeyFrameInterval kfi = new KeyFrameInterval(new Gop(encodeNodeVideoKFIGop), new MinKeyframeInterval(encodeNodeVideoKFIMin));
+						video.setKeyFrameInterval(kfi);
 					}
 					else
 					{
@@ -323,7 +317,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Invalid video keyframe/gop settings. Following source...");
+					logger.info("Invalid video keyframe/gop settings. {"+e.getMessage()+"} Following source...");
 					video.setKeyFrameInterval(new KeyFrameInterval(true));
 				}
 				
@@ -450,7 +444,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Error in extra video params");
+					logger.info("Error in extra video params {"+e.getMessage()+"}");
 					video.setExtraParams(new ArrayList<IParameter>());
 				}
 				
@@ -472,12 +466,12 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Error in extra audio properties");
+					logger.info("Error in extra audio properties {"+e.getMessage()+"}");
 					video.setExtraProperties(new ArrayList<IProperty>());
 				}
+
 				
-				
-				
+				/******************** Final validation of video object *****************************/
 				try
 				{
 					Set<ConstraintViolation <IVideo>> constraintViolations = validator.validate(video);  
@@ -495,9 +489,6 @@ public class TemplateDao implements ITranscodeDao {
 					logger.info("Video Config Error : " + e.getMessage()+". Disabling video processing for this {Encode} " + encode.getName() + " configuration.");
 					video.setEnabled(false);
 				}
-				
-				
-				
 				
 				/**** store video configuration into encode object *****/
 				encode.setVideoConfig(video);
@@ -545,7 +536,8 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeAudioBitrate = xpath.compile(encodeNodeAudioBitrateExpression).evaluate(document);
 					if(encodeNodeAudioBitrate != null && Integer.parseInt(encodeNodeAudioBitrate)>0)
 					{
-						audio.setBitrate(new AudioBitrate(Integer.parseInt(encodeNodeAudioBitrate)));
+						IAudioBitrate ab = new AudioBitrate(Integer.parseInt(encodeNodeAudioBitrate));
+						audio.setBitrate(ab);
 					}
 					else 
 					{
@@ -554,7 +546,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Improper audio bitrate. Following source");
+					logger.info("Improper audio bitrate. {"+e.getMessage()+"} Following source");
 					audio.setBitrate(new AudioBitrate(true));
 				}
 				
@@ -565,7 +557,8 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeAudioSampleRate = xpath.compile(encodeNodeAudioSamplerateExpression).evaluate(document);
 					if(encodeNodeAudioSampleRate != null && Integer.parseInt(encodeNodeAudioSampleRate)>0)
 					{
-						audio.setSamplerate(new AudioSampleRate(Integer.parseInt(encodeNodeAudioSampleRate)));
+						IAudioSampleRate ar = new AudioSampleRate(Integer.parseInt(encodeNodeAudioSampleRate));
+						audio.setSamplerate(ar);
 					}
 					else
 					{
@@ -574,7 +567,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Improper audio sample rate. Following source");
+					logger.info("Improper audio sample rate. {"+e.getMessage()+"} Following source");
 					audio.setSamplerate(new AudioSampleRate(true));
 				}
 				
@@ -630,7 +623,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Error in extra audio params");
+					logger.info("Error in extra audio params {"+e.getMessage()+"}");
 					audio.setExtraParams(new ArrayList<IParameter>());
 				}
 				
@@ -652,7 +645,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Error in extra audio properties");
+					logger.info("Error in extra audio properties {"+e.getMessage()+"}");
 					audio.setExtraProperties(new ArrayList<IProperty>());
 				}
 				
@@ -708,7 +701,7 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				catch(Exception e)
 				{
-					logger.info("Error in extra output properties");
+					logger.info("Error in extra output properties {"+e.getMessage()+"}");
 					encodeOutput.setOutputProperties(new ArrayList<IProperty>());
 				}		
 				

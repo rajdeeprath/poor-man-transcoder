@@ -1,6 +1,8 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 
+import javax.validation.constraints.NotNull;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
@@ -9,13 +11,17 @@ import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Encode extends MutableObject implements IEncode  {
 
+	@NotNull
 	private String name;
 	
+	@NotNull
 	private IVideo vConfig;
+	
+	@NotNull
 	private IAudio aConfig;
 	
-	private ITranscodeOutput output;
-	
+	@NotNull
+	private ITranscodeOutput output;	
 	
 
 	public IAudio getAudioConfig() {

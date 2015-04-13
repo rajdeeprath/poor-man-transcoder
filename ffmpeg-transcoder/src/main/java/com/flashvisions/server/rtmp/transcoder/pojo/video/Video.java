@@ -14,20 +14,29 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidCodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoBitrate;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoCodec;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoFrameRate;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoFrameSize;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidVideoKeyframeInterval;
 
 public class Video extends MutableObject implements IVideo  {
 
 	@NotNull
+	@ValidVideoCodec
 	private ICodec codec;
 	
 	@NotNull
+	@ValidCodecImplementation
 	private ICodecImplementation codecImplementation;
 	
 	@NotNull
+	@ValidVideoFrameSize
 	private IFrameSize framesize;
 	
 	@NotNull
+	@ValidVideoFrameRate
 	private IFrameRate framerate;
 	
 	@NotNull
@@ -35,11 +44,11 @@ public class Video extends MutableObject implements IVideo  {
 	private IVideoBitrate bitrate;
 	
 	@NotNull
+	@ValidVideoKeyframeInterval
 	private IKeyFrameInterval keyFrameInterval;
 	
 	@NotNull
 	private ArrayList<IParameter> extraParams;
-	
 	
 	@NotNull
 	private ArrayList<IProperty> extraProperties;

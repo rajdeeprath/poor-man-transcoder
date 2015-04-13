@@ -1,14 +1,22 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
+import javax.validation.constraints.NotNull;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
 
 public class Transcode extends MutableObject implements ITranscode  {
 	
-	private String label;	
+	@NotNull
+	private String label;
+	
+	@NotNull
 	private String description;
+	
+	@NotNull
 	private IEncodeCollection encodes;
+	
 	
 	private Transcode(Builder builder){
 		this.label = builder.label;

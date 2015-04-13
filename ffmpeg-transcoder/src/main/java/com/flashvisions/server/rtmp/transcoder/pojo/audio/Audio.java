@@ -13,22 +13,32 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.MutableObject;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidAudioBitrate;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidAudioChannel;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidAudioCodec;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidAudioSampleRate;
+import com.flashvisions.server.rtmp.transcoder.validation.interfaces.ValidCodecImplementation;
 
 public class Audio extends MutableObject implements IAudio  {
 
 	@NotNull
+	@ValidAudioCodec
 	private ICodec codec;
 	
 	@NotNull
+	@ValidCodecImplementation
 	private ICodecImplementation codecImplementation;
 	
 	@NotNull
+	@ValidAudioBitrate
 	private IAudioBitrate bitrate;
 	
 	@NotNull
+	@ValidAudioSampleRate
 	private IAudioSampleRate samplerate;
 	
 	@NotNull
+	@ValidAudioChannel
 	private IAudioChannel channel;
 	
 	@NotNull
