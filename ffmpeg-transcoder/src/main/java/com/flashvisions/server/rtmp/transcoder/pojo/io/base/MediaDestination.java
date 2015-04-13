@@ -17,7 +17,7 @@ public class MediaDestination extends Media implements IMediaOutput {
 	
 	public MediaDestination(IMediaOutput object){
 		this.setSourcePath(object.getSourcePath());
-		this.setStreamName(object.getStreamName());
+		this.setMediaName(object.getMediaName());
 		this.setProtocol(object.getProtocol());
 		this.setContainer(object.getContainer());
 	}
@@ -77,18 +77,12 @@ public class MediaDestination extends Media implements IMediaOutput {
 		return false;
 	}
 
-	@Override
-	public Object getMediaInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public String getStreamName() 
+	public String getMediaName() 
 	{
 		return streamName;
 	}
 
-	public void setStreamName(String streamName) 
+	public void setMediaName(String streamName) 
 	{
 		this.streamName = streamName;
 	}

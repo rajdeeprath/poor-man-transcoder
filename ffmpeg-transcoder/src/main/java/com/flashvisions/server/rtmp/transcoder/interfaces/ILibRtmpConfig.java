@@ -16,5 +16,5 @@ public interface ILibRtmpConfig {
 	public void setPlayPath(String playPath);
 	public String getTcUrl();
 	public void setTcUrl(String tcUrl);
-	public void parseRtmp(IMediaInput input);
+	public void parseRtmp(IMedia media);
 }

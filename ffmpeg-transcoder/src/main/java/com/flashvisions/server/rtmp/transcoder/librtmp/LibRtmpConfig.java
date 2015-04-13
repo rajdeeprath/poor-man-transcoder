@@ -1,7 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.librtmp;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 
 public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	
@@ -12,6 +12,9 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	private String appName;
 	private String playPath;
 	private String tcUrl;
+	private String pageUrl;
+	private String swfUrl;
+	private String conn;
 	private long buffer;
 	
 	
@@ -19,6 +22,11 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		return timeout;
 	}
 	
+	/*******************************************************************************
+	timeout=num
+	Timeout the session after num seconds without receiving any data from the server.
+	The default is 120.
+	********************************************************************************/
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
@@ -43,10 +51,19 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		return live;
 	}
 	
+	/******************************************************************************************
+	live=0|1
+	Specify that the media is a live stream. No resuming or seeking in live streams is possible.
+	*******************************************************************************************/
 	public void setLive(boolean live) {
 		this.live = live;
 	}
 	
+	/*****************************************************************************************************************************
+	app=name
+	Name of application to connect to on the RTMP server. Overrides the app in the RTMP URL. 
+	Sometimes the librtmp URL parser cannot determine the app name automatically, so it must be given explicitly using this option.
+	******************************************************************************************************************************/
 	public String getAppName() {
 		return appName;
 	}
@@ -59,6 +76,10 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		return playPath;
 	}
 	
+	/****************************************************************************************************************************************************************************************
+	playpath=path
+	Overrides the playpath parsed from the RTMP URL. Sometimes the rtmpdump URL parser cannot determine the correct playpath automatically, so it must be given explicitly using this option.
+	*****************************************************************************************************************************************************************************************/
 	public void setPlayPath(String playPath) {
 		this.playPath = playPath;
 	}
@@ -67,6 +88,10 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		return tcUrl;
 	}
 	
+	/*******************************************************************
+	tcUrl=url
+	URL of the target stream. Defaults to rtmp[t][e|s]://host[:port]/app.
+	********************************************************************/
 	public void setTcUrl(String tcUrl) {
 		this.tcUrl = tcUrl;
 	}
@@ -75,15 +100,58 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		return buffer;
 	}
 
+	
+	/********************************************************
+	buffer=num
+	Set buffer time to num milliseconds. The default is 30000.
+	********************************************************/
 	public void setBuffer(long buffer) {
 		this.buffer = buffer;
 	}
+	
+	public String getConn() {
+		return conn;
+	}
+	
+	
+	/**************************************************************************************
+	conn=type:data
+	Append arbitrary AMF data to the Connect message. The type must be B for Boolean, N for number, S for string, O for object, or Z for null. For Booleans the data must be either 0 or 1 for FALSE or TRUE, respectively. Likewise for Objects the data must be 0 or 1 to end or begin an object, respectively. Data items in subobjects may be named, by prefixing the type with 'N' and specifying the name before the value, e.g. NB:myFlag:1. This option may be used multiple times to construct arbitrary AMF sequences. E.g.
+	conn=B:1 conn=S:authMe conn=O:1 conn=NN:code:1.23 conn=NS:flag:ok conn=O:0
+	**************************************************************************************/
+	public void setConn(String conn) {
+		this.conn = conn;
+	}
+
+	public String getSwfUrl() {
+		return swfUrl;
+	}
+
+	/********************************************************************
+	swfUrl=url
+	URL of the SWF player for the media. By default no value will be sent.
+	********************************************************************/
+	public void setSwfUrl(String swfUrl) {
+		this.swfUrl = swfUrl;
+	}
+
+	public String getPageUrl() {
+		return pageUrl;
+	}
+
+	/***********************************************************************************
+	pageUrl=url
+	URL of the web page in which the media was embedded. By default no value will be sent.
+	************************************************************************************/
+	public void setPageUrl(String pageUrl) {
+		this.pageUrl = pageUrl;
+	}
 
 	@Override
-	public void parseRtmp(IMediaInput input) {
+	public void parseRtmp(IMedia input) {
 		// TODO Auto-generated method stub
 		String source = input.getSourcePath();
-		String stream = input.getStreamName();
+		String stream = input.getMediaName();
 		String rtmpApplication = source.substring(0, source.indexOf(stream)-1);
 		String appname = rtmpApplication.substring(rtmpApplication.lastIndexOf("/")+1);
 		String playpath = source.substring(rtmpApplication.length(), source.indexOf(stream)-1);
@@ -123,16 +191,27 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		command += "playpath=" + getPlayPath();
 		}command += SPACE;
 		
+		if(!getPageUrl().equals("")){
+		command += "pageUrl=" + getPageUrl();
+		command += SPACE;	
+		}
+		
 		if(!getTcUrl().equals("")){
 		command += "tcUrl=" + getTcUrl();
 		command += SPACE;	
 		}
+		
+		if(!getSwfUrl().equals("")){
+		command += "swfUrl=" + getSwfUrl();
+		command += SPACE;	
+		}
+		
+		if(!getConn().equals("")){
+		command += "conn=" + getConn();
+		command += SPACE;	
+		}
 		command += "\"";
 		
-		return command;
+		return command.trim();
 	}
-
-	
-
-	
 }

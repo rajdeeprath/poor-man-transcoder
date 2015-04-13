@@ -10,7 +10,6 @@ public interface IMedia {
 	public String getProtocol();
 	public boolean isFile();
 	public boolean isStreamingMedia();
-	public String getStreamName();
-	public void setStreamName(String streamName);
-	public Object getMediaInfo();
+	public String getMediaName();
+	public void setMediaName(String streamName);
 }

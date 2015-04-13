@@ -28,7 +28,7 @@ public class IOUtils {
 			input.setProtocol(protocol);
 			
 			String medianame = (uri.getPath().contains("/"))?uri.getPath().substring(uri.getPath().lastIndexOf("/")+1):uri.getPath();
-			input.setStreamName(medianame);	
+			input.setMediaName(medianame);	
 			
 			
 			if(input.getContainer() == null)
@@ -57,7 +57,7 @@ public class IOUtils {
 			output.setProtocol(protocol);
 			
 			String medianame = (uri.getPath().contains("/"))?uri.getPath().substring(uri.getPath().lastIndexOf("/")+1):uri.getPath();
-			output.setStreamName(medianame);
+			output.setMediaName(medianame);
 			
 			if(output.getContainer() == null)
 			output.setContainer(new Container(IOUtils.guessContainer(source)));
@@ -150,7 +150,7 @@ public class IOUtils {
 		IContainer container = null;
 		
 		String insource = in.getSourcePath();
-		String streamname = in.getStreamName();
+		String streamname = in.getMediaName();
 		String inapp = insource.substring(0, insource.indexOf(streamname)-1);
 		
 		String outsource = temp.getSourcePath();

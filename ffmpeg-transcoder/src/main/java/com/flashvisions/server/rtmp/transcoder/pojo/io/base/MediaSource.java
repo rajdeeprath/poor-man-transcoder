@@ -67,12 +67,6 @@ public class MediaSource extends Media implements IMediaInput {
 	}
 
 	@Override
-	public Object getMediaInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public IContainer getContainer() {
 		// TODO Auto-generated method stub
 		return this.container;
@@ -85,13 +79,13 @@ public class MediaSource extends Media implements IMediaInput {
 	}
 
 	@Override
-	public String getStreamName() {
+	public String getMediaName() {
 		// TODO Auto-generated method stub
 		return streamName;
 	}
 
 	@Override
-	public void setStreamName(String streamName) {
+	public void setMediaName(String streamName) {
 		// TODO Auto-generated method stub
 		this.streamName = streamName;
 	}
