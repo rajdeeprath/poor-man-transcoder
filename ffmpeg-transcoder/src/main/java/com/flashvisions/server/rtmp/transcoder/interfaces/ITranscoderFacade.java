@@ -21,10 +21,6 @@ public interface ITranscoderFacade {
 	public void setTemplateDirectory(String templateDirectoryPath);
 	public String getTemplateDirectory();
 	
-	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException;
-	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
-	public Object doTranscode(IMediaInput input, ITranscode transcode, ILibRtmpConfig librtmpConfig) throws TranscoderException;;
-		
-	public void abortTranscode(long sessionId) throws TranscoderException;;
-	public void abortTranscode(String sessionSignature) throws TranscoderException;;
+	
+	public Object doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException;
 }

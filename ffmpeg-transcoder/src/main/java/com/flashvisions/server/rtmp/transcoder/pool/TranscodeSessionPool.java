@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
@@ -59,7 +59,7 @@ public class TranscodeSessionPool {
 	  }
 	  
 	  // !!! for future use
-	  protected ISession create(IMediaInput input, ITranscode transcode) throws MalformedTranscodeQueryException, MediaIdentifyException
+	  protected ISession create(ITranscoderResource input, ITranscode transcode) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  // need to add template name to transcode object else session signature wont be created
 		  ISession session = Session.Builder.newSession()
@@ -71,7 +71,7 @@ public class TranscodeSessionPool {
 		  return session;
 	  }
 
-	  protected ISession create(IMediaInput input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
+	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  logger.info("Creating new object");
 		  ISession session = Session.Builder.newSession()
@@ -85,7 +85,7 @@ public class TranscodeSessionPool {
 	  }
 
 	  // check if this available session is usable for our request
-	  public boolean validate(IMediaInput input, String usingTemplate, ISession available)
+	  public boolean validate(ITranscoderResource input, String usingTemplate, ISession available)
 	  {
 		  String requestSignature = SessionUtil.generateSessionSignature(input.getSourcePath(), usingTemplate);
 		  return getSignature(available).equals(requestSignature);
@@ -107,7 +107,7 @@ public class TranscodeSessionPool {
 		  return SessionUtil.generateSessionSignature(input, template);
 	  }
 
-	  public synchronized ISession checkOut(IMediaInput input, String usingTemplate) throws TranscoderException 
+	  public synchronized ISession checkOut(ITranscoderResource input, String usingTemplate) throws TranscoderException 
 	  {
 		  
 	    long now = System.currentTimeMillis();

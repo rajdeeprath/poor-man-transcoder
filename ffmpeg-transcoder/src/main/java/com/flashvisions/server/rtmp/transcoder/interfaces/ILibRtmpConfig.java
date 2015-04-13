@@ -16,5 +16,11 @@ public interface ILibRtmpConfig {
 	public void setPlayPath(String playPath);
 	public String getTcUrl();
 	public void setTcUrl(String tcUrl);
-	public void parseRtmp(IMedia media);
+	public String getSwfUrl();
+	public void setSwfUrl(String swfUrl);
+	public String getPageUrl();
+	public void setPageUrl(String pageUrl);
+	public String getConn();
+	public void setConn(String conn);
+	public void prepareFrom(ITranscoderResource resource);
 }

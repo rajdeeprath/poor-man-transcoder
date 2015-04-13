@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.data.factory.AbstractDAOFactory;
-import com.flashvisions.server.rtmp.transcoder.data.factory.LibRtmpConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
@@ -24,15 +23,16 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.DefaultInterpretStrategy;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.RTMPInterpretStrategy;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
@@ -45,7 +45,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
 	private ITranscode config;
-	private IMediaInput source;
+	private ITranscoderResource source;
 	private String workingDirectoryPath;
 	
 	private DefaultExecutor executor;
@@ -88,7 +88,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	
 
 	@Override
-	public IMediaInput getInputSource() {
+	public ITranscoderResource getInputSource() {
 		// TODO Auto-generated method stub
 		return source;
 	}
@@ -224,11 +224,11 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		private String templateFile;
 		private String workingDirectoryPath;
 		
-		private IMediaInput source;
-		private ISession session;	
-		private ILibRtmpConfig librtmpConfig;
+		private ITranscoderResource source;
+		private ISession session;
 		
 		private CommandLine cmdLine;
+		@SuppressWarnings("unused")
 		private Server serverType;
 		
 		
@@ -242,7 +242,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			return this;
 		}
 		
-		public Builder usingMediaInput(IMediaInput source){
+		public Builder usingMediaInput(ITranscoderResource source){
 			this.source = source;
 			return this;
 		}
@@ -253,7 +253,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		}
 		
 		public Builder forServer(String rtmpserver){
-			serverType = Server.valueOf(rtmpserver.toUpperCase());
+			this.serverType = Server.valueOf(rtmpserver.toUpperCase());
 			return this;
 		}
 
@@ -262,11 +262,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			this.templateFile = templateFile;
 			return this;
 		}
-		
-		public Builder usingLibRtmpConfig(ILibRtmpConfig librtmpConfig){
-			this.librtmpConfig = librtmpConfig;
-			return this;
-		}
+
 		
 		public ISession build() throws MalformedTranscodeQueryException, MediaIdentifyException{
 			this.identifyInput();
@@ -275,19 +271,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			this.session = new Session(this);						
 			return this.session;
 		}
-		
-		private String buildLibRtmpString(ILibRtmpConfig librtmpConfig)
-		{
-			return librtmpConfig.toString();
-		}
-		
-		private ILibRtmpConfig buildLibRtmpConfigurion(IMediaInput input, Server serverType)
-		{
-			ILibRtmpConfig configuration = LibRtmpConfigurationFactory.getLibRtmpConfiguration(serverType);
-			configuration.parseRtmp(input);
-			return configuration;
-		}
-		
+
 		protected void identifyInput() throws MediaIdentifyException
 		{
 			logger.info("Identifying input");
@@ -302,7 +286,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			return configFactory.getTranscodeConfiguration(templateFile);
 		}
 		
-		protected CommandLine buildExecutableCommand(IMediaInput source, ITranscode config) throws MalformedTranscodeQueryException{
+		protected CommandLine buildExecutableCommand(ITranscoderResource source, ITranscode config) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
@@ -312,33 +296,38 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			
 			try
 			{
-					replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-					replacementMap.put("inputSource", source.getSourcePath());
+						replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
+						replacementMap.put("inputSource", source.getSourcePath());
 									
 										
 						if(!config.getEnabled())
 						throw new Exception("Transcode configuration disabled");
 						
-						/************************************************
-						 ********** Processing Inputs ****************
-						 ************************************************/
-						{
-							logger.info("Peparing librtmp");
-							if(IOUtils.isRTMPCompatStream(source)){
-								ILibRtmpConfig librtmpConfig = (this.librtmpConfig == null)?buildLibRtmpConfigurion(source, serverType):this.librtmpConfig;
-								cmdLine.addArgument("-re");
-								replacementMap.put("inputSource", buildLibRtmpString(librtmpConfig));
-							}
-							
-							cmdLine.addArgument("-i");
-							cmdLine.addArgument("${inputSource}");
+						
+						/********************************************
+						****** Setting Interpret Strategy ***********
+						*********************************************/
+						
+						if(source.getStrategy() == null){
+						if(IOUtils.isRTMPCompatStream(source)){
+						source.setStrategy(new RTMPInterpretStrategy());
+						cmdLine.addArgument("-re");
+						}else{
+						source.setStrategy(new DefaultInterpretStrategy());
+						}
 						}
 						
+						/********************************************
+						********** Processing Inputs ****************
+						*********************************************/
 						
+						cmdLine.addArgument("-i");
+						cmdLine.addArgument("${inputSource}");						
 						
 						/************************************************
 						 ********** Processing Encodes ****************
-						 ************************************************/						
+						 ************************************************/	
+						
 						IEncodeCollection outputs = config.getEncodes();
 						IEncodeIterator iterator = outputs.iterator();
 						
@@ -433,6 +422,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 							}
 						}
 						
+						replacementMap.put("inputSource", source.describe());
 						cmdLine.setSubstitutionMap(replacementMap);
 						return cmdLine;
 			}

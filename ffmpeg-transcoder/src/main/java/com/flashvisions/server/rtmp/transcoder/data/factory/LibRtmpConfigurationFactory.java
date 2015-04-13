@@ -1,6 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.data.factory;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
+import com.flashvisions.server.rtmp.transcoder.librtmp.FMSLibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.librtmp.Red5LibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.librtmp.WowzaLibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
@@ -18,7 +19,7 @@ public class LibRtmpConfigurationFactory {
 			return new WowzaLibRtmpConfig();
 			
 			case FMS:
-			break;
+			return new FMSLibRtmpConfig();
 		}
 		
 		return null;

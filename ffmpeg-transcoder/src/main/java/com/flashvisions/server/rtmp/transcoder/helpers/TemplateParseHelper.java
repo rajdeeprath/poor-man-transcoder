@@ -11,9 +11,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import net.objecthunter.exp4j.Expression;
-import net.objecthunter.exp4j.ExpressionBuilder;
-
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
 public class TemplateParseHelper {
@@ -27,16 +24,6 @@ public class TemplateParseHelper {
     	VARIABLEMAP.put("${SourceStreamName}", "SourceStreamName");
     	VARIABLEMAP.put("${homeDirectory}", Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
     }
-	
-
-	public static int evaluateExpressionForInt(String expression, String variable, double value)
-	{
-		Expression we = new ExpressionBuilder(expression)
-        .variables(variable).build().setVariable(variable, value);
-        Double width = we.evaluate();
-        
-        return width.intValue();
-	}
 	
 	@SuppressWarnings("rawtypes")
 	public static void updateDocumentWithVariables(Document document, XPath xpath) throws XPathExpressionException

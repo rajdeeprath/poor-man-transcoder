@@ -95,4 +95,6 @@ public class MediaSource extends Media implements IMediaInput {
 		// TODO Auto-generated method stub
 		this.protocol = protocol;
 	}
+	
+	
 }

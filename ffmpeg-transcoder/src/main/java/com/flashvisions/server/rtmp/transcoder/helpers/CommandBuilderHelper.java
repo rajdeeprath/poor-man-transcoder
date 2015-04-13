@@ -16,11 +16,11 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementations;
@@ -31,7 +31,7 @@ public class CommandBuilderHelper {
 	private static Logger logger = LoggerFactory.getLogger(CommandBuilderHelper.class);
 	
 	
-	public void buildOutputQuery(CommandLine cmdLine, IMediaInput input, ITranscodeOutput output) throws Exception
+	public void buildOutputQuery(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output) throws Exception
 	{
 		logger.info("Processing output destination for encode");
 		

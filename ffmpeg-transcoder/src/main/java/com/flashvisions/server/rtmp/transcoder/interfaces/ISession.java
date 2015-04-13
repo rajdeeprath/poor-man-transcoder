@@ -5,7 +5,7 @@ public interface ISession extends IDisposable {
 
 	public long getId();
 	
-	public IMediaInput getInputSource();	
+	public ITranscoderResource getInputSource();	
 	public ITranscode getTranscodeConfig();
 	
 	public void start();

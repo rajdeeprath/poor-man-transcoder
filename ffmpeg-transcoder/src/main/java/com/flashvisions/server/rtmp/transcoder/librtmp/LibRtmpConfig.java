@@ -1,7 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.librtmp;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 
 public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	
@@ -17,6 +17,13 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	private String conn;
 	private long buffer;
 	
+	public LibRtmpConfig(){
+		
+	}
+	
+	public LibRtmpConfig(ITranscoderResource source){
+		prepareFrom(source);
+	}
 	
 	public int getTimeout() {
 		return timeout;
@@ -147,8 +154,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		this.pageUrl = pageUrl;
 	}
 
-	@Override
-	public void parseRtmp(IMedia input) {
+	public void prepareFrom(ITranscoderResource input) {
 		// TODO Auto-generated method stub
 		String source = input.getSourcePath();
 		String stream = input.getMediaName();
@@ -189,9 +195,20 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		
 		if(!getPlayPath().equals("")){
 		command += "playpath=" + getPlayPath();
-		}command += SPACE;
+		command += SPACE;
+		}
 		
-		if(!getPageUrl().equals("")){
+		if(!getPlayPath().equals("")){
+		command += "playpath=" + getPlayPath();
+		command += SPACE;
+		}
+		
+		if(!getAppName().equals("")){
+		command += "app=" + getAppName();
+		command += SPACE;
+		}
+		
+		if(!(getPageUrl() == null)){
 		command += "pageUrl=" + getPageUrl();
 		command += SPACE;	
 		}
@@ -201,17 +218,18 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		command += SPACE;	
 		}
 		
-		if(!getSwfUrl().equals("")){
+		if(!(getSwfUrl() == null)){
 		command += "swfUrl=" + getSwfUrl();
 		command += SPACE;	
 		}
 		
-		if(!getConn().equals("")){
+		if(!(getConn() == null)){
 		command += "conn=" + getConn();
 		command += SPACE;	
 		}
-		command += "\"";
 		
-		return command.trim();
+		command = command.replaceAll("^\\s+|\\s+$", "");
+		command += "\"";
+		return command;
 	}
 }

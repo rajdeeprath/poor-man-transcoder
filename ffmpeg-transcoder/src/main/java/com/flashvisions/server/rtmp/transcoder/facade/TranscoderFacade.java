@@ -6,11 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 
 public final class TranscoderFacade implements ITranscoderFacade {
@@ -122,7 +120,7 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	/*********************************************************************************************/
 	
 	@Override
-	public Object doTranscode(IMediaInput input, String usingTemplate) throws TranscoderException {
+	public Object doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException {
 		
 		// TODO Auto-generated method stub
 		TranscodeSessionPool pool = context.getPool();
@@ -131,30 +129,4 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		
 		return null;
 	}
-
-	@Override
-	public Object doTranscode(IMediaInput input, String usingTemplate, ILibRtmpConfig librtmpConfig) throws TranscoderException {
-		// TODO Auto-generated method stub		
-		return null;
-	}
-
-	@Override
-	public Object doTranscode(IMediaInput input, ITranscode transcode, ILibRtmpConfig librtmpConfig) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void abortTranscode(long sessionId) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void abortTranscode(String sessionSignature) {
-		// TODO Auto-generated method stub
-	}
-
-
-	
 }

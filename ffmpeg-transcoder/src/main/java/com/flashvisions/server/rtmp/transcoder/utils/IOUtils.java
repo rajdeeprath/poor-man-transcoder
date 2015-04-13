@@ -7,8 +7,8 @@ import java.net.URISyntaxException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaInput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.FileDestination;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamDestination;
@@ -17,7 +17,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
 
 public class IOUtils {
 	
-	public static void IdentifyInput(IMediaInput input) throws MediaIdentifyException
+	public static void IdentifyInput(ITranscoderResource input) throws MediaIdentifyException
 	{
 		try
 		{
@@ -68,7 +68,7 @@ public class IOUtils {
 		}
 	}
 	
-	public static boolean isRTMPCompatStream(IMediaInput input)
+	public static boolean isRTMPCompatStream(ITranscoderResource input)
 	{
 		try
 		{
@@ -144,7 +144,7 @@ public class IOUtils {
 		}
 	}
 	
-	public static IMediaOutput createOutputFromInput(IMediaInput in, IMediaOutput temp) throws URISyntaxException{
+	public static IMediaOutput createOutputFromInput(ITranscoderResource in, IMediaOutput temp) throws URISyntaxException{
 		
 		IMediaOutput finalOutput = null;
 		IContainer container = null;
