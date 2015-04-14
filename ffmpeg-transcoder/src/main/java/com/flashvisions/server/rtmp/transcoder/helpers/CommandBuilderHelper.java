@@ -7,7 +7,6 @@ import org.apache.commons.exec.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
@@ -17,7 +16,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;

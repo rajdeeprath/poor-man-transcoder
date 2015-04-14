@@ -6,16 +6,19 @@ import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResour
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.RTMPInterpretStrategy;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.interfaces.InterpretStrategy;
 
 public class RTMPTranscoderResource extends TranscoderResource implements ITranscoderResource{
 	
 	public RTMPTranscoderResource(IMedia media) throws InvalidTranscoderResourceException{
 		super(media);
+		setStrategy(new RTMPInterpretStrategy());
 	}
 	
 	public RTMPTranscoderResource(IMedia media, ArrayList<IProperty> flags) throws InvalidTranscoderResourceException{
 		super(media, flags);
+		setStrategy(new RTMPInterpretStrategy());
 	}
 	
 	public RTMPTranscoderResource(IMedia media, InterpretStrategy strategy) throws InvalidTranscoderResourceException{
