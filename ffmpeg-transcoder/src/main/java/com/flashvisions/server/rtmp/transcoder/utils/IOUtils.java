@@ -144,7 +144,7 @@ public class IOUtils {
 		}
 	}
 	
-	public static IMediaOutput createOutputFromInput(ITranscoderResource in, IMediaOutput temp) throws URISyntaxException{
+	public static IMediaOutput createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException{
 		
 		IMediaOutput finalOutput = null;
 		IContainer container = null;

@@ -35,7 +35,7 @@ public class CommandBuilderHelper {
 	{
 		logger.info("Processing output destination for encode");
 		
-		IMediaOutput template = output.getMediaOutput();
+		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		
 		IMediaOutput destination = IOUtils.createOutputFromInput(input, template);

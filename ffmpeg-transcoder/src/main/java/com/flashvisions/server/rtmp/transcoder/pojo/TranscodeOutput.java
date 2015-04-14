@@ -2,24 +2,24 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.util.ArrayList;
 
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 
 public class TranscodeOutput implements ITranscodeOutput{
 	
-	private IMediaOutput output;
+	private ITranscoderResource output;
 	public ArrayList<IProperty> extraProperties;
 
 
 	@Override
-	public IMediaOutput getMediaOutput() {
+	public ITranscoderResource getMediaOutput() {
 		// TODO Auto-generated method stub
 		return output;
 	}
 
 	@Override
-	public void setMediaOutput(IMediaOutput output) {
+	public void setMediaOutput(ITranscoderResource output) {
 		// TODO Auto-generated method stub
 		this.output = output;
 	}

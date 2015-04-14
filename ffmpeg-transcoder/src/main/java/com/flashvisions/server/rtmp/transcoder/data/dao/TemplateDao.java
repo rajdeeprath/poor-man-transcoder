@@ -32,6 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.flashvisions.server.rtmp.transcoder.decorator.TranscoderOutputResource;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -51,6 +52,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.CodecImplementation;
@@ -663,6 +665,7 @@ public class TemplateDao implements ITranscodeDao {
 				 ************************************************/
 				ITranscodeOutput encodeOutput = new TranscodeOutput();
 				
+				
 				try
 				{
 					String encodeNodeOutputNameExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/StreamName";
@@ -671,7 +674,7 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeOutputContainerExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Container";
 					String encodeNodeOutputContainer = xpath.compile(encodeNodeOutputContainerExpression).evaluate(document);
 					
-					IMediaOutput output = new MediaDestination(encodeNodeOutputName, true);
+					ITranscoderResource output = new TranscoderOutputResource(new MediaDestination(encodeNodeOutputName, true));
 					//IOUtils.IdentifyOutput(output);
 					
 					if(!encodeNodeOutputContainer.equals("") && encodeNodeOutputContainer.length()>=3)
