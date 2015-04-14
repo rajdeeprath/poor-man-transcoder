@@ -1,7 +1,10 @@
 package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Observer;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -24,6 +27,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
@@ -44,6 +48,10 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
+	public static enum Event{
+		START, STOP, PROGRESS, FAILED, COMPLETE
+	};
+	
 	private ITranscode config;
 	private ITranscoderResource source;
 	private String workingDirectoryPath;
@@ -56,6 +64,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	
 	private long executonTimeout;
 	private ExecuteWatchdog watchdog;
+	
+	private ArrayList<ISessionObserver> observers;
 	
 	private static long id;
 	
@@ -74,6 +84,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
+		
+		this.observers = new ArrayList<ISessionObserver>();
 		
 		logger.info("Session :"+Session.id);
 		logger.info("Command :" + this.cmdLine.toString());
@@ -157,25 +169,35 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	
 	
 	@Override
-	public void onTranscodeProcessComplete(int exitValue) {
+	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
-		logger.error("Process completed with exitValue"+exitValue);
+		logger.error("Process completed with exitValue " + exitValue);
+		notifyObservers(Event.COMPLETE, null);
 	}
 
 	@Override
-	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog) {
+	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp) {
 		// TODO Auto-generated method stub
 		if(watchdog != null && watchdog.killedProcess())
 		logger.error("Process timed out");
 		else
 		logger.error("Process failed : " + e.getMessage());
+		
+		notifyObservers(Event.FAILED, null);
 	}
 	
 	@Override
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.info(String.valueOf(data));
-	}	
+		notifyObservers(Event.PROGRESS, data);
+	}
+	
+	@Override
+	public void onTranscodeProcessStart(long timestamp) {
+		// TODO Auto-generated method stub
+		notifyObservers(Event.START, null);
+	}
 	
 	@Override
 	public void dispose() {
@@ -211,6 +233,52 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		finally{}
 	}
 
+	
+	@Override
+	public void registerObserver(ISessionObserver observer) {
+		// TODO Auto-generated method stub
+		this.observers.add(observer);
+	}
+
+
+	@Override
+	public void removeObserver(ISessionObserver observer) {
+		// TODO Auto-generated method stub
+		this.observers.remove(observer);
+	}
+
+
+	@Override
+	public void notifyObservers(Event event, Object data) {
+		// TODO Auto-generated method stub
+		for(ISessionObserver observer : observers)
+		{
+			switch(event)
+			{
+				case START:
+				observer.onSessionStart(null);
+				break;
+				
+				case PROGRESS:
+				observer.onSessionData(null);
+				break;
+					
+				case COMPLETE:
+				observer.onSessionComplete(null);
+				break;
+					
+				case FAILED:
+				observer.onSessionFailed(null);
+				break;
+				
+				case STOP:
+				break;
+				
+				default:
+				break;		
+			}
+		}
+	}
 
 	/***************** Session Builder *********************/
 	
@@ -437,6 +505,9 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			}
 		}
 	}
+
+
+	
 
 
 	

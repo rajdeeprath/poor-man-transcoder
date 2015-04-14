@@ -3,6 +3,7 @@ package com.flashvisions.server.rtmp.transcoder.handler;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
+
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
 
 public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
@@ -45,7 +46,7 @@ public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
 	public void onProcessComplete(int exitValue) {
 		// TODO Auto-generated method stub
 		if(this.callback != null) 
-		this.callback.onTranscodeProcessComplete(exitValue);
+		this.callback.onTranscodeProcessComplete(exitValue, System.currentTimeMillis());
 		
 		super.onProcessComplete(exitValue);
 	}
@@ -54,7 +55,7 @@ public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
 	public void onProcessFailed(ExecuteException e) {
 		// TODO Auto-generated method stub
 		if(this.callback != null) 
-		this.callback.onTranscodeProcessFailed(e, watchdog);
+		this.callback.onTranscodeProcessFailed(e, watchdog, System.currentTimeMillis());
 		
 		super.onProcessFailed(e);
 	}

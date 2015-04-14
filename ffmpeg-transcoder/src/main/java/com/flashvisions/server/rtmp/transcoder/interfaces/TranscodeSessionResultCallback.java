@@ -5,6 +5,6 @@ import org.apache.commons.exec.ExecuteWatchdog;
 
 public interface TranscodeSessionResultCallback {
 
-	public void onTranscodeProcessComplete(int exitValue);
-	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog);
+	public void onTranscodeProcessComplete(int exitValue, long timestamp);
+	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp);
 }

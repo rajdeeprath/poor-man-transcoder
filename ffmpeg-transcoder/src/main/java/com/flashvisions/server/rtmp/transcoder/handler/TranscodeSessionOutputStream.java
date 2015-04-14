@@ -16,7 +16,7 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	private TranscodeSessionDataCallback callback;
-	private static final int QUEUE_SIZE = 50;
+	private static final int QUEUE_SIZE = 10;
 	private final Queue<String> lines = new LinkedList<String>();
 	private long lastOutputTime = 0;
 	
@@ -31,16 +31,19 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	@Override
 	protected void processLine(String line, int level) {
 		
+		logger.info(line);
+		
 		if(lines.size()>QUEUE_SIZE){
 		lines.remove();}
 		
 		lines.add(line);
 		lastOutputTime = System.currentTimeMillis();
 		
-		logger.info(line);
-		
-		if(this.callback != null)
-		this.callback.onTranscodeProcessData(lines, lastOutputTime);
+		if(this.callback != null){
+		this.callback.onTranscodeProcessData(line, lastOutputTime);
+		if(lines.size() == 1)
+		this.callback.onTranscodeProcessStart(lastOutputTime);
+		}
 	}
 	
 	/* Estimates if process is running by checking if there was output in last 3 seconds */
@@ -54,6 +57,7 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	@Override
 	public void close() throws IOException {
 		// TODO Auto-generated method stub
+		logger.info("closing output stream");
 		super.close();
 	}
 
