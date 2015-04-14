@@ -1,12 +1,14 @@
 package com.flashvisions.server.rtmp.transcoder.utils;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.FilenameUtils;
+
+import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResourceException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFileMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
@@ -32,13 +34,7 @@ public class IOUtils {
 			
 			
 			if(input.getContainer() == null)
-			input.setContainer(new Container(IOUtils.guessContainer(source)));
-			
-			
-			if(input.isFile()){
-			IFileMedia in = (IFileMedia) input;
-			in.setFile(new File(source));
-			}			
+			input.setContainer(new Container(IOUtils.guessContainer(source)));			
 		}
 		catch(Exception e)
 		{
@@ -46,6 +42,7 @@ public class IOUtils {
 		}
 	}
 	
+	/*
 	public static void IdentifyOutput(IMedia output) throws MediaIdentifyException
 	{
 		try
@@ -67,7 +64,7 @@ public class IOUtils {
 			throw new MediaIdentifyException("Unable to identify media " + e.getMessage());
 		}
 	}
-	
+	*/
 	public static boolean isRTMPCompatStream(ITranscoderResource input)
 	{
 		try
@@ -132,7 +129,7 @@ public class IOUtils {
 		catch(Exception e)
 		{
 			// match for files types from supported filetypes
-			String fileType = source.substring(source.lastIndexOf(".")+1);
+			String fileType = FilenameUtils.getExtension(source);
 			switch(Format.valueOf(fileType.toUpperCase()))
 			{
 				case M3U8:
@@ -144,16 +141,17 @@ public class IOUtils {
 		}
 	}
 	
-	public static IMedia createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException{
+	public static ITranscoderResource createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException, InvalidTranscoderResourceException{
 		
 		IMedia finalOutput = null;
 		IContainer container = null;
 		
 		String insource = in.getSourcePath();
-		String streamname = in.getMediaName();
+		String outsource = temp.getSourcePath();
+		
+		String streamname = FilenameUtils.removeExtension(in.getMediaName());;
 		String inapp = insource.substring(0, insource.indexOf(streamname)-1);
 		
-		String outsource = temp.getSourcePath();
 		outsource = outsource.replace("SourceApplication", inapp);
 		outsource = outsource.replace("SourceStreamName", streamname);
 		
@@ -161,7 +159,7 @@ public class IOUtils {
 		finalOutput = (temp.isStreamingMedia())?new StreamMedia(outsource, container):new FileMedia(outsource, container);
 		finalOutput.setContainer(container);
 		
-		return finalOutput;
+		return new SimpleTranscoderResource(finalOutput);
 	}
 	
 	

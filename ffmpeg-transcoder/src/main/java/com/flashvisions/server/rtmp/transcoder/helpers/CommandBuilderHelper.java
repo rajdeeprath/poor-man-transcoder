@@ -39,12 +39,11 @@ public class CommandBuilderHelper {
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		
-		IMedia destination = IOUtils.createOutputFromInput(input, template);
-		ITranscoderResource trannscoderoutput = new SimpleTranscoderResource(destination);
+		ITranscoderResource trannscoderoutput = IOUtils.createOutputFromInput(input, template);
 									
 		cmdLine.addArgument("-y");
 		cmdLine.addArgument("-f");
-		cmdLine.addArgument(destination.getContainer().toString());		
+		cmdLine.addArgument(trannscoderoutput.getContainer().toString());		
 		
 		
 		/***************** extra properties for output **************/
@@ -57,8 +56,16 @@ public class CommandBuilderHelper {
 			}
 		}
 		
-		
-		cmdLine.addArgument(trannscoderoutput.describe());
+		/************* special pre-processing for hls output ******/
+		switch(trannscoderoutput.getContainer().getType())
+		{
+			case SSEGMENT:
+			break;
+			
+			default:
+			cmdLine.addArgument(trannscoderoutput.describe());
+			break;
+		}
 	}
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception

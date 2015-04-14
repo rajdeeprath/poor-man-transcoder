@@ -11,6 +11,7 @@ public class Media implements IMedia {
 	private String source;
 	private IContainer container;
 	
+	
 	public Media(String source, IContainer container){
 		setSourcePath(source);
 		setContainer(container);

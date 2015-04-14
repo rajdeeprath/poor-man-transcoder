@@ -167,7 +167,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	@Override
 	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
-		logger.error("Process completed with exitValue " + exitValue);
+		logger.info("Process completed with exitValue " + exitValue);
 		notifyObservers(Event.COMPLETE, null);
 	}
 

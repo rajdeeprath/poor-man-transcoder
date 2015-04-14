@@ -68,7 +68,7 @@
 				<Output>
 						<StreamName>${SourceStreamName}.m3u8</StreamName>
 						<!-- mp4, flv etc.. -->
-						<Container></Container>
+						<Container>ssegment</Container>
 						<Properties>
 							<!--<Property>-bsf:v</Property>
 							<Property>h264_mp4toannexb</Property>-->
