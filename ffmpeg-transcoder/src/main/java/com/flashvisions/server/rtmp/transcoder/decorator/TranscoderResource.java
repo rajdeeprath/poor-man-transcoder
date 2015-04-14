@@ -2,15 +2,19 @@ package com.flashvisions.server.rtmp.transcoder.decorator;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 
 import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResourceException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.DefaultInterpretStrategy;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.interfaces.InterpretStrategy;
 
 public abstract class TranscoderResource implements IMedia,ITranscoderResource {
 
+	private ArrayList<IProperty> flags;
 	private InterpretStrategy strategy;
 	private IMedia media;
 	
@@ -18,12 +22,27 @@ public abstract class TranscoderResource implements IMedia,ITranscoderResource {
 	public TranscoderResource(IMedia media) throws InvalidTranscoderResourceException{
 		this.media = media;
 		this.parseMedia(media);
+		this.strategy = new DefaultInterpretStrategy();
+	}
+	
+	public TranscoderResource(IMedia media, ArrayList<IProperty> flags) throws InvalidTranscoderResourceException{
+		this.media = media;
+		this.parseMedia(media);
+		this.setOptionFlags(flags);
+		this.strategy = new DefaultInterpretStrategy();
 	}
 	
 	public TranscoderResource(IMedia media, InterpretStrategy strategy) throws InvalidTranscoderResourceException{
 		this.media = media;
 		this.parseMedia(media);
 		
+		this.setStrategy(strategy);
+	}
+	
+	public TranscoderResource(IMedia media, InterpretStrategy strategy, ArrayList<IProperty> flags) throws InvalidTranscoderResourceException{
+		this.media = media;
+		this.parseMedia(media);
+		this.setOptionFlags(flags);		
 		this.setStrategy(strategy);
 	}
 	
@@ -113,6 +132,18 @@ public abstract class TranscoderResource implements IMedia,ITranscoderResource {
 	@Override
 	public void setStrategy(InterpretStrategy strategy) {
 		this.strategy = strategy;
+	}
+	
+	@Override
+	public ArrayList<IProperty> getOptionFlags() {
+		// TODO Auto-generated method stub
+		return flags;
+	}
+
+	@Override
+	public void setOptionFlags(ArrayList<IProperty> flags) {
+		// TODO Auto-generated method stub
+		this.flags = flags;
 	}
 
 	@Override

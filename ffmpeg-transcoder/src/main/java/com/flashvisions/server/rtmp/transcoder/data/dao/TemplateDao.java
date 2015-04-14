@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.flashvisions.server.rtmp.transcoder.decorator.TranscoderOutputResource;
+import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
 import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -48,7 +48,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeDao;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
@@ -69,7 +68,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioChannel;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioCodec;
 import com.flashvisions.server.rtmp.transcoder.pojo.audio.AudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.pojo.collection.EncodeCollection;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaDestination;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.Media;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.AverageBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.DeviceBuffer;
@@ -674,7 +673,7 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeOutputContainerExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Container";
 					String encodeNodeOutputContainer = xpath.compile(encodeNodeOutputContainerExpression).evaluate(document);
 					
-					ITranscoderResource output = new TranscoderOutputResource(new MediaDestination(encodeNodeOutputName, true));
+					ITranscoderResource output = new SimpleTranscoderResource(new Media(encodeNodeOutputName));
 					//IOUtils.IdentifyOutput(output);
 					
 					if(!encodeNodeOutputContainer.equals("") && encodeNodeOutputContainer.length()>=3)

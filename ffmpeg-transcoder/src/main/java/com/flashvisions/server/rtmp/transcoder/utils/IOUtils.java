@@ -6,12 +6,12 @@ import java.net.URISyntaxException;
 
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFileMedia;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.FileDestination;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamDestination;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.FileMedia;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamMedia;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
 
@@ -36,7 +36,7 @@ public class IOUtils {
 			
 			
 			if(input.isFile()){
-			IFileInput in = (IFileInput) input;
+			IFileMedia in = (IFileMedia) input;
 			in.setFile(new File(source));
 			}			
 		}
@@ -46,7 +46,7 @@ public class IOUtils {
 		}
 	}
 	
-	public static void IdentifyOutput(IMediaOutput output) throws MediaIdentifyException
+	public static void IdentifyOutput(IMedia output) throws MediaIdentifyException
 	{
 		try
 		{
@@ -144,9 +144,9 @@ public class IOUtils {
 		}
 	}
 	
-	public static IMediaOutput createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException{
+	public static IMedia createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException{
 		
-		IMediaOutput finalOutput = null;
+		IMedia finalOutput = null;
 		IContainer container = null;
 		
 		String insource = in.getSourcePath();
@@ -158,7 +158,7 @@ public class IOUtils {
 		outsource = outsource.replace("SourceStreamName", streamname);
 		
 		container = (temp.getContainer() == null)?new Container(guessContainer(outsource)):temp.getContainer();
-		finalOutput = (temp.isStreamingMedia())?new StreamDestination(outsource, container):new FileDestination(outsource, container);
+		finalOutput = (temp.isStreamingMedia())?new StreamMedia(outsource, container):new FileMedia(outsource, container);
 		finalOutput.setContainer(container);
 		
 		return finalOutput;

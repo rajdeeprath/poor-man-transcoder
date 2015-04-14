@@ -33,8 +33,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.DefaultInterpretStrategy;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.strategy.impl.RTMPInterpretStrategy;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
@@ -202,6 +200,10 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		// TODO Auto-generated method stub
 		logger.info("Destroying session");
 		
+		try{
+		stopTranscode();
+		}catch(Exception e){}
+		
 		try{watchdog.stop();}
 		catch(Exception e1){	}
 		finally{watchdog = null;}
@@ -211,6 +213,10 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		finally{outstream = null;}
 	
 		try{resultHandler = null;}
+		catch(Exception e3){}
+		finally{}
+		
+		try{observers.clear();}
 		catch(Exception e3){}
 		finally{}
 		
@@ -363,7 +369,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			try
 			{
 						replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-						replacementMap.put("inputSource", source.getSourcePath());
+						replacementMap.put("inputSource", source.describe());
 									
 										
 						if(!config.getEnabled())
@@ -371,22 +377,10 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 						
 						
 						/********************************************
-						****** Setting Interpret Strategy ***********
-						*********************************************/
-						
-						if(source.getStrategy() == null){
-						if(IOUtils.isRTMPCompatStream(source)){
-						source.setStrategy(new RTMPInterpretStrategy());
-						cmdLine.addArgument("-re");
-						}else{
-						source.setStrategy(new DefaultInterpretStrategy());
-						}
-						}
-						
-						/********************************************
 						********** Processing Inputs ****************
 						*********************************************/
 						
+						cmdLine.addArgument("-re");
 						cmdLine.addArgument("-i");
 						cmdLine.addArgument("${inputSource}");						
 						

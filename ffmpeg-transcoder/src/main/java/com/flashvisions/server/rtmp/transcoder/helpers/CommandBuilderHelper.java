@@ -7,6 +7,7 @@ import org.apache.commons.exec.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
@@ -16,7 +17,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IMediaOutput;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
@@ -38,7 +39,8 @@ public class CommandBuilderHelper {
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		
-		IMediaOutput destination = IOUtils.createOutputFromInput(input, template);
+		IMedia destination = IOUtils.createOutputFromInput(input, template);
+		ITranscoderResource trannscoderoutput = new SimpleTranscoderResource(destination);
 									
 		cmdLine.addArgument("-y");
 		cmdLine.addArgument("-f");
@@ -56,7 +58,7 @@ public class CommandBuilderHelper {
 		}
 		
 		
-		cmdLine.addArgument(destination.getSourcePath());
+		cmdLine.addArgument(trannscoderoutput.describe());
 	}
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception

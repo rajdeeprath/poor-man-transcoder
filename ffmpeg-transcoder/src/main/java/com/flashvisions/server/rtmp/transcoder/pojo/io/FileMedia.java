@@ -3,19 +3,19 @@ package com.flashvisions.server.rtmp.transcoder.pojo.io;
 import java.io.File;
 
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IFileInput;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.base.MediaSource;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IFileMedia;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.base.Media;
 
-public class FileSource extends MediaSource implements IFileInput {
+public class FileMedia extends Media implements IFileMedia {
 
 	File file;
 	
-	public FileSource(String source) {
+	public FileMedia(String source) {
 		super(source);
 		// TODO Auto-generated constructor stub
 	}
 	
-	public FileSource(String source, IContainer container){
+	public FileMedia(String source, IContainer container){
 		super(source, container);
 	}
 
