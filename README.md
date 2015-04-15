@@ -39,11 +39,27 @@ Much more....
 7. commons-io
 
 
+## Usage
+
+First time:
+```
+ITranscoderFacade facade = TranscoderFacade.getInstance();
+facade.setFFmpegPath("/path/to/ffmpeg/");
+facade.setHomeDirectory("/path-to/server-home-directory/");
+facade.setWorkingDirectory("/path-to/working-directory/);
+facade.setTemplateDirectory("/path-to/templates/directory/");
+facade.setOperatingMediaServer("red5"); // server string => red5 / wowza
+facade.init();
+```
+To transcode your stream::
+
+facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream")), "sample-rtmp-template.xml");
+
 ## Status
 
 TO DO:
 
-##### Updates to do
+##### Updates to do (Lots of work)
 
 1. Casual Testing
 2. Unit testting
