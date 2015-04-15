@@ -55,6 +55,92 @@ To transcode your stream::
 
 facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream")), "sample-rtmp-template.xml");
 
+
+## Template Structure
+
+```
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- sample transcoder template for java-ffmpeg wrapper -->
+<Template version="1">
+	<Transcode>
+		<Name>Sample rtmp 2 rtmp </Name>
+		<Description>Sample to transcode rtmp to rtmp</Description>	
+		<Encodes>
+			<Encode>
+				<Enable>true</Enable>
+				<Name>Sample</Name>								
+				<!-- must be unique in this sequence of encodes -->
+				<Video>
+					<!-- Any supported codec, copy, Disable, {codecname} -->
+					<Codec>libx264</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation>normal</Implementation>
+					<FrameSize>
+						<Width>320</Width>
+						<Height>240</Height>
+					</FrameSize>
+					<FrameRate>24</FrameRate>
+					<Bitrate>
+						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
+						<Min>200</Min><!-- K -->
+						<Max>250</Max><!-- K -->
+						<Buffer>300</Buffer> <!-- K (device buffer)-->
+					</Bitrate> 
+					<KeyFrameInterval>
+						<Gop>24</Gop>
+						<IntervalMin>48</IntervalMin>
+					</KeyFrameInterval>
+					
+					<Parameters>
+						<Parameter>
+							<Key>profile:v</Key>
+							<Value>baseline</Value>
+						</Parameter>
+					</Parameters>
+					
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
+				</Video>
+				
+				<Audio>
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
+					<Codec>aac</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation>experimental</Implementation>
+					<Bitrate>128</Bitrate> <!-- Kbps -->
+					<!-- samplerate -->
+					<SampleRate>22050</SampleRate>
+					<!-- mono, stereo -->
+					<Channels>mono</Channels>
+					<!-- Extra params such as filters -->
+					<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+					</Parameters>
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
+				</Audio>
+				
+				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
+				<Output>
+						<StreamName>${SourceApplication}/mp4:${SourceStreamName}</StreamName>
+						<!-- mp4, flv etc.. -->
+						<Container></Container>
+						<Properties>
+							<!--<Property></Property>-->
+						</Properties>
+				</Output>
+			</Encode>
+		</Encodes>
+	</Transcode>
+</Template>
+
+```
+
 ## Status
 
 TO DO:
