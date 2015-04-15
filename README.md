@@ -28,11 +28,22 @@ Much more....
 [![Overview](https://raw.githubusercontent.com/rajdeeprath/ffmpeg-transcoder/93b441c7851d5e08ee2158e345ee43d94f80e40b/images/transcoder-service%20-%20small.png "Verifying")](https://raw.githubusercontent.com/rajdeeprath/ffmpeg-transcoder/93b441c7851d5e08ee2158e345ee43d94f80e40b/images/transcoder-service.png)
 
 
+## Libraries (Dependencies) used
+
+1. slf4j-simple - Logging framework
+2. commons-exec - command line executior
+3. commons-chain - command chaining utility
+4. validation-api - Custom validations
+5. hibernate-validator - Custom validations
+6. httpclient
+7. commons-io
+
+
 ## Status
 
 TO DO:
 
-##### Update 1
+##### Updates to do
 
 1. Casual Testing
 2. Unit testting
