@@ -1,6 +1,6 @@
 # ffmpeg-transcoder
 
-Transcoder for live stream to be used with red5 / wowza ( java based rtmp servers )
+Transcoder for live streams to be used with red5 / wowza ( java based rtmp servers )
 
 
 
@@ -21,6 +21,7 @@ ffmpeg transcoder is a maven project towards building a cli wrapper initiative f
 
 Much more....
 
+The best part of this system is :  "No programming required to get your transcoding process going"
 
 ## Overview
 
@@ -41,7 +42,7 @@ Much more....
 
 ## Usage
 
-First time:
+First time bootsrap:
 ```
 ITranscoderFacade facade = TranscoderFacade.getInstance();
 facade.setFFmpegPath("/path/to/ffmpeg/");
@@ -51,10 +52,11 @@ facade.setTemplateDirectory("/path-to/templates/directory/");
 facade.setOperatingMediaServer("red5"); // server string => red5 / wowza
 facade.init();
 ```
+
 To transcode your stream::
-
+```
 facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream")), "sample-rtmp-template.xml");
-
+```
 
 ## Template Structure
 
