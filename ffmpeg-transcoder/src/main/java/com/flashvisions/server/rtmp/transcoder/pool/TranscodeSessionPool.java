@@ -24,6 +24,7 @@ public class TranscodeSessionPool {
 	  private Server operatingServer; 
 	  private Hashtable<ISession, Long> locked, unlocked;
 	  private Hashtable<String, ISession> sessionMap;
+	  private Hashtable<Long, ISession> sessionIdMap;
 	  private Hashtable<ISession, String> templateMap;
 	  
 	  
@@ -56,6 +57,7 @@ public class TranscodeSessionPool {
 		  this.unlocked = new Hashtable<ISession, Long>();
 		  this.sessionMap = new Hashtable<String, ISession>();
 		  this.templateMap = new Hashtable<ISession, String>();
+		  this.sessionIdMap = new Hashtable<Long, ISession>();
 	  }
 	  
 	  // !!! for future use
@@ -95,6 +97,7 @@ public class TranscodeSessionPool {
 	  {
 		  logger.info("Expiring object " + session.getId());
 		  sessionMap.remove(getSignature(session));
+		  sessionIdMap.remove(session.getId());
 		  templateMap.remove(session);
 		  session.dispose();
 		  session = null;
@@ -144,6 +147,7 @@ public class TranscodeSessionPool {
 	    	t = create(input, usingTemplate);
 	    	templateMap.put(t, usingTemplate);
 	    	sessionMap.put(getSignature(t), t);
+	    	sessionIdMap.put(t.getId(), t);
 		} 
 	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
 	    {
@@ -164,6 +168,11 @@ public class TranscodeSessionPool {
 	  public ISession getSession(String signature)
 	  {
 		  return sessionMap.get(signature);
+	  }
+	  
+	  public ISession getSession(long id)
+	  {
+		  return sessionIdMap.get(id);
 	  }
 
 	  public Server getOperatingServer() {

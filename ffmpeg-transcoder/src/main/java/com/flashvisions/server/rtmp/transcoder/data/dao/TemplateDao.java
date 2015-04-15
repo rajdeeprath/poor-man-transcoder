@@ -477,7 +477,6 @@ public class TemplateDao implements ITranscodeDao {
 				{
 					Set<ConstraintViolation <IVideo>> constraintViolations = validator.validate(video);  
 					
-					//@ Validating VideoBitrate object
 					if(constraintViolations.size()>0){
 					 for(ConstraintViolation<IVideo> constraintViolation : constraintViolations){  
 					  throw new Exception(constraintViolation.getMessage());
@@ -651,8 +650,24 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				
 				
-				/*** all ok with audio configuration */
-				audio.setEnabled(true);
+				/******************** Final validation of audio object *****************************/
+				try
+				{
+					Set<ConstraintViolation <IAudio>> constraintViolations = validator.validate(audio);  
+					
+					if(constraintViolations.size()>0){
+					 for(ConstraintViolation<IAudio> constraintViolation : constraintViolations){  
+					  throw new Exception(constraintViolation.getMessage());
+					 }}
+					
+					audio.setEnabled(true);
+				}
+				catch(Exception e)
+				{
+					logger.info("Audio Config Error : " + e.getMessage()+". Disabling audio processing for this {Encode} " + encode.getName() + " configuration.");
+					audio.setEnabled(false);
+				}
+				
 				
 				/**** store audio configuration into encode object *****/
 				encode.setAudioConfig(audio);

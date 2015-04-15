@@ -10,7 +10,7 @@
 				<Name>HLS Copy</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, PassThru, Disable, {codecname} -->
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
 					<Codec>Copy</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>

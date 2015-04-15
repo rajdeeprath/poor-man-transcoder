@@ -22,11 +22,13 @@ public class AudioChannelValidator implements ConstraintValidator<ValidAudioChan
 		// TODO Auto-generated method stub
 		String message = null;
 		boolean valid = false;
+		String channelType = (String) channel.getValue();
 		
 		try
 		{
-			for (AudioChannelType channelType : AudioChannelType.values()) {
-				System.out.print(channelType.getCode());
+			if(isInEnum(channelType, AudioChannelType.class))
+			{
+				valid = true;
 			}
 			
 			if(!valid) {
@@ -42,4 +44,10 @@ public class AudioChannelValidator implements ConstraintValidator<ValidAudioChan
 		return valid;
 	}
 
+	public <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
+		  for (E e : enumClass.getEnumConstants()) {
+		    if(e.name().equalsIgnoreCase(value)) { return true; }
+		  }
+		  return false;
+	}
 }

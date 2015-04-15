@@ -144,7 +144,6 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	{
 		try
 		{
-			if(isRunning())
 			executor.getWatchdog().destroyProcess();
 		}
 		catch(Exception e)
@@ -157,6 +156,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	}
 
 	
+	/***** Not Accurate*****/
 	@Override
 	public boolean isRunning() 
 	{

@@ -10,8 +10,8 @@
 				<Name>Record to Mp4</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, PassThru, Disable, {codecname} -->
-					<Codec>libx264</Codec>
+					<!-- Any supported codec, copy, Disable, {codecname} -->
+					<Codec>Copy</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<FrameSize>
@@ -44,7 +44,7 @@
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>libvo_aacenc</Codec>
+					<Codec>Copy</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->

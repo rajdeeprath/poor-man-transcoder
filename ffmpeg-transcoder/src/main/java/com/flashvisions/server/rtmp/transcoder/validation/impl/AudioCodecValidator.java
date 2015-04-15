@@ -34,6 +34,12 @@ public class AudioCodecValidator implements ConstraintValidator<ValidAudioCodec,
 				message = "{com.flashvisions.server.rtmp.transcoder.validation.audio.codec.invalid.generic}";
 			}
 			
+			if(isEnum(codecName, CodecOptions.COPY))
+			codec.setSameAsSource(true);
+				
+			if(isEnum(codecName, CodecOptions.DISABLE))
+			codec.setEnabled(false);
+			
 			if(!valid) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
@@ -52,5 +58,10 @@ public class AudioCodecValidator implements ConstraintValidator<ValidAudioCodec,
 		    if(e.name().equalsIgnoreCase(value)) { return true; }
 		  }
 		  return false;
-		}
+	}
+	
+	public boolean isEnum(String element, Enum<?> e)
+	{
+		return element.toLowerCase().equals(e.name().toLowerCase());
+	}
 }

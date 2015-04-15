@@ -77,7 +77,6 @@ public class CommandBuilderHelper {
 	
 		if(acodec.getSameAsSource())
 		{
-			// pass thru -> use same as source
 			cmdLine.addArgument(acodec.getKey());
 			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
 		}

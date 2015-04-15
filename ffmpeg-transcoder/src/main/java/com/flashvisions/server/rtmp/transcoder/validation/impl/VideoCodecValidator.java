@@ -33,7 +33,14 @@ public class VideoCodecValidator implements ConstraintValidator<ValidVideoCodec,
 				message = "{com.flashvisions.server.rtmp.transcoder.validation.video.codec.invalid.generic}";
 			}
 			
-			if(!valid) {
+			if(isEnum(codecName, CodecOptions.COPY))
+			codec.setSameAsSource(true);
+			
+			if(isEnum(codecName, CodecOptions.DISABLE))
+			codec.setEnabled(false);
+			
+			
+			if(!valid) {	
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
 		    }
@@ -53,4 +60,8 @@ public class VideoCodecValidator implements ConstraintValidator<ValidVideoCodec,
 		  return false;
 		}
 
+	public boolean isEnum(String element, Enum<?> e)
+	{
+		return element.toLowerCase().equals(e.name().toLowerCase());
+	}
 }
