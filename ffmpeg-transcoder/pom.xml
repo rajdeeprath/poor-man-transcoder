@@ -3,6 +3,7 @@
   <groupId>com.flashvisions.server.rtmp.transcoder</groupId>
   <artifactId>ffmpeg-transcoder</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>ffmpeg-transcoder</name>
   <description>Wrapper library  for rtmp servers to use ffmpeg as a live transcoign engine</description>
   <properties>

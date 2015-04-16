@@ -30,18 +30,18 @@ public class CommandBuilderHelper {
 	private static Logger logger = LoggerFactory.getLogger(CommandBuilderHelper.class);
 	
 	
-	public void buildOutputQuery(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output) throws Exception
+	public ITranscoderResource buildOutput(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output) throws Exception
 	{
 		logger.info("Processing output destination for encode");
 		
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
+		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template);
 		
-		ITranscoderResource trannscoderoutput = IOUtils.createOutputFromInput(input, template);
-									
+		
 		cmdLine.addArgument("-y");
 		cmdLine.addArgument("-f");
-		cmdLine.addArgument(trannscoderoutput.getContainer().toString());		
+		cmdLine.addArgument(transcoderOutput.getContainer().toString());		
 		
 		
 		/***************** extra properties for output **************/
@@ -55,15 +55,17 @@ public class CommandBuilderHelper {
 		}
 		
 		/************* special pre-processing for hls output ******/
-		switch(trannscoderoutput.getContainer().getType())
+		switch(transcoderOutput.getContainer().getType())
 		{
 			case SSEGMENT:
 			break;
 			
 			default:
-			cmdLine.addArgument(trannscoderoutput.describe());
+			cmdLine.addArgument(transcoderOutput.describe());
 			break;
 		}
+		
+		return transcoderOutput;
 	}
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception

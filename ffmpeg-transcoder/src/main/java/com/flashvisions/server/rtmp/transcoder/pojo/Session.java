@@ -31,6 +31,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
+import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionProcessCallback;
 import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
@@ -40,12 +41,12 @@ import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
  * @author Rajdeep
  *
  */
-public class Session implements ISession, TranscodeSessionResultCallback, TranscodeSessionDataCallback {
+public class Session implements ISession, TranscodeSessionProcessCallback, TranscodeSessionResultCallback, TranscodeSessionDataCallback {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
 	public static enum Event{
-		START, STOP, PROGRESS, FAILED, COMPLETE
+		START, STOP, DATA, FAILED, COMPLETE, PROCESSADDED, PROCESSREMOVED
 	};
 	
 	private ITranscode config;
@@ -62,6 +63,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	private ExecuteWatchdog watchdog;
 	
 	private ArrayList<ISessionObserver> observers;
+	private ArrayList<ITranscoderResource> outputs;
 	
 	private static long id;
 	
@@ -70,9 +72,9 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		Session.id++;
 		
 		this.config = builder.config;
-		this.source = builder.source;
+		this.source = builder.input;
 		this.cmdLine = builder.cmdLine;	
-		
+		this.setOutputs(builder.outputs);
 		this.executor = new DefaultExecutor();
 		
 		// set this locally not globally -|
@@ -110,7 +112,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	@Override
 	public void start() 
 	{
-		startTranscode();
+		//startTranscode();
 	}
 	
 	protected void startTranscode()
@@ -156,7 +158,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	}
 
 	
-	/***** Not Accurate*****/
+	/***** Not Accurate !! Dont use this *****/
 	@Override
 	public boolean isRunning() 
 	{
@@ -167,32 +169,49 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 	@Override
 	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
-		logger.info("Process completed with exitValue " + exitValue);
+		logger.info("onTranscodeProcessComplete exitValue: " + exitValue);
 		notifyObservers(Event.COMPLETE, null);
 	}
 
 	@Override
 	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp) {
 		// TODO Auto-generated method stub
-		if(watchdog != null && watchdog.killedProcess())
-		logger.error("Process timed out");
-		else
-		logger.error("Process failed : " + e.getMessage());
+		String cause = null;
 		
+		if(watchdog != null && watchdog.killedProcess()) cause = "Timeout";
+		else cause = "Failure";
+		
+		logger.info("onTranscodeProcessData cause: " + cause);
 		notifyObservers(Event.FAILED, null);
 	}
 	
 	@Override
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
-		logger.info(String.valueOf(data));
-		notifyObservers(Event.PROGRESS, data);
+		logger.info("onTranscodeProcessData");
+		notifyObservers(Event.DATA, data);
 	}
 	
 	@Override
 	public void onTranscodeProcessStart(long timestamp) {
 		// TODO Auto-generated method stub
+		logger.info("onTranscodeProcessStart");
 		notifyObservers(Event.START, null);
+	}
+	
+	@Override
+	public void onTranscodeProcessAdded(Process proc) {
+		// TODO Auto-generated method stub
+		logger.info("onTranscodeProcessAdded");
+		notifyObservers(Event.PROCESSADDED, proc);
+	}
+
+
+	@Override
+	public void onTranscodeProcessRemoved(Process proc) {
+		// TODO Auto-generated method stub
+		logger.info("onTranscodeProcessRemoved");
+		notifyObservers(Event.PROCESSREMOVED, proc);
 	}
 	
 	@Override
@@ -263,7 +282,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 				observer.onSessionStart(null);
 				break;
 				
-				case PROGRESS:
+				case DATA:
 				observer.onSessionData(null);
 				break;
 					
@@ -284,6 +303,14 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		}
 	}
 
+	public ArrayList<ITranscoderResource> getOutputs() {
+		return outputs;
+	}
+
+	private void setOutputs(ArrayList<ITranscoderResource> outputs) {
+		this.outputs = outputs;
+	}
+
 	/***************** Session Builder *********************/
 	
 	public static class Builder {
@@ -296,7 +323,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		private String templateFile;
 		private String workingDirectoryPath;
 		
-		private ITranscoderResource source;
+		private ITranscoderResource input;
+		private ArrayList<ITranscoderResource> outputs;
 		private ISession session;
 		
 		private CommandLine cmdLine;
@@ -315,7 +343,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		}
 		
 		public Builder usingMediaInput(ITranscoderResource source){
-			this.source = source;
+			this.input = source;
 			return this;
 		}
 		
@@ -339,7 +367,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		public ISession build() throws MalformedTranscodeQueryException, MediaIdentifyException{
 			this.identifyInput();
 			this.config = (this.templateFile != null)?this.buildTranscodeConfigFromTemplate(this.templateFile):this.config;
-			this.cmdLine = buildExecutableCommand(this.source, this.config);
+			this.outputs = new ArrayList<ITranscoderResource>();
+			this.cmdLine = buildExecutableCommand(this.input, this.config, this.outputs);
 			this.session = new Session(this);						
 			return this.session;
 		}
@@ -347,7 +376,7 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 		protected void identifyInput() throws MediaIdentifyException
 		{
 			logger.info("Identifying input");
-			IOUtils.IdentifyInput(source);
+			IOUtils.IdentifyInput(input);
 		}
 		
 		protected ITranscode buildTranscodeConfigFromTemplate(String templateFile)
@@ -358,13 +387,14 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			return configFactory.getTranscodeConfiguration(templateFile);
 		}
 		
-		protected CommandLine buildExecutableCommand(ITranscoderResource source, ITranscode config) throws MalformedTranscodeQueryException{
+		protected CommandLine buildExecutableCommand(ITranscoderResource source, ITranscode config, ArrayList<ITranscoderResource> outputBucket) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
 			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
 			CommandBuilderHelper helper = new CommandBuilderHelper();
+			
 			
 			try
 			{
@@ -388,8 +418,8 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 						 ********** Processing Encodes ****************
 						 ************************************************/	
 						
-						IEncodeCollection outputs = config.getEncodes();
-						IEncodeIterator iterator = outputs.iterator();
+						IEncodeCollection encodes = config.getEncodes();
+						IEncodeIterator iterator = encodes.iterator();
 						
 						while(iterator.hasNext())
 						{
@@ -466,8 +496,9 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 								 ********** Output configurations ****************
 								 ************************************************/
 								try
-								{								
-									helper.buildOutputQuery(cmdLine, source, output);
+								{				
+									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, source, output);
+									outputBucket.add(transcoderOutput);
 								}
 								catch(Exception e)
 								{
@@ -497,10 +528,5 @@ public class Session implements ISession, TranscodeSessionResultCallback, Transc
 			}
 		}
 	}
-
-
-	
-
-
 	
 }

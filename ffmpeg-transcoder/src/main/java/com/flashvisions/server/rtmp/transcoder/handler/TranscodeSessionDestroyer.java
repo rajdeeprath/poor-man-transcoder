@@ -1,25 +1,23 @@
 package com.flashvisions.server.rtmp.transcoder.handler;
 
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
+import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionProcessCallback;
 
 public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 
-	private static Logger logger = LoggerFactory.getLogger(TranscodeSessionDestroyer.class);
-	private ISession session;
+	private TranscodeSessionProcessCallback callback;
 	
-	public TranscodeSessionDestroyer(ISession session){
-		this.setSession(session);
+	public TranscodeSessionDestroyer(TranscodeSessionProcessCallback session){
+		this.setCallback(callback);
 	}
 	
 	
 	@Override
 	public boolean add(Process process) {
 		// TODO Auto-generated method stub
-		logger.info("adding process");
+		if(callback != null)
+		callback.onTranscodeProcessRemoved(process);
+		
 		return super.add(process);
 	}
 
@@ -32,7 +30,9 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	@Override
 	public boolean remove(Process process) {
 		// TODO Auto-generated method stub
-		logger.info("removing process");
+		if(callback != null)
+		callback.onTranscodeProcessAdded(process);
+		
 		return super.remove(process);
 	}
 
@@ -49,13 +49,13 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	}
 
 
-	public ISession getSession() {
-		return session;
+	public TranscodeSessionProcessCallback getCallback() {
+		return callback;
 	}
 
 
-	private void setSession(ISession session) {
-		this.session = session;
+	public void setCallback(TranscodeSessionProcessCallback callback) {
+		this.callback = callback;
 	}
 
 }
