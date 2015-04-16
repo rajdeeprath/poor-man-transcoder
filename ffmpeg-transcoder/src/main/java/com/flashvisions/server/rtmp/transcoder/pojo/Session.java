@@ -24,6 +24,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeIterator;
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
@@ -82,10 +83,8 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 		this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
-		
 		this.observers = new ArrayList<ISessionObserver>();
 		
-		logger.info("Session :"+Session.id);
 		logger.info("Command :" + this.cmdLine.toString());
 	}
 
@@ -112,7 +111,7 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 	@Override
 	public void start() 
 	{
-		//startTranscode();
+		startTranscode();
 	}
 	
 	protected void startTranscode()
@@ -279,19 +278,19 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 			switch(event)
 			{
 				case START:
-				observer.onSessionStart(null);
+				observer.onSessionStart(this, null);
 				break;
 				
 				case DATA:
-				observer.onSessionData(null);
+				observer.onSessionData(this, null);
 				break;
 					
 				case COMPLETE:
-				observer.onSessionComplete(null);
+				observer.onSessionComplete(this, null);
 				break;
 					
 				case FAILED:
-				observer.onSessionFailed(null);
+				observer.onSessionFailed(this, null);
 				break;
 				
 				case STOP:
@@ -387,7 +386,7 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 			return configFactory.getTranscodeConfiguration(templateFile);
 		}
 		
-		protected CommandLine buildExecutableCommand(ITranscoderResource source, ITranscode config, ArrayList<ITranscoderResource> outputBucket) throws MalformedTranscodeQueryException{
+		protected CommandLine buildExecutableCommand(ITranscoderResource input, ITranscode config, ArrayList<ITranscoderResource> outputBucket) throws MalformedTranscodeQueryException{
 			
 			logger.info("Building transcoder command");
 			
@@ -399,20 +398,22 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 			try
 			{
 						replacementMap.put("ffmpegExecutable", Globals.getEnv(Globals.Vars.FFMPEG_EXECUTABLE_PATH));
-						replacementMap.put("inputSource", source.describe());
-									
-										
+						
+						
 						if(!config.getEnabled())
 						throw new Exception("Transcode configuration disabled");
 						
 						
 						/********************************************
-						********** Processing Inputs ****************
+						********** Processing Input *****************
 						*********************************************/
 						
-						cmdLine.addArgument("-re");
+						ArrayList<IProperty> options = input.getOptionFlags();
+						if(options != null) for(IProperty option: options) 
+						cmdLine.addArgument(option.getData());
 						cmdLine.addArgument("-i");
-						cmdLine.addArgument("${inputSource}");						
+						cmdLine.addArgument("${inputSource}");
+						
 						
 						/************************************************
 						 ********** Processing Encodes ****************
@@ -433,13 +434,13 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 							
 								IVideo vConfig = encode.getVideoConfig();
 								IAudio aConfig = encode.getAudioConfig();
-								ITranscodeOutput output = encode.getOutput();
-	
+								ITranscodeOutput output = encode.getOutput();	
 								
 								
 								/************************************************
 								 ********** Video configurations ****************
 								 ************************************************/
+								
 								try
 								{
 									logger.info("Parsing video settings for encode");
@@ -497,7 +498,7 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 								 ************************************************/
 								try
 								{				
-									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, source, output);
+									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output);
 									outputBucket.add(transcoderOutput);
 								}
 								catch(Exception e)
@@ -513,7 +514,7 @@ public class Session implements ISession, TranscodeSessionProcessCallback, Trans
 							}
 						}
 						
-						replacementMap.put("inputSource", source.describe());
+						replacementMap.put("inputSource", input.describe());
 						cmdLine.setSubstitutionMap(replacementMap);
 						return cmdLine;
 			}

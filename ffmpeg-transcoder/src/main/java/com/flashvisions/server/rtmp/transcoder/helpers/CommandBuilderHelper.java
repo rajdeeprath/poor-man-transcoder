@@ -44,7 +44,7 @@ public class CommandBuilderHelper {
 		cmdLine.addArgument(transcoderOutput.getContainer().toString());		
 		
 		
-		/***************** extra properties for output **************/
+		/***************** extra properties for output **************/		
 		
 		if(!properties.isEmpty())
 		{
@@ -140,14 +140,24 @@ public class CommandBuilderHelper {
 			}
 			
 			
-			/* Extra params such as filters */
+			/* Extra params (dashed)*/
 			logger.info("Setting extra audio params");
-			ArrayList<IParameter> extraAudioParams = config.getExtraParams();
-			Iterator<?> ita = extraAudioParams.iterator();
-			while(ita.hasNext()){
-				IParameter prop = (IParameter) ita.next();
-				cmdLine.addArgument(DASH+prop.getKey());
-				cmdLine.addArgument(String.valueOf(prop.getValue()));
+			ArrayList<IParameter> params = config.getExtraParams();
+			if(params != null){
+			for(IParameter param: params){
+			cmdLine.addArgument(DASH+param.getKey());
+			cmdLine.addArgument(String.valueOf(param.getValue()));
+			}
+			}
+			
+			
+			/* Extra properties*/
+			logger.info("Setting extra audio properties");
+			ArrayList<IProperty> props = config.getExtraProperties();
+			if(props != null){
+			for(IProperty prop: props){
+			cmdLine.addArgument(prop.getData());
+			}
 			}
 		}
 	}
@@ -271,15 +281,25 @@ public class CommandBuilderHelper {
 			}
 			
 			
-			/* Extra params such as filters */
+			/* Extra params (dashed)*/
 			logger.info("Setting extra video params");
-			ArrayList<IParameter> extraVideoParams = config.getExtraParams();
-			Iterator<IParameter> itv = extraVideoParams.iterator();
-			while(itv.hasNext()){
-				IParameter prop = (IParameter) itv.next();
-				cmdLine.addArgument(DASH+prop.getKey());
-				cmdLine.addArgument(String.valueOf(prop.getValue()));
-			}		
+			ArrayList<IParameter> params = config.getExtraParams();
+			if(params != null){
+			for(IParameter param: params){
+			cmdLine.addArgument(DASH+param.getKey());
+			cmdLine.addArgument(String.valueOf(param.getValue()));
+			}
+			}
+			
+			
+			/* Extra properties*/
+			logger.info("Setting extra video properties");
+			ArrayList<IProperty> props = config.getExtraProperties();
+			if(props != null){
+			for(IProperty prop: props){
+			cmdLine.addArgument(prop.getData());
+			}
+			}			
 		}
 	}
 }

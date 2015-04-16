@@ -42,7 +42,7 @@ The best part of this system is :  "No programming required to get your transcod
 
 ## Usage
 
-First time bootsrap:
+First time bootsrap (onAppStart / onServerStart):
 ```
 ITranscoderFacade facade = TranscoderFacade.getInstance();
 facade.setFFmpegPath("/path/to/ffmpeg/");
@@ -55,7 +55,17 @@ facade.init();
 
 To transcode your stream::
 ```
-facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream")), "sample-rtmp-template.xml");
+ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
+
+ISession transcodesession = 
+Session.Builder.newSession()
+.forServer("red5")
+.setWorkingDirectory("/path/to/working-directory/")
+.usingTemplateFile("sample-rtmp-template.xml")
+.usingMediaInput(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream"), inputflags))
+.build();
+                    
+transcodesession.start();
 ```
 
 ## Template Structure
