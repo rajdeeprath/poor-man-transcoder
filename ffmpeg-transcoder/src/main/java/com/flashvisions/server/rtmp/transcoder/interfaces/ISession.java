@@ -3,7 +3,7 @@ package com.flashvisions.server.rtmp.transcoder.interfaces;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session.Event;
 
 
-public interface ISession extends IDisposable {
+public interface ISession extends IDisposable, TranscodeSessionProcessCallback, TranscodeSessionResultCallback, TranscodeSessionDataCallback {
 
 	public long getId();
 	

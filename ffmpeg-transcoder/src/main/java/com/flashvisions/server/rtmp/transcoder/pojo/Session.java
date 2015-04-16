@@ -31,9 +31,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
-import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionDataCallback;
-import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionProcessCallback;
-import com.flashvisions.server.rtmp.transcoder.interfaces.TranscodeSessionResultCallback;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
@@ -42,7 +39,7 @@ import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
  * @author Rajdeep
  *
  */
-public class Session implements ISession, TranscodeSessionProcessCallback, TranscodeSessionResultCallback, TranscodeSessionDataCallback {
+public class Session implements ISession  {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
