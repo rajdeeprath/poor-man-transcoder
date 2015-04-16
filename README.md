@@ -21,7 +21,7 @@ ffmpeg transcoder is a maven project towards building a cli wrapper initiative f
 
 Much more....
 
-The best part of this system is :  "No programming required to get your transcoding process going"
+The best part of this system is :  "Very Little programming needed to get your transcoding process going"
 
 ## Overview
 
