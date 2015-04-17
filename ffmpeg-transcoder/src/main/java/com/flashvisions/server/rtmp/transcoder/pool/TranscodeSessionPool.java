@@ -6,26 +6,27 @@ import java.util.Hashtable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscode;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.system.TranscoderTable;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
-public class TranscodeSessionPool {
+public class TranscodeSessionPool implements ISessionObserver {
 	  
 	  private static Logger logger = LoggerFactory.getLogger(TranscodeSessionPool.class);
 	
 	  private long expirationTime = 30000;
-	  private Server operatingServer; 
+	  private TranscoderContext context; 
 	  private Hashtable<ISession, Long> locked, unlocked;
-	  private Hashtable<String, ISession> sessionMap;
-	  private Hashtable<Long, ISession> sessionIdMap;
-	  private Hashtable<ISession, String> templateMap;
+	  private Hashtable<String, ISession> sessionSignatureTable;
+	  private Hashtable<ISession, String> templateTable;
+	  private TranscoderTable resourceTable;
 	  
 	  
 	  public long getSessionExpirationTime() 
@@ -33,56 +34,47 @@ public class TranscodeSessionPool {
 			return expirationTime;
 	  }
 
-	  public void setSessionExpirationTime(long expirationTime) 
+	  private void setSessionExpirationTime(long expirationTime) 
 	  {
 			this.expirationTime = expirationTime;
 	  }
 
-	  public TranscodeSessionPool(Server operatingServer) 
-	  {
-		  	this.setOperatingServer(operatingServer);	    
-		  	this.initHashMaps();
+	  public TranscodeSessionPool(TranscoderContext context) 
+	  {	    
+		  	this.context = context;
+		  	this.initTables();
 	  }
 	  
-	  public TranscodeSessionPool(Server operatingServer, long sessionExpireTime) 
+	  public TranscodeSessionPool(TranscoderContext context, long sessionExpireTime) 
 	  {
-			this.setOperatingServer(operatingServer);
+		  	this.context = context;
 			this.setSessionExpirationTime(sessionExpireTime);	
-		    this.initHashMaps();
+		    this.initTables();
 	  }
 	  
-	  private void initHashMaps()
+	  private void initTables()
 	  {
 		  this.locked = new Hashtable<ISession, Long>();
 		  this.unlocked = new Hashtable<ISession, Long>();
-		  this.sessionMap = new Hashtable<String, ISession>();
-		  this.templateMap = new Hashtable<ISession, String>();
-		  this.sessionIdMap = new Hashtable<Long, ISession>();
-	  }
-	  
-	  // !!! for future use
-	  protected ISession create(ITranscoderResource input, ITranscode transcode) throws MalformedTranscodeQueryException, MediaIdentifyException
-	  {
-		  // need to add template name to transcode object else session signature wont be created
-		  ISession session = Session.Builder.newSession()
-					.usingMediaInput(input)
-					.usingTranscodeConfig(transcode)
-					.forServer(String.valueOf(this.operatingServer).toLowerCase())
-					.build();
-		  
-		  return session;
+		  this.sessionSignatureTable = new Hashtable<String, ISession>();
+		  this.templateTable = new Hashtable<ISession, String>();
+		  this.resourceTable = new TranscoderTable();
 	  }
 
 	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
-		  logger.info("Creating new object");
+		  String hostserver = this.context.getOperatingMediaServer().toLowerCase();
 		  ISession session = Session.Builder.newSession()
 					.usingMediaInput(input)
 					.usingTemplateFile(usingTemplate)
-					.forServer(String.valueOf(this.operatingServer).toLowerCase())
+					.forServer(hostserver)
 					.build();
 		  
-		  logger.info("new session created " + session.getId());
+		  session.registerObserver(this);
+		  templateTable.put(session, usingTemplate);
+		  sessionSignatureTable.put(getSignature(session), session);
+		  
+		  logger.info("new session created " + session.getId());		  
 		  return session;
 	  }
 
@@ -95,17 +87,17 @@ public class TranscodeSessionPool {
 
 	  public void expire(ISession session)
 	  {
-		  logger.info("Expiring object " + session.getId());
-		  sessionMap.remove(getSignature(session));
-		  sessionIdMap.remove(session.getId());
-		  templateMap.remove(session);
+		  logger.info("Expiring session " + session.getId());
+		  session.removeObserver(this);
+		  sessionSignatureTable.remove(getSignature(session));
+		  templateTable.remove(session);
 		  session.dispose();
 		  session = null;
 	  }
 	  
-	  public String getSignature(ISession session)
+	  private String getSignature(ISession session)
 	  {
-		  String template = templateMap.get(session);
+		  String template = templateTable.get(session);
 		  String input = session.getInputSource().getSourcePath();
 		  return SessionUtil.generateSessionSignature(input, template);
 	  }
@@ -145,9 +137,7 @@ public class TranscodeSessionPool {
 	    try 
 	    {
 	    	t = create(input, usingTemplate);
-	    	templateMap.put(t, usingTemplate);
-	    	sessionMap.put(getSignature(t), t);
-	    	sessionIdMap.put(t.getId(), t);
+	    	
 		} 
 	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
 	    {
@@ -160,26 +150,64 @@ public class TranscodeSessionPool {
 	  }
 
 	  public synchronized void checkIn(ISession session) {
-		logger.info("Checking in object " + session.getId());  
+		logger.info("Checking in " + session.getId());  
 	    locked.remove(session);
 	    unlocked.put(session, System.currentTimeMillis());
 	  }
 	  
 	  public ISession getSession(String signature)
 	  {
-		  return sessionMap.get(signature);
+		  return sessionSignatureTable.get(signature);
 	  }
 	  
-	  public ISession getSession(long id)
-	  {
-		  return sessionIdMap.get(id);
+	  /*****************************************************
+	  ********** ISession event Handlers *******************
+	  *****************************************************/
+
+	  @Override
+	  public void onSessionStart(ISession session, Object data) {
+			// TODO Auto-generated method stub
+	  }
+	  
+	
+	  @Override
+	  public void onSessionComplete(ISession session, Object data) {
+			// TODO Auto-generated method stub
+		  checkIn(session);
+	  }
+	
+	  
+	  @Override
+	  public void onSessionFailed(ISession session, Object data) {
+			// TODO Auto-generated method stub	
+		  checkIn(session);
+	  }
+	
+	  @Override
+	  public void onSessionData(ISession session, Object data) {
+			// TODO Auto-generated method stub	
 	  }
 
-	  public Server getOperatingServer() {
-		return operatingServer;
+	  @Override
+	  public void onSessionProcessAdded(ISession session, Process proc) {
+		// TODO Auto-generated method stub
+		  resourceTable.put(session.getInputSource(), session.getOutputs());
+		  logger.info(resourceTable.size()+"");
 	  }
 
-	  public void setOperatingServer(Server operatingServer) {
-		this.operatingServer = operatingServer;
+	  @Override
+	  public void onSessionProcessRemoved(ISession session, Process proc) {
+		// TODO Auto-generated method stub
+		  resourceTable.remove(session.getInputSource());
+		  logger.info(resourceTable.size()+"");
 	  }
+
+	public TranscoderContext getContext() {
+		return context;
 	}
+
+	public void setContext(TranscoderContext context) {
+		this.context = context;
+	}
+
+}

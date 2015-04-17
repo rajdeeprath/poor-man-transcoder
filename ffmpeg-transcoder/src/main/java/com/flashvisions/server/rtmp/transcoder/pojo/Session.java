@@ -177,7 +177,7 @@ public class Session implements ISession  {
 		if(watchdog != null && watchdog.killedProcess()) cause = "Timeout";
 		else cause = "Failure";
 		
-		logger.info("onTranscodeProcessData cause: " + cause);
+		logger.info("onTranscodeProcessFailed cause: " + cause);
 		notifyObservers(Event.FAILED, null);
 	}
 	
@@ -291,6 +291,14 @@ public class Session implements ISession  {
 				break;
 				
 				case STOP:
+				break;
+				
+				case PROCESSADDED:
+				observer.onSessionProcessAdded(this, null);
+				break;
+				
+				case PROCESSREMOVED:
+				observer.onSessionProcessRemoved(this, null);
 				break;
 				
 				default:

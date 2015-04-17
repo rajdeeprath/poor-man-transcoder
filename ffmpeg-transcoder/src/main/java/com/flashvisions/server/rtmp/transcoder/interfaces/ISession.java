@@ -1,5 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
+import java.util.ArrayList;
+
 import com.flashvisions.server.rtmp.transcoder.pojo.Session.Event;
 
 
@@ -8,6 +10,7 @@ public interface ISession extends IDisposable, TranscodeSessionProcessCallback, 
 	public long getId();
 	
 	public ITranscoderResource getInputSource();	
+	public ArrayList<ITranscoderResource> getOutputs();
 	public ITranscode getTranscodeConfig();
 	
 	public void registerObserver(ISessionObserver observer);

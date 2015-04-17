@@ -3,13 +3,13 @@ package com.flashvisions.server.rtmp.transcoder.facade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.command.AbortTranscodeCommand;
+import com.flashvisions.server.rtmp.transcoder.command.DoTranscodeCommand;
 import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
-import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 
 public final class TranscoderFacade implements ITranscoderFacade {
 
@@ -120,13 +120,24 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	/*********************************************************************************************/
 	
 	@Override
-	public Object doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException {
+	public void doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException {
 		
-		// TODO Auto-generated method stub
-		TranscodeSessionPool pool = context.getPool();
-		ISession session = pool.checkOut(input, usingTemplate);
-		session.start();
-		
-		return null;
+		try {
+			new DoTranscodeCommand(input, usingTemplate).execute(context);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("doTranscode ->"+e.getMessage());
+		}
+	}
+	
+	@Override
+	public void abortTranscode()
+	{
+		try {
+			new AbortTranscodeCommand().execute(context);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error(e.getMessage());
+		}
 	}
 }

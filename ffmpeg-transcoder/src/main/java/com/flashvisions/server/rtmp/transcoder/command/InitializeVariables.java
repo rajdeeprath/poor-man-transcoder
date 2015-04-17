@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 
 
 public class InitializeVariables implements Command {
@@ -24,7 +23,7 @@ public class InitializeVariables implements Command {
 		try
 		{
 			TranscoderContext ctx = (TranscoderContext) context;
-			TranscodeSessionPool pool = new TranscodeSessionPool(Server.valueOf(ctx.getOperatingMediaServer().toUpperCase()));
+			TranscodeSessionPool pool = new TranscodeSessionPool(ctx);
 			ctx.setPool(pool);
 		}
 		catch(Exception e)

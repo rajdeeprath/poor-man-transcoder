@@ -7,8 +7,8 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 
 	private TranscodeSessionProcessCallback callback;
 	
-	public TranscodeSessionDestroyer(TranscodeSessionProcessCallback session){
-		this.setCallback(callback);
+	public TranscodeSessionDestroyer(TranscodeSessionProcessCallback callback){
+		this.callback = callback;
 	}
 	
 	
@@ -16,7 +16,7 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean add(Process process) {
 		// TODO Auto-generated method stub
 		if(callback != null)
-		callback.onTranscodeProcessRemoved(process);
+		callback.onTranscodeProcessAdded(process);
 		
 		return super.add(process);
 	}
@@ -31,7 +31,7 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	public boolean remove(Process process) {
 		// TODO Auto-generated method stub
 		if(callback != null)
-		callback.onTranscodeProcessAdded(process);
+		callback.onTranscodeProcessRemoved(process);
 		
 		return super.remove(process);
 	}
@@ -46,16 +46,6 @@ public class TranscodeSessionDestroyer extends ShutdownHookProcessDestroyer {
 	public int size() {
 		// TODO Auto-generated method stub
 		return super.size();
-	}
-
-
-	public TranscodeSessionProcessCallback getCallback() {
-		return callback;
-	}
-
-
-	public void setCallback(TranscodeSessionProcessCallback callback) {
-		this.callback = callback;
 	}
 
 }

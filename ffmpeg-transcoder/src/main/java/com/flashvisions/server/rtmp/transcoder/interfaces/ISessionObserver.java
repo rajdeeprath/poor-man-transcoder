@@ -5,4 +5,6 @@ public interface ISessionObserver {
 	public void onSessionComplete(ISession session, Object data);
 	public void onSessionFailed(ISession session, Object data);
 	public void onSessionData(ISession session, Object data);
+	public void onSessionProcessAdded(ISession session, Process proc);
+	public void onSessionProcessRemoved(ISession session, Process proc);
 }

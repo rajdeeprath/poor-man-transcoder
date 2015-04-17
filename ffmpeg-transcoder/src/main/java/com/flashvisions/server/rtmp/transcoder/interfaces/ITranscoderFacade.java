@@ -22,5 +22,6 @@ public interface ITranscoderFacade {
 	public String getTemplateDirectory();
 	
 	
-	public Object doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException;
+	public void doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException;
+	public void abortTranscode();
 }
