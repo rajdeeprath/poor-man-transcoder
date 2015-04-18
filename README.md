@@ -56,16 +56,7 @@ facade.init();
 To transcode your stream::
 ```
 ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
-
-ISession transcodesession = 
-Session.Builder.newSession()
-.forServer("red5")
-.setWorkingDirectory("/path/to/working-directory/")
-.usingTemplateFile("sample-rtmp-template.xml")
-.usingMediaInput(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream"), inputflags))
-.build();
-                    
-transcodesession.start();
+facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream"),inputflags), "sample-rtmp-template.xml");
 ```
 
 ## Template Structure

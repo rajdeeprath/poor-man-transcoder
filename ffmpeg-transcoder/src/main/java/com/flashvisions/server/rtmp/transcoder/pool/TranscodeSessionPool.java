@@ -13,8 +13,8 @@ import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.managers.StreamManager;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
-import com.flashvisions.server.rtmp.transcoder.system.TranscoderTable;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 public class TranscodeSessionPool implements ISessionObserver {
@@ -26,8 +26,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  private Hashtable<ISession, Long> locked, unlocked;
 	  private Hashtable<String, ISession> sessionSignatureTable;
 	  private Hashtable<ISession, String> templateTable;
-	  private TranscoderTable resourceTable;
-	  
+	  private StreamManager ioManager;
 	  
 	  public long getSessionExpirationTime() 
 	  {
@@ -58,7 +57,6 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  this.unlocked = new Hashtable<ISession, Long>();
 		  this.sessionSignatureTable = new Hashtable<String, ISession>();
 		  this.templateTable = new Hashtable<ISession, String>();
-		  this.resourceTable = new TranscoderTable();
 	  }
 
 	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
@@ -191,23 +189,28 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  @Override
 	  public void onSessionProcessAdded(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		  resourceTable.put(session.getInputSource(), session.getOutputs());
-		  logger.info(resourceTable.size()+"");
+		  ioManager.registerTranscodeSession(session);
 	  }
 
 	  @Override
 	  public void onSessionProcessRemoved(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		  resourceTable.remove(session.getInputSource());
-		  logger.info(resourceTable.size()+"");
+		  ioManager.unRegisterTranscodeSession(session);
 	  }
 
-	public TranscoderContext getContext() {
-		return context;
-	}
-
-	public void setContext(TranscoderContext context) {
-		this.context = context;
-	}
-
+	  public TranscoderContext getContext() {
+			return context;
+	  }
+		
+	  public void setContext(TranscoderContext context) {
+			this.context = context;
+	  }
+		
+	  public StreamManager getIoManager() {
+			return ioManager;
+	  }
+		
+	  public void setIoManager(StreamManager ioManager) {
+			this.ioManager = ioManager;
+	  }
 }

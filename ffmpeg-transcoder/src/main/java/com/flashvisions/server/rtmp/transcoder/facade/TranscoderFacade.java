@@ -10,6 +10,7 @@ import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.managers.StreamManager;
 
 public final class TranscoderFacade implements ITranscoderFacade {
 
@@ -123,6 +124,8 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	public void doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException {
 		
 		try {
+			StreamManager ioManager = context.getStreamManager();
+			if(!ioManager.isTranscodeLoopSafe(input)) throw new TranscoderException("Transcode Request Rejected");
 			new DoTranscodeCommand(input, usingTemplate).execute(context);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
