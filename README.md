@@ -48,8 +48,12 @@ Setup:
 
 2. From the project copy the transcoder/templates folder to a location on your media server (ie: {red5-home}/transcoder/templates/)
 
-3. You can test the codebase from eclipse by creating a simple java project or implementing the code given below in a red5/wowza live type application. if you decude to try this code inside a  rtmp application make sure to initialize the facade in appStart and make the transcoder request in the publish callback method of the rtmp server.
+3. You can test the codebase from eclipse by creating a simple java project or implementing the code given below in a red5/wowza live type application. If you decide to try this code inside a rtmp application (NOT RECOMMENDED!!) make sure to initialize the facade in appStart and make the transcoder request in the publish callback method of the rtmp server. [ Since the project is in early stages i will recommend testing it from a separate java application and not from within your rtmp server application code. ]
 
+Red5 sample concept code:
+```
+https://github.com/rajdeeprath/red5-server/blob/master/transcoderlive/src/org/red5/core/Application.java
+```
 
 
 First time bootsrap (onAppStart / onServerStart):
@@ -68,6 +72,7 @@ To transcode your stream::
 ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
 facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream"),inputflags), "sample-rtmp-template.xml");
 ```
+
 
 ## Template Structure
 
