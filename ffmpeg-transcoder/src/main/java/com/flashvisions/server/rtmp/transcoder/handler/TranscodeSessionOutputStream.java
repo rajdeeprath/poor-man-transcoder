@@ -31,27 +31,26 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	@Override
 	protected void processLine(String line, int level) {
 		
-		logger.info(line);
+		logger.debug(line);
 		
-		if(lines.size()>QUEUE_SIZE){
-		lines.remove();}
+		if(lines.size()>QUEUE_SIZE)
+		lines.remove();
 		
 		lines.add(line);
 		lastOutputTime = System.currentTimeMillis();
 		
 		if(this.callback != null){
+		if(lines.size() == 1) this.callback.onTranscodeProcessStart(lastOutputTime);
 		this.callback.onTranscodeProcessData(line, lastOutputTime);
-		if(lines.size() == 1)
-		this.callback.onTranscodeProcessStart(lastOutputTime);
 		}
 	}
 	
-	/* Estimates if process is running by checking if there was output in last 3 seconds */
+	/* Estimates if process is running by checking if there was output in last 5 seconds */
 	public boolean isRunning()
 	{
 		long diff = System.currentTimeMillis() - lastOutputTime;
         long diffSeconds = diff / 1000 % 60;
-        return (diffSeconds>3)?false:true;
+        return (diffSeconds>5)?false:true;
 	}
 	
 	@Override

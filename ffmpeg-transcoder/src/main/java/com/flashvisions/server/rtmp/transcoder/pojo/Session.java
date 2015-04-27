@@ -49,8 +49,8 @@ public class Session implements ISession  {
 	
 	private ITranscode config;
 	private ITranscoderResource source;
-	private String workingDirectoryPath;
-	
+	private String workingDirectoryPath;	
+
 	private DefaultExecutor executor;
 	private CommandLine cmdLine;
 	
@@ -77,7 +77,7 @@ public class Session implements ISession  {
 		
 		// set this locally not globally -|
 		this.workingDirectoryPath = (builder.workingDirectoryPath == null || builder.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):builder.workingDirectoryPath;
-		this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
+		
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
 		this.observers = new ArrayList<ISessionObserver>();
@@ -85,6 +85,15 @@ public class Session implements ISession  {
 		logger.info("Command :" + this.cmdLine.toString());
 	}
 
+	public String getWorkingDirectoryPath() 
+	{
+		return workingDirectoryPath;
+	}
+
+	public void setWorkingDirectoryPath(String workingDirectoryPath) 
+	{
+		this.workingDirectoryPath = workingDirectoryPath;
+	}
 	
 	@Override
 	public long getId() {
@@ -113,12 +122,12 @@ public class Session implements ISession  {
 	
 	protected void startTranscode()
 	{
-		// TODO Auto-generated method stub
 		try 
 		{	
-			this.outstream = new TranscodeSessionOutputStream();
+			this.outstream = new TranscodeSessionOutputStream(this);
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
 			
+			this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
 			this.executor.setProcessDestroyer(new TranscodeSessionDestroyer(this));
 			this.executor.setWatchdog(this.watchdog);
@@ -177,28 +186,28 @@ public class Session implements ISession  {
 		if(watchdog != null && watchdog.killedProcess()) cause = "Timeout";
 		else cause = "Failure";
 		
-		logger.info("onTranscodeProcessFailed cause: " + cause);
+		logger.debug("onTranscodeProcessFailed cause: " + cause);
 		notifyObservers(Event.FAILED, null);
 	}
 	
 	@Override
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
-		logger.info("onTranscodeProcessData");
+		logger.debug("onTranscodeProcessData");
 		notifyObservers(Event.DATA, data);
 	}
 	
 	@Override
 	public void onTranscodeProcessStart(long timestamp) {
 		// TODO Auto-generated method stub
-		logger.info("onTranscodeProcessStart");
+		logger.debug("onTranscodeProcessStart");
 		notifyObservers(Event.START, null);
 	}
 	
 	@Override
 	public void onTranscodeProcessAdded(Process proc) {
 		// TODO Auto-generated method stub
-		logger.info("onTranscodeProcessAdded");
+		logger.debug("onTranscodeProcessAdded");
 		notifyObservers(Event.PROCESSADDED, proc);
 	}
 
@@ -206,7 +215,7 @@ public class Session implements ISession  {
 	@Override
 	public void onTranscodeProcessRemoved(Process proc) {
 		// TODO Auto-generated method stub
-		logger.info("onTranscodeProcessRemoved");
+		logger.debug("onTranscodeProcessRemoved");
 		notifyObservers(Event.PROCESSREMOVED, proc);
 	}
 	

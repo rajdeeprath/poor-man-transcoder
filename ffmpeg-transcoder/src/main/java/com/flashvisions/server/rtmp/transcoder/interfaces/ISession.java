@@ -13,6 +13,9 @@ public interface ISession extends IDisposable, TranscodeSessionProcessCallback, 
 	public ArrayList<ITranscoderResource> getOutputs();
 	public ITranscode getTranscodeConfig();
 	
+	public String getWorkingDirectoryPath();
+	public void setWorkingDirectoryPath(String workingDirectoryPath);
+	
 	public void registerObserver(ISessionObserver observer);
 	public void removeObserver(ISessionObserver observer);
 	public void notifyObservers(Event event, Object data);

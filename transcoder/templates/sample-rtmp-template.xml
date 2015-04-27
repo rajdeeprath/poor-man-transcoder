@@ -66,7 +66,7 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}</StreamName>
+						<StreamName>${SourceApplication}/${SourceStreamName}_transcoded</StreamName>
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
 						<Properties>

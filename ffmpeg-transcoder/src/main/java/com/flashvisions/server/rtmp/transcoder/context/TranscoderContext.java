@@ -9,7 +9,7 @@ import java.util.Set;
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.impl.ContextBase;
 
-import com.flashvisions.server.rtmp.transcoder.managers.StreamManager;
+import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 
 public class TranscoderContext extends ContextBase implements Context {
@@ -30,7 +30,8 @@ public class TranscoderContext extends ContextBase implements Context {
 	private String ffmpegVersion;
 	
 	private TranscodeSessionPool pool;
-	private StreamManager streamManager;
+	private IOManager streamManager;
+	private boolean contextReady;
 	
 	
 	public void setFFmpegPath(String ffmpegPath) {
@@ -188,12 +189,20 @@ public class TranscoderContext extends ContextBase implements Context {
 		this.ffmpegVersion = ffmpegVersion;
 	}
 
-	public StreamManager getStreamManager() {
+	public IOManager getStreamManager() {
 		return streamManager;
 	}
 
-	public void setStreamManager(StreamManager streamManager) {
+	public void setStreamManager(IOManager streamManager) {
 		this.streamManager = streamManager;
+	}
+
+	public boolean isContextReady() {
+		return contextReady;
+	}
+
+	public void setContextReady(boolean contextReady) {
+		this.contextReady = contextReady;
 	}
 
 }

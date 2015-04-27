@@ -9,19 +9,19 @@ import java.util.Map.Entry;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 
-public class StreamManager {
+public class IOManager {
 
-	private static StreamManager instance;
+	private static IOManager instance;
 	private static Hashtable<ITranscoderResource, ArrayList<ITranscoderResource>> resourceTable;
 	
-	private StreamManager(){	
+	private IOManager(){	
 		resourceTable = new Hashtable<ITranscoderResource, ArrayList<ITranscoderResource>>();
 	}
 	
-	public static StreamManager getInstance()
+	public static IOManager getInstance()
 	{
 		if(instance == null)
-		instance = new StreamManager();
+		instance = new IOManager();
 		return instance;
 	}
 	

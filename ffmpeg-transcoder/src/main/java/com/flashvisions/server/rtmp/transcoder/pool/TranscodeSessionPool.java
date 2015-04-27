@@ -13,7 +13,7 @@ import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
-import com.flashvisions.server.rtmp.transcoder.managers.StreamManager;
+import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
@@ -26,7 +26,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  private Hashtable<ISession, Long> locked, unlocked;
 	  private Hashtable<String, ISession> sessionSignatureTable;
 	  private Hashtable<ISession, String> templateTable;
-	  private StreamManager ioManager;
+	  private IOManager ioManager;
 	  
 	  public long getSessionExpirationTime() 
 	  {
@@ -41,22 +41,23 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  public TranscodeSessionPool(TranscoderContext context) 
 	  {	    
 		  	this.context = context;
-		  	this.initTables();
+		  	this.initialize();
 	  }
 	  
 	  public TranscodeSessionPool(TranscoderContext context, long sessionExpireTime) 
 	  {
 		  	this.context = context;
 			this.setSessionExpirationTime(sessionExpireTime);	
-		    this.initTables();
+		    this.initialize();
 	  }
 	  
-	  private void initTables()
+	  private void initialize()
 	  {
 		  this.locked = new Hashtable<ISession, Long>();
 		  this.unlocked = new Hashtable<ISession, Long>();
 		  this.sessionSignatureTable = new Hashtable<String, ISession>();
 		  this.templateTable = new Hashtable<ISession, String>();
+		  this.setIoManager(context.getStreamManager());
 	  }
 
 	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
@@ -165,12 +166,14 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  @Override
 	  public void onSessionStart(ISession session, Object data) {
 			// TODO Auto-generated method stub
+		  //logger.info("Session started " + session.getId());
 	  }
 	  
 	
 	  @Override
 	  public void onSessionComplete(ISession session, Object data) {
 			// TODO Auto-generated method stub
+		  //logger.info("Session complete " + session.getId());
 		  checkIn(session);
 	  }
 	
@@ -189,13 +192,13 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  @Override
 	  public void onSessionProcessAdded(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		  ioManager.registerTranscodeSession(session);
+		 ioManager.registerTranscodeSession(session);
 	  }
 
 	  @Override
 	  public void onSessionProcessRemoved(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		  ioManager.unRegisterTranscodeSession(session);
+		 ioManager.unRegisterTranscodeSession(session);
 	  }
 
 	  public TranscoderContext getContext() {
@@ -206,11 +209,11 @@ public class TranscodeSessionPool implements ISessionObserver {
 			this.context = context;
 	  }
 		
-	  public StreamManager getIoManager() {
+	  public IOManager getIoManager() {
 			return ioManager;
 	  }
 		
-	  public void setIoManager(StreamManager ioManager) {
+	  public void setIoManager(IOManager ioManager) {
 			this.ioManager = ioManager;
 	  }
 }

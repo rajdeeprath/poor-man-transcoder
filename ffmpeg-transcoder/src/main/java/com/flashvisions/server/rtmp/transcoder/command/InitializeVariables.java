@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
-import com.flashvisions.server.rtmp.transcoder.managers.StreamManager;
+import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 
 
@@ -26,7 +26,7 @@ public class InitializeVariables implements Command {
 			
 			TranscoderContext ctx = (TranscoderContext) context;
 			
-			StreamManager streamManager = StreamManager.getInstance();
+			IOManager streamManager = IOManager.getInstance();
 			ctx.setStreamManager(streamManager);
 			
 			TranscodeSessionPool pool = new TranscodeSessionPool(ctx);
