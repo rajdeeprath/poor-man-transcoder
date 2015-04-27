@@ -94,4 +94,5 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
-ffmpeg-transcoder-test/src/com/flashvisions/server/rtmp/transcoder/testclient/Main.java
+# Test code project
+ffmpeg-transcoder-test/
