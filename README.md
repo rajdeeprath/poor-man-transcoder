@@ -42,6 +42,16 @@ The best part of this system is :  "Very Little programming needed to get your t
 
 ## Usage
 
+Setup:
+
+1. Make sure you have latest ffmpeg installed on your system with librtmp, libx264 and other necessary libraries compiled in.
+
+2. From the project copy the transcoder/templates folder to a location on your media server (ie: {red5-home}/transcoder/templates/)
+
+3. You can test the codebase from eclipse by creating a simple java project or implementing the code given below in a red5/wowza live type application. if you decude to try this code inside a  rtmp application make sure to initialize the facade in appStart and make the transcoder request in the publish callback method of the rtmp server.
+
+
+
 First time bootsrap (onAppStart / onServerStart):
 ```
 ITranscoderFacade facade = TranscoderFacade.getInstance();
@@ -146,7 +156,8 @@ facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/
 
 ## Status
 
-####### [ Unstable ]
+####### [ Unstable (Not for production) ]
+
 
 TO DO:
 
