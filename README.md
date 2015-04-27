@@ -26,7 +26,7 @@ The best part of this system is :  "Very Little programming needed to get your t
 ## Overview
 
 
-[![Overview](https://raw.githubusercontent.com/rajdeeprath/ffmpeg-transcoder/93b441c7851d5e08ee2158e345ee43d94f80e40b/images/transcoder-service%20-%20small.png "Verifying")](https://raw.githubusercontent.com/rajdeeprath/ffmpeg-transcoder/93b441c7851d5e08ee2158e345ee43d94f80e40b/images/transcoder-service.png)
+[![Overview](https://github.com/rajdeeprath/poor-man-transcoder/blob/master/images/transcoder-service%20-%20small.png "Verifying")](https://github.com/rajdeeprath/poor-man-transcoder/blob/master/images/transcoder-service.png)
 
 
 ## Libraries (Dependencies) used
