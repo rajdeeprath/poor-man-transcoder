@@ -47,9 +47,10 @@ public class CommandBuilderHelper {
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template);
 		
+		
 		cmdLine.addArgument(Flags.OVERWRITE);
 		cmdLine.addArgument(Flags.OUTPUT);
-		cmdLine.addArgument(transcoderOutput.getContainer().toString());		
+		cmdLine.addArgument(transcoderOutput.getContainer().toString());
 		
 		
 		/************* special pre-processing for hls output ******/
@@ -117,7 +118,7 @@ public class CommandBuilderHelper {
 			case RTMP:
 			case RTMPS:
 			case RTMPT:
-				
+			/*
 			String inName = input.getMediaName();
 			
 			ILibRtmpConfig rtmpInterpretor = LibRtmpConfigurationFactory.getLibRtmpConfiguration(Server.valueOf(Globals.getEnv(Globals.Vars.OPERATING_SERVER).toUpperCase()));
@@ -127,7 +128,7 @@ public class CommandBuilderHelper {
 			File appScopeDir = new File(dir.getAbsolutePath() + File.separator + appName);
 			if(!appScopeDir.exists()) appScopeDir.mkdirs();
 			dir = appScopeDir;
-			
+			*/
 			break;
 				
 			default:
