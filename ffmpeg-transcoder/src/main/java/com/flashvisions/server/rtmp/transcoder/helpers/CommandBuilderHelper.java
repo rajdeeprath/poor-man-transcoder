@@ -7,7 +7,9 @@ import org.apache.commons.exec.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.command.PrepareHLSWorkspaceCommand;
+import com.flashvisions.server.rtmp.transcoder.command.PreSegmentOutputCommand;
+import com.flashvisions.server.rtmp.transcoder.context.TranscoderOutputContext;
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
@@ -39,9 +41,8 @@ public class CommandBuilderHelper {
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template);
 		
-		
-		cmdLine.addArgument("-y");
-		cmdLine.addArgument("-f");
+		cmdLine.addArgument(Flags.OVERWRITE);
+		cmdLine.addArgument(Flags.OUTPUT);
 		cmdLine.addArgument(transcoderOutput.getContainer().toString());		
 		
 		
@@ -59,6 +60,7 @@ public class CommandBuilderHelper {
 		switch(transcoderOutput.getContainer().getType())
 		{
 			case SSEGMENT:
+			// NO OP
 			break;
 			
 			default:
@@ -71,7 +73,6 @@ public class CommandBuilderHelper {
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception
 	{
-		final String DASH = "-";
 		ICodec acodec = config.getCodec();
 		
 		if(!acodec.getEnabled())
@@ -146,7 +147,7 @@ public class CommandBuilderHelper {
 			ArrayList<IParameter> params = config.getExtraParams();
 			if(params != null){
 			for(IParameter param: params){
-			cmdLine.addArgument(DASH+param.getKey());
+			cmdLine.addArgument(Flags.DASH + param.getKey());
 			cmdLine.addArgument(String.valueOf(param.getValue()));
 			}
 			}
@@ -165,7 +166,6 @@ public class CommandBuilderHelper {
 	
 	public void buildVideoQuery(CommandLine cmdLine, IVideo config) throws Exception
 	{
-		final String DASH = "-";
 		ICodec vcodec = config.getCodec();
 		
 		if(!vcodec.getEnabled())
@@ -287,7 +287,7 @@ public class CommandBuilderHelper {
 			ArrayList<IParameter> params = config.getExtraParams();
 			if(params != null){
 			for(IParameter param: params){
-			cmdLine.addArgument(DASH+param.getKey());
+			cmdLine.addArgument(Flags.DASH + param.getKey());
 			cmdLine.addArgument(String.valueOf(param.getValue()));
 			}
 			}

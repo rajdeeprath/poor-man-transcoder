@@ -127,8 +127,6 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		
 		try 
 		{
-			IOManager ioManager = context.getStreamManager();
-			if(!ioManager.isTranscodeLoopSafe(input)) throw new TranscoderException("Transcode Request Rejected. Because specified input is a output in progress");
 			new DoTranscodeCommand(input, usingTemplate).execute(context);
 		} 
 		catch (Exception e) 
@@ -142,8 +140,6 @@ public final class TranscoderFacade implements ITranscoderFacade {
 		
 		try 
 		{
-			IOManager ioManager = context.getStreamManager();
-			if(!ioManager.isTranscodeLoopSafe(input)) throw new TranscoderException("Transcode Request Rejected. Because specified input is a output in progress");
 			new DoTranscodeCommand(input, usingTemplate).execute(context);
 		} 
 		catch (Exception e) 

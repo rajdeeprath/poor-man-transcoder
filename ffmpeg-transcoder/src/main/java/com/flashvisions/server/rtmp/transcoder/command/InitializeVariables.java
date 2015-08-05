@@ -26,9 +26,6 @@ public class InitializeVariables implements Command {
 			
 			TranscoderContext ctx = (TranscoderContext) context;
 			
-			IOManager streamManager = IOManager.getInstance();
-			ctx.setStreamManager(streamManager);
-			
 			TranscodeSessionPool pool = new TranscodeSessionPool(ctx);
 			ctx.setPool(pool);			
 		}

@@ -32,8 +32,10 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.SessionEvent;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
+import com.flashvisions.server.rtmp.transcoder.vo.TranscoderExecutionError;
 
 /**
  * @author Rajdeep
@@ -42,10 +44,6 @@ import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 public class Session implements ISession  {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
-	
-	public static enum Event{
-		START, STOP, DATA, FAILED, COMPLETE, PROCESSADDED, PROCESSREMOVED
-	};
 	
 	private ITranscode config;
 	private ITranscoderResource source;
@@ -124,6 +122,8 @@ public class Session implements ISession  {
 	{
 		try 
 		{	
+			notifyObservers(SessionEvent.PRESTART, null);
+			
 			this.outstream = new TranscodeSessionOutputStream(this);
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
 			
@@ -132,6 +132,7 @@ public class Session implements ISession  {
 			this.executor.setProcessDestroyer(new TranscodeSessionDestroyer(this));
 			this.executor.setWatchdog(this.watchdog);
 			this.executor.setExitValue(0);
+			
 			
 			this.executor.execute(this.cmdLine, this.resultHandler);
 		} 
@@ -163,7 +164,11 @@ public class Session implements ISession  {
 	}
 
 	
-	/***** Not Accurate !! Dont use this *****/
+	/*
+	 * Note: Not Accurate !! Dont use this
+	 * (non-Javadoc)
+	 * @see com.flashvisions.server.rtmp.transcoder.interfaces.ISession#isRunning()
+	 */
 	@Override
 	public boolean isRunning() 
 	{
@@ -175,7 +180,7 @@ public class Session implements ISession  {
 	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.info("onTranscodeProcessComplete exitValue: " + exitValue);
-		notifyObservers(Event.COMPLETE, null);
+		notifyObservers(SessionEvent.COMPLETE, null);
 	}
 
 	@Override
@@ -187,28 +192,28 @@ public class Session implements ISession  {
 		else cause = "Failure";
 		
 		logger.debug("onTranscodeProcessFailed cause: " + cause);
-		notifyObservers(Event.FAILED, null);
+		notifyObservers(SessionEvent.FAILED, new TranscoderExecutionError(e, cause, timestamp));
 	}
 	
 	@Override
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessData");
-		notifyObservers(Event.DATA, data);
+		notifyObservers(SessionEvent.DATA, data);
 	}
 	
 	@Override
 	public void onTranscodeProcessStart(long timestamp) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessStart");
-		notifyObservers(Event.START, null);
+		notifyObservers(SessionEvent.START, timestamp);
 	}
 	
 	@Override
 	public void onTranscodeProcessAdded(Process proc) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessAdded");
-		notifyObservers(Event.PROCESSADDED, proc);
+		notifyObservers(SessionEvent.PROCESSADDED, proc);
 	}
 
 
@@ -216,7 +221,7 @@ public class Session implements ISession  {
 	public void onTranscodeProcessRemoved(Process proc) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessRemoved");
-		notifyObservers(Event.PROCESSREMOVED, proc);
+		notifyObservers(SessionEvent.PROCESSREMOVED, proc);
 	}
 	
 	@Override
@@ -277,40 +282,45 @@ public class Session implements ISession  {
 
 
 	@Override
-	public void notifyObservers(Event event, Object data) {
+	public void notifyObservers(SessionEvent event, Object data) {
 		// TODO Auto-generated method stub
 		for(ISessionObserver observer : observers)
 		{
 			switch(event)
 			{
+				case PRESTART:
+				observer.onSessionPreStart(this);
+				break;
+			
 				case START:
-				observer.onSessionStart(this, null);
+				observer.onSessionStart(this, data);
 				break;
 				
 				case DATA:
-				observer.onSessionData(this, null);
+				observer.onSessionData(this, data);
 				break;
 					
 				case COMPLETE:
-				observer.onSessionComplete(this, null);
+				observer.onSessionComplete(this, data);
 				break;
 					
 				case FAILED:
-				observer.onSessionFailed(this, null);
+				observer.onSessionFailed(this, data);
 				break;
 				
 				case STOP:
 				break;
 				
 				case PROCESSADDED:
-				observer.onSessionProcessAdded(this, null);
+				observer.onSessionProcessAdded(this, (Process)data);
 				break;
 				
 				case PROCESSREMOVED:
-				observer.onSessionProcessRemoved(this, null);
+				observer.onSessionProcessRemoved(this, (Process)data);
 				break;
 				
 				default:
+				logger.warn("Unknown session event");
 				break;		
 			}
 		}
