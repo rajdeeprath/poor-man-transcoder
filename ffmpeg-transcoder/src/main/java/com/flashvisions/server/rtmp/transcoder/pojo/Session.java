@@ -9,6 +9,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -440,6 +441,15 @@ public class Session implements ISession  {
 						
 						
 						/************************************************
+						 ********** Prepare working directory ***********
+						 ************************************************/
+						
+						String workingDirectory = (this.workingDirectoryPath == null || this.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):this.workingDirectoryPath;
+						workingDirectory = helper.prepareWorkingDirectory(input, workingDirectory);
+						this.setWorkingDirectory(workingDirectory);
+						
+						
+						/************************************************
 						 ********** Processing Encodes ****************
 						 ************************************************/	
 						
@@ -522,7 +532,7 @@ public class Session implements ISession  {
 								 ************************************************/
 								try
 								{				
-									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output);
+									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output, workingDirectory);
 									outputBucket.add(transcoderOutput);
 								}
 								catch(Exception e)

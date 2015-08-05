@@ -1,14 +1,16 @@
 package com.flashvisions.server.rtmp.transcoder.helpers;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.command.PreSegmentOutputCommand;
-import com.flashvisions.server.rtmp.transcoder.context.TranscoderOutputContext;
+import com.flashvisions.server.rtmp.transcoder.data.factory.LibRtmpConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -19,6 +21,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
+import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
@@ -26,6 +29,9 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementations;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 public class CommandBuilderHelper {
@@ -33,7 +39,7 @@ public class CommandBuilderHelper {
 	private static Logger logger = LoggerFactory.getLogger(CommandBuilderHelper.class);
 	
 	
-	public ITranscoderResource buildOutput(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output) throws Exception
+	public ITranscoderResource buildOutput(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output, String workingDirectory) throws Exception
 	{
 		logger.info("Processing output destination for encode");
 		
@@ -46,21 +52,12 @@ public class CommandBuilderHelper {
 		cmdLine.addArgument(transcoderOutput.getContainer().toString());		
 		
 		
-		/***************** extra properties for output **************/		
-		
-		if(!properties.isEmpty())
-		{
-			Iterator<IProperty> it = properties.iterator();
-			while(it.hasNext())	{
-			cmdLine.addArgument(it.next().getData(), true);
-			}
-		}
-		
 		/************* special pre-processing for hls output ******/
+		String ownSegmentDirectory = "";
 		switch(transcoderOutput.getContainer().getType())
 		{
 			case SSEGMENT:
-			// NO OP
+			ownSegmentDirectory = getOwnSegmentDirectory(cmdLine, transcoderOutput, workingDirectory);
 			break;
 			
 			default:
@@ -68,7 +65,76 @@ public class CommandBuilderHelper {
 			break;
 		}
 		
+		
+		/***************** extra properties for output **************/		
+		if(!properties.isEmpty())
+		{
+			Iterator<IProperty> it = properties.iterator();
+			
+			while(it.hasNext())	{
+			String prop = it.next().getData();
+			prop = prop.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
+			cmdLine.addArgument(prop, true);
+			}
+		}
+		
+		
 		return transcoderOutput;
+	}
+	
+	
+	protected String getOwnSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory)
+	{	
+		// create sub directory for hls output
+		String outName = output.getMediaName();
+		String outNameWithOutExt = FilenameUtils.removeExtension(outName);
+		
+		File sub = new File(masterWorkingDirectory + File.separator + outNameWithOutExt);
+		if(!sub.exists()) sub.mkdir();
+		
+		String relative = new File(masterWorkingDirectory).toURI().relativize(new File(sub.getAbsolutePath()).toURI()).getPath();
+		logger.info("relative path of segment directory " + relative);
+		
+		return relative;
+		
+	}
+	
+	
+	public String prepareWorkingDirectory(ITranscoderResource input, String masterWorkingDirectory)
+	{
+		// create master working directory if not exists
+		File dir = new File(masterWorkingDirectory);
+		if(!dir.exists()) dir.mkdir();
+		
+				
+		switch(Protocol.valueOf(input.getProtocol().toUpperCase()))
+		{
+			case RTSP:
+			case RTP:
+			logger.info("create application name folder");	
+			break;
+		
+			case RTMP:
+			case RTMPS:
+			case RTMPT:
+				
+			String inName = input.getMediaName();
+			
+			ILibRtmpConfig rtmpInterpretor = LibRtmpConfigurationFactory.getLibRtmpConfiguration(Server.valueOf(Globals.getEnv(Globals.Vars.OPERATING_SERVER).toUpperCase()));
+			rtmpInterpretor.prepareFrom(input);
+			String appName = rtmpInterpretor.getAppName();
+			
+			File appScopeDir = new File(dir.getAbsolutePath() + File.separator + appName);
+			if(!appScopeDir.exists()) appScopeDir.mkdirs();
+			dir = appScopeDir;
+			
+			break;
+				
+			default:
+			break;			  
+		}
+		
+		return dir.getAbsolutePath();
 	}
 	
 	public void buildAudioQuery(CommandLine cmdLine, IAudio config) throws Exception
