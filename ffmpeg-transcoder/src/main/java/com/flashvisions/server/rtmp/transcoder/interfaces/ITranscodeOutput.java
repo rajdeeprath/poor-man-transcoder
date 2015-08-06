@@ -7,4 +7,6 @@ public interface ITranscodeOutput {
 	public void setMediaOutput(ITranscoderResource output); 
 	public ArrayList<IProperty> getOutputProperties();
 	public void setOutputProperties(ArrayList<IProperty> extraProperties);
+	public ArrayList<IParameter> getOutputIParameters();
+	public void setOutputIParameters(ArrayList<IParameter> extraParameters);
 }

@@ -176,6 +176,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 			// TODO Auto-generated method stub
 		  logger.info("Session started " + session.getId());
 		  logger.info("Waiting to read stream source");
+		  logger.info("working directory = " + session.getWorkingDirectoryPath());
 	  }
 	  
 	

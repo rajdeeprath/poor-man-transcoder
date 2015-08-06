@@ -2,6 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.util.ArrayList;
 
+import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
@@ -10,6 +11,7 @@ public class TranscodeOutput implements ITranscodeOutput{
 	
 	private ITranscoderResource output;
 	public ArrayList<IProperty> extraProperties;
+	public ArrayList<IParameter> extraParameters;
 
 
 	@Override
@@ -34,6 +36,18 @@ public class TranscodeOutput implements ITranscodeOutput{
 	public void setOutputProperties(ArrayList<IProperty> extraProperties) {
 		// TODO Auto-generated method stub
 		this.extraProperties = extraProperties;
+	}
+
+	@Override
+	public ArrayList<IParameter> getOutputIParameters() {
+		// TODO Auto-generated method stub
+		return extraParameters;
+	}
+
+	@Override
+	public void setOutputIParameters(ArrayList<IParameter> extraParameters) {
+		// TODO Auto-generated method stub
+		this.extraParameters = extraParameters;
 	}
 
 }

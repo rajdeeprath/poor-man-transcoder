@@ -688,9 +688,7 @@ public class TemplateDao implements ITranscodeDao {
 				
 				
 				
-				/*************************************************
-				 * **********look for output Properties***********
-				 ************************************************/
+				
 				ITranscodeOutput encodeOutput = new TranscodeOutput();
 				
 				
@@ -716,6 +714,49 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				
 				
+				
+				/*************************************************
+				 * **********look for output Parameters **********
+				 ************************************************/
+				
+				try
+				{
+					String outputExtraParamsNodeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters";
+					Node outputExtraParamsNode = (Node) xpath.compile(outputExtraParamsNodeExpression).evaluate(document, XPathConstants.NODE);
+					
+					if(outputExtraParamsNode != null && outputExtraParamsNode.hasChildNodes())
+					{
+						String outputExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter";
+						NodeList outputParams = (NodeList) xpath.compile(outputExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
+						
+						ArrayList<IParameter> extras = new ArrayList<IParameter>(); 
+						for(int j=0;j<outputParams.getLength();j++)
+						{
+							String outputParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter["+(j+1)+"]/Key";
+							String outputParamsKey = xpath.compile(outputParamsKeyExpression).evaluate(document);
+							
+							String outputParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter["+(j+1)+"]/Value";
+							String outputParamsValue = xpath.compile(outputParamsValueExpression).evaluate(document);
+							
+							IParameter param = new Parameter(outputParamsKey, outputParamsValue);
+							extras.add(param);
+						}
+						
+						encodeOutput.setOutputIParameters(extras);
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra output params {"+e.getMessage()+"}");
+					encodeOutput.setOutputIParameters(new ArrayList<IParameter>());
+				}
+				
+				
+				
+				
+				/*************************************************
+				 * **********look for output Properties***********
+				 ************************************************/
 				
 				try
 				{

@@ -45,6 +45,7 @@ public class CommandBuilderHelper {
 		
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
+		ArrayList<IParameter> parameters = output.getOutputIParameters();
 		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template);
 		
 		
@@ -66,6 +67,21 @@ public class CommandBuilderHelper {
 			break;
 		}
 		
+		
+		/***************** extra parameters for output **************/
+		if(!parameters.isEmpty())
+		{
+			for(IParameter param: parameters){
+				String key = param.getKey();
+				String value = String.valueOf(param.getValue());
+				
+				// TO DO - dynamic replacement
+				//value = value.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
+				
+				cmdLine.addArgument(Flags.DASH + key);
+				cmdLine.addArgument(value);
+			}
+		}
 		
 		/***************** extra properties for output **************/		
 		if(!properties.isEmpty())

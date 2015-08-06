@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.flashvisions.server.rtmp.transcoder.command.AbortTranscodeCommand;
 import com.flashvisions.server.rtmp.transcoder.command.DoTranscodeCommand;
 import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap;
+import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
@@ -123,24 +124,11 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	/*********************************************************************************************/
 	
 	@Override
-	public void doTranscode(ITranscoderResource input, String usingTemplate) throws TranscoderException {
+	public void doTranscode(ITranscoderResource input, TranscodeRequest request) throws TranscoderException {
 		
 		try 
 		{
-			new DoTranscodeCommand(input, usingTemplate).execute(context);
-		} 
-		catch (Exception e) 
-		{
-			logger.error("doTranscode ->"+e.getMessage());
-		}
-	}
-	
-	@Override
-	public void doTranscode(ITranscoderResource input, String usingTemplate, File workingDirectory) throws TranscoderException {
-		
-		try 
-		{
-			new DoTranscodeCommand(input, usingTemplate).execute(context);
+			new DoTranscodeCommand(input, request).execute(context);
 		} 
 		catch (Exception e) 
 		{
