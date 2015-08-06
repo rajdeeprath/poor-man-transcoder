@@ -68,7 +68,7 @@
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
 						<!-- for hls {StreamName} extension is not looked up -->
-						<StreamName>${SourceStreamName}.m3u8</StreamName> 
+						<StreamName>${SourceStreamName}_400k.m3u8</StreamName> 
 						<!-- mp4, flv etc.. -->
 						<Container>ssegment</Container>
 						
@@ -156,7 +156,7 @@
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
 						<!-- for hls {StreamName} extension is not looked up -->
-						<StreamName>${SourceStreamName}.m3u8</StreamName> 
+						<StreamName>${SourceStreamName}_200k.m3u8</StreamName> 
 						<!-- mp4, flv etc.. -->
 						<Container>ssegment</Container>
 						
