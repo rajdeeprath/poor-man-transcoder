@@ -24,7 +24,10 @@ public class AudioBitrateValidator implements ConstraintValidator<ValidAudioBitr
 		
 		try
 		{
-			
+			// if follow source values
+			if(bitrate.getSameAsSource())
+			return valid;
+						
 			if(!valid) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();

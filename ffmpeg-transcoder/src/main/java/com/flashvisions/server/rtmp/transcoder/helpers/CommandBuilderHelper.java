@@ -146,10 +146,17 @@ public class CommandBuilderHelper {
 		throw new Exception("Audio codec disabled");
 		
 	
+		
 		if(acodec.getSameAsSource())
 		{
 			cmdLine.addArgument(acodec.getKey());
 			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
+			
+			return;
+		}
+		else if(acodec.getIgnore())
+		{
+			// skip codec assignment
 		}
 		else
 		{
@@ -158,76 +165,83 @@ public class CommandBuilderHelper {
 			cmdLine.addArgument(acodec.getKey());
 			cmdLine.addArgument(String.valueOf(acodec.getValue()).toLowerCase());
 			
+			
 			ICodecImplementation impl = config.getImplementation();
 			if(!CodecImplementations.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
 			cmdLine.addArgument(impl.getKey());
 			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
+		}
 			
-			logger.info("Setting audio bitrate");
-			IAudioBitrate abitrate = config.getBitrate();
-			if(abitrate.getSameAsSource())
-			{
-				// NO OP
+		
+		/*****************************************
+		 ****** SET AUDIO ENCODING PARAMS ********
+		 ****************************************/
+		
+		
+		logger.info("Setting audio bitrate");
+		IAudioBitrate abitrate = config.getBitrate();
+		if(abitrate.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			if((Integer)abitrate.getValue()>0) {
+			cmdLine.addArgument(abitrate.getKey());
+			cmdLine.addArgument(String.valueOf(abitrate.getValue())+"k");
 			}
-			else
-			{
-				if((Integer)abitrate.getValue()>0) {
-				cmdLine.addArgument(abitrate.getKey());
-				cmdLine.addArgument(String.valueOf(abitrate.getValue())+"k");
-				}
+		}
+		
+		
+		logger.info("Setting audio samplerate");
+		IAudioSampleRate asamplerate = config.getSamplerate();
+		if(asamplerate.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			if((Integer)asamplerate.getValue()>0){
+			cmdLine.addArgument(asamplerate.getKey());
+			cmdLine.addArgument(String.valueOf(asamplerate.getValue()));
 			}
-			
-			
-			logger.info("Setting audio samplerate");
-			IAudioSampleRate asamplerate = config.getSamplerate();
-			if(asamplerate.getSameAsSource())
-			{
-				// NO OP
+		}
+		
+		
+		logger.info("Setting audio channel");
+		IAudioChannel achannel = config.getChannel();
+		if(achannel.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			if((Integer)achannel.getChannels()>0){
+			cmdLine.addArgument(achannel.getKey());
+			cmdLine.addArgument(String.valueOf(achannel.getChannels()));
 			}
-			else
-			{
-				if((Integer)asamplerate.getValue()>0){
-				cmdLine.addArgument(asamplerate.getKey());
-				cmdLine.addArgument(String.valueOf(asamplerate.getValue()));
-				}
-			}
-			
-			
-			logger.info("Setting audio channel");
-			IAudioChannel achannel = config.getChannel();
-			if(achannel.getSameAsSource())
-			{
-				// NO OP
-			}
-			else
-			{
-				if((Integer)achannel.getChannels()>0){
-				cmdLine.addArgument(achannel.getKey());
-				cmdLine.addArgument(String.valueOf(achannel.getChannels()));
-				}
-			}
-			
-			
-			/* Extra params (dashed)*/
-			logger.info("Setting extra audio params");
-			ArrayList<IParameter> params = config.getExtraParams();
-			if(params != null){
-			for(IParameter param: params){
-			cmdLine.addArgument(Flags.DASH + param.getKey());
-			cmdLine.addArgument(String.valueOf(param.getValue()));
-			}
-			}
-			
-			
-			/* Extra properties*/
-			logger.info("Setting extra audio properties");
-			ArrayList<IProperty> props = config.getExtraProperties();
-			if(props != null){
-			for(IProperty prop: props){
-			cmdLine.addArgument(prop.getData());
-			}
-			}
+		}
+		
+		
+		/* Extra params (dashed)*/
+		logger.info("Setting extra audio params");
+		ArrayList<IParameter> params = config.getExtraParams();
+		if(params != null){
+		for(IParameter param: params){
+		cmdLine.addArgument(Flags.DASH + param.getKey());
+		cmdLine.addArgument(String.valueOf(param.getValue()));
+		}
+		}
+		
+		
+		/* Extra properties*/
+		logger.info("Setting extra audio properties");
+		ArrayList<IProperty> props = config.getExtraProperties();
+		if(props != null){
+		for(IProperty prop: props){
+		cmdLine.addArgument(prop.getData());
+		}
 		}
 	}
 	
@@ -237,137 +251,147 @@ public class CommandBuilderHelper {
 		
 		if(!vcodec.getEnabled())
 		throw new Exception("Video codec disabled");
-	
+		
+		
 		if(vcodec.getSameAsSource())
 		{
 			// pass thru -> use same as source
 			cmdLine.addArgument(vcodec.getKey());
 			cmdLine.addArgument(String.valueOf(vcodec.getValue()).toLowerCase());
+			
+			return;
+		}
+		
+		if(vcodec.getIgnore())
+		{
+			// skip
 		}
 		else
 		{
-			logger.info("Calculating new video settings");
-			
 			logger.info("Setting codec");
 			cmdLine.addArgument(vcodec.getKey());
 			cmdLine.addArgument(String.valueOf(vcodec.getValue()));
-			
 			
 			ICodecImplementation impl = config.getImplementation();
 			if(!CodecImplementations.NORMAL.name().equalsIgnoreCase(String.valueOf(impl.getValue()))){
 			cmdLine.addArgument(impl.getKey());
 			cmdLine.addArgument(String.valueOf(impl.getValue()));
 			}
+		}
 			
-			logger.info("Setting frame size");
-			IFrameSize framesize = config.getFramesize();
-			if(framesize.getSameAsSource())
-			{
-				// NO OP
+			
+		/*****************************************
+		 ****** SET VIDEO ENCODING PARAMS ********
+		 ****************************************/
+			
+		logger.info("Setting frame size");
+		IFrameSize framesize = config.getFramesize();
+		if(framesize.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			cmdLine.addArgument(framesize.getKey());
+			cmdLine.addArgument(String.valueOf(framesize.getValue()));
+		}
+		
+		
+		logger.info("Setting frame rate");
+		IFrameRate framerate = config.getFramerate();
+		if(framerate.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			cmdLine.addArgument(framerate.getKey());
+			cmdLine.addArgument(String.valueOf(framerate.getValue()));
+		}
+		
+		
+		logger.info("Setting bitrate");
+		IVideoBitrate vbitrate = config.getBitrate();
+		if(vbitrate.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			IParameter avgBitrate = vbitrate.getAverage();
+			if(((Integer)avgBitrate.getValue() > 0)){
+				logger.info("ABR enabled");
+				cmdLine.addArgument(avgBitrate.getKey());
+				cmdLine.addArgument(avgBitrate.getValue()+"k");
 			}
 			else
 			{
-				cmdLine.addArgument(framesize.getKey());
-				cmdLine.addArgument(String.valueOf(framesize.getValue()));
-			}
-			
-			
-			logger.info("Setting frame rate");
-			IFrameRate framerate = config.getFramerate();
-			if(framerate.getSameAsSource())
-			{
-				// NO OP
-			}
-			else
-			{
-				cmdLine.addArgument(framerate.getKey());
-				cmdLine.addArgument(String.valueOf(framerate.getValue()));
-			}
-			
-			
-			logger.info("Setting bitrate");
-			IVideoBitrate vbitrate = config.getBitrate();
-			if(vbitrate.getSameAsSource())
-			{
-				// NO OP
-			}
-			else
-			{
-				IParameter avgBitrate = vbitrate.getAverage();
-				if(((Integer)avgBitrate.getValue() > 0)){
-					logger.info("ABR enabled");
-					cmdLine.addArgument(avgBitrate.getKey());
-					cmdLine.addArgument(avgBitrate.getValue()+"k");
-				}
-				else
-				{
-					logger.info("VBR enabled");
-					IParameter minBitrate = vbitrate.getMinimum();
-					if(((Integer)minBitrate.getValue() > 0)){
-					cmdLine.addArgument(minBitrate.getKey());
-					cmdLine.addArgument(minBitrate.getValue()+"k");
-					}
-					
-					IParameter maxBitrate = vbitrate.getMaximum();
-					if(((Integer)maxBitrate.getValue() > 0)){
-					cmdLine.addArgument(maxBitrate.getKey());
-					cmdLine.addArgument(maxBitrate.getValue()+"k");
-					}
-					
-					IParameter deviceBuffer = vbitrate.getDeviceBuffer();
-					if(((Integer)deviceBuffer.getValue() > 0)){
-					cmdLine.addArgument(deviceBuffer.getKey());
-					cmdLine.addArgument(deviceBuffer.getValue()+"k");
-					}
-				}
-			}
-			
-			
-			logger.info("Setting keyframeinterval & gop");
-			IKeyFrameInterval keyframeinterval = config.getKeyFrameInterval();
-			if(keyframeinterval.getSameAsSource())
-			{
-				// NO OP
-			}
-			else
-			{
-				IParameter gop = keyframeinterval.getGop();
-				if((Integer)gop.getValue()>0)
-				{
-					IParameter g = (IParameter) gop;
-					cmdLine.addArgument(g.getKey());
-					cmdLine.addArgument(String.valueOf(g.getValue()));
+				logger.info("VBR enabled");
+				IParameter minBitrate = vbitrate.getMinimum();
+				if(((Integer)minBitrate.getValue() > 0)){
+				cmdLine.addArgument(minBitrate.getKey());
+				cmdLine.addArgument(minBitrate.getValue()+"k");
 				}
 				
+				IParameter maxBitrate = vbitrate.getMaximum();
+				if(((Integer)maxBitrate.getValue() > 0)){
+				cmdLine.addArgument(maxBitrate.getKey());
+				cmdLine.addArgument(maxBitrate.getValue()+"k");
+				}
 				
-				IParameter minkfi = keyframeinterval.getMinimunInterval();
-				{
-					IParameter kfi_min = (IParameter) minkfi;
-					cmdLine.addArgument(kfi_min.getKey());
-					cmdLine.addArgument(String.valueOf(kfi_min.getValue()));
+				IParameter deviceBuffer = vbitrate.getDeviceBuffer();
+				if(((Integer)deviceBuffer.getValue() > 0)){
+				cmdLine.addArgument(deviceBuffer.getKey());
+				cmdLine.addArgument(deviceBuffer.getValue()+"k");
 				}
 			}
-			
-			
-			/* Extra params (dashed)*/
-			logger.info("Setting extra video params");
-			ArrayList<IParameter> params = config.getExtraParams();
-			if(params != null){
-			for(IParameter param: params){
-			cmdLine.addArgument(Flags.DASH + param.getKey());
-			cmdLine.addArgument(String.valueOf(param.getValue()));
+		}
+		
+		
+		logger.info("Setting keyframeinterval & gop");
+		IKeyFrameInterval keyframeinterval = config.getKeyFrameInterval();
+		if(keyframeinterval.getSameAsSource())
+		{
+			// NO OP
+		}
+		else
+		{
+			IParameter gop = keyframeinterval.getGop();
+			if((Integer)gop.getValue()>0)
+			{
+				IParameter g = (IParameter) gop;
+				cmdLine.addArgument(g.getKey());
+				cmdLine.addArgument(String.valueOf(g.getValue()));
 			}
-			}
 			
 			
-			/* Extra properties*/
-			logger.info("Setting extra video properties");
-			ArrayList<IProperty> props = config.getExtraProperties();
-			if(props != null){
-			for(IProperty prop: props){
-			cmdLine.addArgument(prop.getData());
+			IParameter minkfi = keyframeinterval.getMinimunInterval();
+			{
+				IParameter kfi_min = (IParameter) minkfi;
+				cmdLine.addArgument(kfi_min.getKey());
+				cmdLine.addArgument(String.valueOf(kfi_min.getValue()));
 			}
-			}			
+		}
+		
+		
+		/* Extra params (dashed)*/
+		logger.info("Setting extra video params");
+		ArrayList<IParameter> params = config.getExtraParams();
+		if(params != null){
+		for(IParameter param: params){
+		cmdLine.addArgument(Flags.DASH + param.getKey());
+		cmdLine.addArgument(String.valueOf(param.getValue()));
+		}
+		}
+		
+		
+		/* Extra properties*/
+		logger.info("Setting extra video properties");
+		ArrayList<IProperty> props = config.getExtraProperties();
+		if(props != null){
+		for(IProperty prop: props){
+		cmdLine.addArgument(prop.getData());
+		}
 		}
 	}
 }

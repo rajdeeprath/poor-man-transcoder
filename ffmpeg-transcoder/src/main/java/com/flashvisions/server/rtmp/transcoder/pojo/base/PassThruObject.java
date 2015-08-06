@@ -6,6 +6,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderEntity;
 public abstract class PassThruObject extends TranscoderEntity implements IPassThruObject, ITranscoderEntity {
 
 	private boolean sameAsSource;
+	private boolean ignore = false;
 	
 	@Override
 	public void setSameAsSource(boolean sameAsSource) {
@@ -17,5 +18,17 @@ public abstract class PassThruObject extends TranscoderEntity implements IPassTh
 	public boolean getSameAsSource() {
 		// TODO Auto-generated method stub
 		return sameAsSource;
+	}
+	
+	@Override
+	public void setIgnore(boolean ignore) {
+		// TODO Auto-generated method stub
+		this.ignore = ignore;
+	}
+
+	@Override
+	public boolean getIgnore() {
+		// TODO Auto-generated method stub
+		return ignore;
 	}
 }

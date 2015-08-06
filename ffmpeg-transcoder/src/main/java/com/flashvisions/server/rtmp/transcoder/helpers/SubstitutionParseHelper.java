@@ -13,7 +13,7 @@ import org.w3c.dom.NodeList;
 
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
-public class TemplateParseHelper {
+public class SubstitutionParseHelper {
 	
 	
 	private static final Map<String, String> VARIABLEMAP;

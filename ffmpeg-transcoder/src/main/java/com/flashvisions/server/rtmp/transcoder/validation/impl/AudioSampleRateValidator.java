@@ -25,6 +25,10 @@ public class AudioSampleRateValidator implements ConstraintValidator<ValidAudioS
 		
 		try
 		{
+			// if follow source values
+			if(samplerate.getSameAsSource())
+			return valid;
+			
 			for (AudioSampleRates rate : AudioSampleRates.values()) {
 				if(rate.getValue() == (Integer)samplerate.getValue()) {
 					valid = true;

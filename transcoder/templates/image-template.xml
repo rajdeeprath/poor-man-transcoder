@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- sample transcoder template for java-ffmpeg wrapper -->
+<Template version="1">
+	<Transcode>
+		<Name>Extract images Sample</Name>
+		<Description>Extract image sequence template</Description>	
+		<Encodes>
+			<Encode>
+				<Enable>true</Enable>
+				<Name>Extract to image sequence</Name>								
+				<!-- must be unique in this sequence of encodes -->
+				<Video>
+					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
+					<Codec>SkipThru</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<!--<Implementation>normal</Implementation>-->
+					
+					<!--<FrameSize>
+						<Width>320</Width>
+						<Height>240</Height>
+					</FrameSize>-->
+					
+					<!--<FrameRate>25</FrameRate>-->
+					
+					<!--<Bitrate>
+						<Average>0</Average>
+						<Min>200</Min>
+						<Max>250</Max>
+						<Buffer>300</Buffer>
+					</Bitrate>-->
+					
+					<!--<KeyFrameInterval>
+						<Gop></Gop>
+						<IntervalMin></IntervalMin>
+					</KeyFrameInterval>-->
+					
+					<Parameters>
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+					</Parameters>
+					
+					<Properties>
+						<Property>-vf</Property>
+						<Property>fps=1/30</Property>
+					</Properties>
+				</Video>
+				
+				<Audio>
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
+					<Codec>Disable</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<!--<Implementation>normal</Implementation>-->
+					<!--<Bitrate>128</Bitrate> -->
+					<!-- samplerate -->
+					<!-- <SampleRate>22050</SampleRate>-->
+					<!-- mono, stereo -->
+					<!-- <Channels>mono</Channels> -->
+					<!-- Extra params such as filters -->
+					<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+					</Parameters>
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
+				</Audio>
+				
+				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
+				<Output>
+						<StreamName>${SourceStreamName}_%03d.jpg</StreamName>
+						<!-- mp4, flv etc.. -->
+						<Container>image2</Container>
+						<Properties>
+							<!--<Property></Property> -->
+						</Properties>
+				</Output>
+			</Encode>
+		</Encodes>
+	</Transcode>
+</Template>
