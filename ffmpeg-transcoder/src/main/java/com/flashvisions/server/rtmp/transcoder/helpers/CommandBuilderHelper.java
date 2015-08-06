@@ -1,11 +1,13 @@
 package com.flashvisions.server.rtmp.transcoder.helpers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +102,7 @@ public class CommandBuilderHelper {
 	}
 	
 	
-	protected String getOwnSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory)
+	protected String getOwnSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory) throws IOException
 	{	
 		// create sub directory for hls output
 		String outName = output.getMediaName();
@@ -108,6 +110,11 @@ public class CommandBuilderHelper {
 		
 		File sub = new File(masterWorkingDirectory + File.separator + outNameWithOutExt);
 		if(!sub.exists()) sub.mkdir();
+		
+		File indexTemplateSample = new File(Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + "hls-index-sample.html");
+		File indexTemplate = new File(sub.getAbsolutePath() + File.separator + "index.html");
+		if(indexTemplateSample.exists())  FileUtils.copyFile(indexTemplateSample, indexTemplate);
+		logger.info("Copying html template for hls playback into " + sub.getAbsolutePath());
 		
 		String relative = new File(masterWorkingDirectory).toURI().relativize(new File(sub.getAbsolutePath()).toURI()).getPath();
 		logger.info("relative path of segment directory " + relative);
