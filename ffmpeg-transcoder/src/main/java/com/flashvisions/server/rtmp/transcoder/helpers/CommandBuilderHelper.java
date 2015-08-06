@@ -78,7 +78,7 @@ public class CommandBuilderHelper {
 				String value = String.valueOf(param.getValue());
 				
 				// TO DO - dynamic replacement
-				//value = value.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
+				value = value.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
 				
 				cmdLine.addArgument(Flags.DASH + key);
 				cmdLine.addArgument(value);
@@ -92,7 +92,10 @@ public class CommandBuilderHelper {
 			
 			while(it.hasNext())	{
 			String prop = it.next().getData();
+			
+			// TO DO - dynamic replacement
 			prop = prop.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
+			
 			cmdLine.addArgument(prop, true);
 			}
 		}

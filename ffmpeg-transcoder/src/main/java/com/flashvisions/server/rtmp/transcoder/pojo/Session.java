@@ -128,6 +128,8 @@ public class Session implements ISession  {
 			this.outstream = new TranscodeSessionOutputStream(this);
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
 			
+			logger.info("working directory " + this.workingDirectoryPath);
+			
 			this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
 			this.executor.setProcessDestroyer(new TranscodeSessionDestroyer(this));
@@ -371,7 +373,7 @@ public class Session implements ISession  {
 			return this;
 		}
 		
-		public Builder setWorkingDirectory(String workingDirectoryPath){
+		public Builder inWorkingDirectory(String workingDirectoryPath){
 			this.workingDirectoryPath = workingDirectoryPath;
 			return this;
 		}
@@ -446,7 +448,7 @@ public class Session implements ISession  {
 						
 						String workingDirectory = (this.workingDirectoryPath == null || this.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):this.workingDirectoryPath;
 						workingDirectory = helper.prepareWorkingDirectory(input, workingDirectory);
-						this.setWorkingDirectory(workingDirectory);
+						this.inWorkingDirectory(workingDirectory);
 						
 						
 						/************************************************

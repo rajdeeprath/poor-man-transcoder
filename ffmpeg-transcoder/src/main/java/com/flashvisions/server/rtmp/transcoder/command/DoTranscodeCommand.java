@@ -29,7 +29,7 @@ public class DoTranscodeCommand implements Command {
 		TranscoderContext ctx = (TranscoderContext) context;
 		
 		TranscodeSessionPool pool =  ctx.getPool();
-		ISession session = pool.checkOut(input, request.getTemplateFileName());
+		ISession session = pool.checkOut(input, request);
 		
 		if(this.request.getWorkingDirectory() != null)
 		{
