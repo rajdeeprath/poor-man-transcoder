@@ -2,93 +2,15 @@
 <!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>Multibitrate template</Name>
-		<Description>Multibitrate template sample</Description>	
+		<Name>Multibitrate HLS Sample</Name>
+		<Description>Multibitrate HLS Sample transcode template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>
-				<Name>200k</Name>								
+				<Name>HLS BA</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
-					<Codec>libx264</Codec>
-					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
-					<FrameSize>
-						<Width>320</Width>
-						<Height>240</Height>
-					</FrameSize>
-					<FrameRate>24</FrameRate>
-					<Bitrate>
-						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
-						<Min>200</Min><!-- K -->
-						<Max>250</Max><!-- K -->
-						<Buffer>300</Buffer> <!-- K (device buffer)-->
-					</Bitrate> 
-					<KeyFrameInterval>
-						<Gop>24</Gop>
-						<IntervalMin>48</IntervalMin>
-					</KeyFrameInterval>
-					
-					<Parameters>
-						<Parameter>
-							<Key>profile:v</Key>
-							<Value>baseline</Value>
-						</Parameter>
-					</Parameters>
-					
-					<Properties>
-						<!--<Property></Property>-->
-					</Properties>
-				</Video>
-				
-				<Audio>
-					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
-					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
-					<Bitrate>128</Bitrate> <!-- Kbps -->
-					<!-- samplerate -->
-					<SampleRate>22050</SampleRate>
-					<!-- mono, stereo -->
-					<Channels>mono</Channels>
-					<!-- Extra params such as filters -->
-					<Parameters> 
-						<!--<Parameter>
-							<Key></Key>
-							<Value></Value>
-						</Parameter>-->
-					</Parameters>
-					<Properties>
-						<!--<Property></Property>-->
-					</Properties>
-				</Audio>
-				
-				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
-				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}_200k</StreamName>
-						<!-- mp4, flv etc.. -->
-						<Container></Container>
-						
-						<Parameters> 
-						<!--<Parameter>
-							<Key></Key>
-							<Value></Value>
-						</Parameter>-->
-						</Parameters>
-					
-						<Properties>
-							<!--<Property></Property>-->
-						</Properties>
-				</Output>
-			</Encode>
-			
-			<Encode>
-				<Enable>true</Enable>
-				<Name>400k</Name>								
-				<!-- must be unique in this sequence of encodes -->
-				<Video>
-					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
+					<!-- Any supported codec, Copy, Disable, SkipThru{codecname} -->
 					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
@@ -101,7 +23,7 @@
 						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
 						<Min>400</Min><!-- K -->
 						<Max>450</Max><!-- K -->
-						<Buffer>500</Buffer> <!-- K (device buffer)-->
+						<Buffer>800</Buffer> <!-- K (device buffer)-->
 					</Bitrate> 
 					<KeyFrameInterval>
 						<Gop>24</Gop>
@@ -116,7 +38,8 @@
 					</Parameters>
 					
 					<Properties>
-						<!--<Property></Property>-->
+						<Property>-force_key_frames </Property>
+						<Property>"expr:gte(t,n_forced*2)"</Property>
 					</Properties>
 				</Video>
 				
@@ -144,9 +67,10 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}_400k</StreamName>
+						<!-- for hls {StreamName} extension is not looked up -->
+						<StreamName>${SourceStreamName}.m3u8</StreamName> 
 						<!-- mp4, flv etc.. -->
-						<Container></Container>
+						<Container>ssegment</Container>
 						
 						<Parameters> 
 						<!--<Parameter>
@@ -156,7 +80,103 @@
 						</Parameters>
 					
 						<Properties>
-							<!--<Property></Property>-->
+							<!--<Property>-bsf:v</Property>
+							<Property>h264_mp4toannexb</Property>-->
+							<Property>-segment_list</Property>
+							<Property>${OwnSegmentDirectory}playlist.m3u8</Property>
+							<Property>-segment_list_flags</Property>
+							<Property>+live</Property>
+							<Property>-segment_time</Property>
+							<Property>2</Property>
+							<Property>${OwnSegmentDirectory}${SourceStreamName}%03d.ts</Property>
+						</Properties>
+				</Output>
+			</Encode>
+			
+			<Encode>
+				<Enable>true</Enable>
+				<Name>HLS BB</Name>								
+				<!-- must be unique in this sequence of encodes -->
+				<Video>
+					<!-- Any supported codec, Copy, Disable, SkipThru{codecname} -->
+					<Codec>libx264</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation>normal</Implementation>
+					<FrameSize>
+						<Width>320</Width>
+						<Height>240</Height>
+					</FrameSize>
+					<FrameRate>24</FrameRate>
+					<Bitrate>
+						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
+						<Min>150</Min><!-- K -->
+						<Max>200</Max><!-- K -->
+						<Buffer>400</Buffer> <!-- K (device buffer)-->
+					</Bitrate> 
+					<KeyFrameInterval>
+						<Gop>24</Gop>
+						<IntervalMin>48</IntervalMin>
+					</KeyFrameInterval>
+					
+					<Parameters>
+						<Parameter>
+							<Key>profile:v</Key>
+							<Value>baseline</Value>
+						</Parameter>
+					</Parameters>
+					
+					<Properties>
+						<Property>-force_key_frames </Property>
+						<Property>"expr:gte(t,n_forced*2)"</Property>
+					</Properties>
+				</Video>
+				
+				<Audio>
+					<!-- Any supported codec, Copy, Disable, {codecname} -->
+					<Codec>libvo_aacenc</Codec>
+					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
+					<Implementation>normal</Implementation>
+					<Bitrate>128</Bitrate> <!-- Kbps -->
+					<!-- samplerate -->
+					<SampleRate>22050</SampleRate>
+					<!-- mono, stereo -->
+					<Channels>mono</Channels>
+					<!-- Extra params such as filters -->
+					<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+					</Parameters>
+					<Properties>
+						<!--<Property></Property>-->
+					</Properties>
+				</Audio>
+				
+				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
+				<Output>
+						<!-- for hls {StreamName} extension is not looked up -->
+						<StreamName>${SourceStreamName}.m3u8</StreamName> 
+						<!-- mp4, flv etc.. -->
+						<Container>ssegment</Container>
+						
+						<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+						</Parameters>
+					
+						<Properties>
+							<!--<Property>-bsf:v</Property>
+							<Property>h264_mp4toannexb</Property>-->
+							<Property>-segment_list</Property>
+							<Property>${OwnSegmentDirectory}playlist.m3u8</Property>
+							<Property>-segment_list_flags</Property>
+							<Property>+live</Property>
+							<Property>-segment_time</Property>
+							<Property>2</Property>
+							<Property>${OwnSegmentDirectory}${SourceStreamName}%03d.ts</Property>
 						</Properties>
 				</Output>
 			</Encode>

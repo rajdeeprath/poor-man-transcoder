@@ -74,6 +74,14 @@
 						<StreamName>${SourceStreamName}_%03d.jpg</StreamName>
 						<!-- mp4, flv etc.. -->
 						<Container>image2</Container>
+						
+						<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+						</Parameters>
+						
 						<Properties>
 							<!--<Property></Property> -->
 						</Properties>

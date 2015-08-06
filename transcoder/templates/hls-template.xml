@@ -10,7 +10,7 @@
 				<Name>HLS B</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, {codecname} -->
+					<!-- Any supported codec, Copy, Disable, SkipThru{codecname} -->
 					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
@@ -38,7 +38,8 @@
 					</Parameters>
 					
 					<Properties>
-						<!--<Property></Property>-->
+						<Property>-force_key_frames </Property>
+						<Property>"expr:gte(t,n_forced*2)"</Property>
 					</Properties>
 				</Video>
 				
@@ -70,6 +71,14 @@
 						<StreamName>${SourceStreamName}.m3u8</StreamName> 
 						<!-- mp4, flv etc.. -->
 						<Container>ssegment</Container>
+						
+						<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+						</Parameters>
+					
 						<Properties>
 							<!--<Property>-bsf:v</Property>
 							<Property>h264_mp4toannexb</Property>-->
@@ -78,7 +87,7 @@
 							<Property>-segment_list_flags</Property>
 							<Property>+live</Property>
 							<Property>-segment_time</Property>
-							<Property>10</Property>
+							<Property>2</Property>
 							<Property>${OwnSegmentDirectory}${SourceStreamName}%03d.ts</Property>
 						</Properties>
 				</Output>
