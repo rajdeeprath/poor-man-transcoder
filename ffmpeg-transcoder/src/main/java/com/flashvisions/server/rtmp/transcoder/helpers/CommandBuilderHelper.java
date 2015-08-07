@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
@@ -31,6 +33,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementations;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
@@ -45,6 +48,9 @@ public class CommandBuilderHelper {
 	{
 		logger.info("Processing output destination for encode");
 		
+		String HLS_PATTERN = "([^\\s]+(\\.(?i)(m3u8|ts))$)";
+		String segmentDirectory = null;
+		
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		ArrayList<IParameter> parameters = output.getOutputIParameters();
@@ -57,11 +63,11 @@ public class CommandBuilderHelper {
 		
 		
 		/************* special pre-processing for hls output ******/
-		String ownSegmentDirectory = "";
+		
 		switch(transcoderOutput.getContainer().getType())
 		{
 			case SSEGMENT:
-			ownSegmentDirectory = getOwnSegmentDirectory(cmdLine, transcoderOutput, workingDirectory);
+			segmentDirectory = prepareSegmentDirectory(cmdLine, transcoderOutput, workingDirectory);
 			break;
 			
 			default:
@@ -77,8 +83,15 @@ public class CommandBuilderHelper {
 				String key = param.getKey();
 				String value = String.valueOf(param.getValue());
 				
-				// TO DO - dynamic replacement
-				value = value.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
+				switch(transcoderOutput.getContainer().getType())
+				{
+					case SSEGMENT:
+					value = value.replaceAll(HLS_PATTERN, segmentDirectory + File.separator + value);
+					break;
+					
+					default:
+					break;
+				}
 				
 				cmdLine.addArgument(Flags.DASH + key);
 				cmdLine.addArgument(value);
@@ -88,15 +101,20 @@ public class CommandBuilderHelper {
 		/***************** extra properties for output **************/		
 		if(!properties.isEmpty())
 		{
-			Iterator<IProperty> it = properties.iterator();
-			
-			while(it.hasNext())	{
-			String prop = it.next().getData();
-			
-			// TO DO - dynamic replacement
-			prop = prop.replace("${OwnSegmentDirectory}", ownSegmentDirectory);
-			
-			cmdLine.addArgument(prop, true);
+			for(IProperty property: properties){
+				String data = property.getData();
+				
+				switch(transcoderOutput.getContainer().getType())
+				{
+					case SSEGMENT:
+					data = data.replaceAll(HLS_PATTERN, segmentDirectory + File.separator + data);
+					break;
+					
+					default:
+					break;
+				}
+				
+				cmdLine.addArgument(data, true);
 			}
 		}
 		
@@ -105,22 +123,23 @@ public class CommandBuilderHelper {
 	}
 	
 	
-	protected String getOwnSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory) throws IOException
+	protected String prepareSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory) throws IOException
 	{	
 		// create sub directory for hls output
+		String HLS_SAMPLE_PLAYBACK_TEMPLATE = "hls-index-sample.html";
 		String outName = output.getMediaName();
 		String outNameWithOutExt = FilenameUtils.removeExtension(outName);
 		
 		File sub = new File(masterWorkingDirectory + File.separator + outNameWithOutExt);
 		if(!sub.exists()) sub.mkdir();
 		
-		File indexTemplateSample = new File(Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + "hls-index-sample.html");
+		File indexTemplateSample = new File(Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + HLS_SAMPLE_PLAYBACK_TEMPLATE);
 		File indexTemplate = new File(sub.getAbsolutePath() + File.separator + "index.html");
 		if(indexTemplateSample.exists())  FileUtils.copyFile(indexTemplateSample, indexTemplate);
 		logger.info("Copying html template for hls playback into " + sub.getAbsolutePath());
 		
 		String relative = new File(masterWorkingDirectory).toURI().relativize(new File(sub.getAbsolutePath()).toURI()).getPath();
-		logger.info("relative path of segment directory " + relative);
+		logger.info("Relative path of segment directory " + relative);
 		
 		return relative;
 		

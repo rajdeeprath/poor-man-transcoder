@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
@@ -14,6 +15,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 public class TranscodeSessionPool implements ISessionObserver {
@@ -58,17 +60,19 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  this.templateTable = new Hashtable<ISession, String>();
 	  }
 
-	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
+	  protected ISession create(ITranscoderResource input, TranscodeRequest request) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  String hostserver = this.context.getOperatingMediaServer().toLowerCase();
+		  String workingDirectory = (request.getWorkingDirectory() == null || request.getWorkingDirectory() == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):request.getWorkingDirectory();
 		  ISession session = Session.Builder.newSession()
 					.usingMediaInput(input)
-					.usingTemplateFile(usingTemplate)
+					.usingTemplateFile(request.getTemplateFileName())
+					.inWorkingDirectory(workingDirectory)
 					.forServer(hostserver)
 					.build();
 		  
 		  session.registerObserver(this);
-		  templateTable.put(session, usingTemplate);
+		  templateTable.put(session, request.getTemplateFileName());
 		  sessionSignatureTable.put(getSignature(session), session);
 		  
 		  logger.info("new session created " + session.getId());		  
@@ -99,7 +103,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  return SessionUtil.generateSessionSignature(input, template);
 	  }
 
-	  public synchronized ISession checkOut(ITranscoderResource input, String usingTemplate) throws TranscoderException 
+	  public synchronized ISession checkOut(ITranscoderResource input, TranscodeRequest request) throws TranscoderException 
 	  {
 		  
 	    long now = System.currentTimeMillis();
@@ -115,7 +119,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	          expire(t);
 	          t = null;
 	        } else {
-	          if (validate(input, usingTemplate, t)) {
+	          if (validate(input, request.getTemplateFileName(), t)) {
 	            unlocked.remove(t);
 	            locked.put(t, now);
 	            return (t);
@@ -133,7 +137,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	    // no objects available, create a new one
 	    try 
 	    {
-	    	t = create(input, usingTemplate);
+	    	t = create(input, request);
 	    	
 		} 
 	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
@@ -176,7 +180,6 @@ public class TranscodeSessionPool implements ISessionObserver {
 			// TODO Auto-generated method stub
 		  logger.info("Session started " + session.getId());
 		  logger.info("Waiting to read stream source");
-		  logger.info("working directory = " + session.getWorkingDirectoryPath());
 	  }
 	  
 	

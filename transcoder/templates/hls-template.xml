@@ -73,22 +73,22 @@
 						<Container>ssegment</Container>
 						
 						<Parameters> 
-						<!--<Parameter>
-							<Key></Key>
-							<Value></Value>
-						</Parameter>-->
+							<Parameter>
+								<Key>segment_list</Key>
+								<Value>playlist.m3u8</Value>
+							</Parameter>
+							<Parameter>
+								<Key>segment_list_flags</Key>
+								<Value>+live</Value>
+							</Parameter>
+							<Parameter>
+								<Key>segment_time</Key>
+								<Value>2</Value>
+							</Parameter>
 						</Parameters>
 					
 						<Properties>
-							<!--<Property>-bsf:v</Property>
-							<Property>h264_mp4toannexb</Property>-->
-							<Property>-segment_list</Property>
-							<Property>${OwnSegmentDirectory}playlist.m3u8</Property>
-							<Property>-segment_list_flags</Property>
-							<Property>+live</Property>
-							<Property>-segment_time</Property>
-							<Property>2</Property>
-							<Property>${OwnSegmentDirectory}${SourceStreamName}%03d.ts</Property>
+							<Property>${SourceStreamName}%03d.ts</Property>
 						</Properties>
 				</Output>
 			</Encode>
