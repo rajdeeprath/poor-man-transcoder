@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
-import com.flashvisions.server.rtmp.transcoder.helpers.TemplateParseHelper;
+import com.flashvisions.server.rtmp.transcoder.helpers.TemplateTokenParser;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
@@ -130,7 +130,7 @@ public class TemplateDao implements ITranscodeDao {
 			validator = validatorFactory.getValidator();  
 			
 			logger.debug("Updating document with expression variables");
-			TemplateParseHelper.updateDocumentWithVariables(document, xpath);
+			TemplateTokenParser.updateDocumentWithVariables(document, xpath);
 			
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";
@@ -185,8 +185,15 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeVideoCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Implementation";
 					String encodeNodeVideoCodecImplementation = xpath.compile(encodeNodeVideoCodecImplementationExpression).evaluate(document);
 					
-					ICodecImplementation codecImpl = new CodecImplementation(encodeNodeVideoCodecImplementation);
-					video.setImplementation(codecImpl);
+					if(encodeNodeVideoCodecImplementation != null && encodeNodeVideoCodecImplementation != "")
+					{
+						ICodecImplementation codecImpl = new CodecImplementation(encodeNodeVideoCodecImplementation);
+						video.setImplementation(codecImpl);
+					}
+					else
+					{
+						video.setImplementation(new CodecImplementation("normal"));
+					}
 				}
 				catch(Exception e)
 				{
@@ -232,7 +239,7 @@ public class TemplateDao implements ITranscodeDao {
 				{
 					String encodeNodeVideoFrameRateExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/FrameRate";
 					String encodeNodeVideoFrameRate = xpath.compile(encodeNodeVideoFrameRateExpression).evaluate(document);
-					if(encodeNodeVideoFrameRate != null) 
+					if(encodeNodeVideoFrameRate != null && encodeNodeVideoFrameRate != "") 
 					{
 						Integer encodeFrameRate = Integer.parseInt(encodeNodeVideoFrameRate);
 						IFrameRate fps = new FrameRate(encodeFrameRate);
@@ -454,7 +461,7 @@ public class TemplateDao implements ITranscodeDao {
 				/******** Extra video properties ***********/
 				try
 				{
-					String videoPropertiesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Properties/Property";
+					String videoPropertiesExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Video/Properties/Property";
 					NodeList videoPropertiesNodes = (NodeList) xpath.compile(videoPropertiesExpression).evaluate(document, XPathConstants.NODESET);
 					ArrayList<IProperty> videoProperties = new ArrayList<IProperty>(); 
 					for(int l=0;l<videoPropertiesNodes.getLength();l++){
@@ -520,8 +527,15 @@ public class TemplateDao implements ITranscodeDao {
 					String encodeNodeAudioCodecImplementationExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Audio/Implementation";
 					String encodeNodeAudioCodecImplementation = xpath.compile(encodeNodeAudioCodecImplementationExpression).evaluate(document);
 					
-					ICodecImplementation codecImpl = new CodecImplementation(encodeNodeAudioCodecImplementation);
-					audio.setImplementation(codecImpl);
+					if(encodeNodeAudioCodecImplementation != null && encodeNodeAudioCodecImplementation != "")
+					{	
+						ICodecImplementation codecImpl = new CodecImplementation(encodeNodeAudioCodecImplementation);
+						audio.setImplementation(codecImpl);
+					}
+					else
+					{
+						audio.setImplementation(new CodecImplementation("normal"));
+					}
 				}
 				catch(Exception e)
 				{
@@ -674,9 +688,7 @@ public class TemplateDao implements ITranscodeDao {
 				
 				
 				
-				/*************************************************
-				 * **********look for output Properties***********
-				 ************************************************/
+				
 				ITranscodeOutput encodeOutput = new TranscodeOutput();
 				
 				
@@ -702,6 +714,49 @@ public class TemplateDao implements ITranscodeDao {
 				}
 				
 				
+				
+				/*************************************************
+				 * **********look for output Parameters **********
+				 ************************************************/
+				
+				try
+				{
+					String outputExtraParamsNodeExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters";
+					Node outputExtraParamsNode = (Node) xpath.compile(outputExtraParamsNodeExpression).evaluate(document, XPathConstants.NODE);
+					
+					if(outputExtraParamsNode != null && outputExtraParamsNode.hasChildNodes())
+					{
+						String outputExtraParamsExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter";
+						NodeList outputParams = (NodeList) xpath.compile(outputExtraParamsExpression).evaluate(document, XPathConstants.NODESET);
+						
+						ArrayList<IParameter> extras = new ArrayList<IParameter>(); 
+						for(int j=0;j<outputParams.getLength();j++)
+						{
+							String outputParamsKeyExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter["+(j+1)+"]/Key";
+							String outputParamsKey = xpath.compile(outputParamsKeyExpression).evaluate(document);
+							
+							String outputParamsValueExpression = "/Template/Transcode/Encodes/Encode["+(i+1)+"]/Output/Parameters/Parameter["+(j+1)+"]/Value";
+							String outputParamsValue = xpath.compile(outputParamsValueExpression).evaluate(document);
+							
+							IParameter param = new Parameter(outputParamsKey, outputParamsValue);
+							extras.add(param);
+						}
+						
+						encodeOutput.setOutputIParameters(extras);
+					}
+				}
+				catch(Exception e)
+				{
+					logger.info("Error in extra output params {"+e.getMessage()+"}");
+					encodeOutput.setOutputIParameters(new ArrayList<IParameter>());
+				}
+				
+				
+				
+				
+				/*************************************************
+				 * **********look for output Properties***********
+				 ************************************************/
 				
 				try
 				{

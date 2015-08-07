@@ -26,6 +26,11 @@ public class AudioChannelValidator implements ConstraintValidator<ValidAudioChan
 		
 		try
 		{
+			// if follow source values
+			if(channel.getSameAsSource())
+			return valid;
+			
+			
 			if(isInEnum(channelType, AudioChannelType.class))
 			{
 				valid = true;

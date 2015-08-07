@@ -10,7 +10,7 @@
 				<Name>HLS B</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, {codecname} -->
+					<!-- Any supported codec, Copy, Disable, SkipThru{codecname} -->
 					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
@@ -38,7 +38,8 @@
 					</Parameters>
 					
 					<Properties>
-						<!--<Property></Property>-->
+						<Property>-force_key_frames </Property>
+						<Property>"expr:gte(t,n_forced*2)"</Property>
 					</Properties>
 				</Video>
 				
@@ -66,19 +67,28 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceStreamName}.m3u8</StreamName>
+						<!-- for hls {StreamName} extension is not looked up -->
+						<StreamName>${SourceStreamName}.m3u8</StreamName> 
 						<!-- mp4, flv etc.. -->
 						<Container>ssegment</Container>
+						
+						<Parameters> 
+							<Parameter>
+								<Key>segment_list</Key>
+								<Value>playlist.m3u8</Value>
+							</Parameter>
+							<Parameter>
+								<Key>segment_list_flags</Key>
+								<Value>+live</Value>
+							</Parameter>
+							<Parameter>
+								<Key>segment_time</Key>
+								<Value>2</Value>
+							</Parameter>
+						</Parameters>
+					
 						<Properties>
-							<!--<Property>-bsf:v</Property>
-							<Property>h264_mp4toannexb</Property>-->
-							<Property>-segment_list</Property>
-							<Property>playlist.m3u8</Property>
-							<Property>-segment_list_flags</Property>
-							<Property>+live</Property>
-							<Property>-segment_time</Property>
-							<Property>10</Property>
-							<Property>output%03d.ts</Property>
+							<Property>${SourceStreamName}%03d.ts</Property>
 						</Properties>
 				</Output>
 			</Encode>

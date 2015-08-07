@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResourceException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
+import com.flashvisions.server.rtmp.transcoder.helpers.TokenReplacer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IContainer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IMedia;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
@@ -141,7 +142,7 @@ public class IOUtils {
 		}
 	}
 	
-	public static ITranscoderResource createOutputFromInput(ITranscoderResource in, ITranscoderResource temp) throws URISyntaxException, InvalidTranscoderResourceException{
+	public static ITranscoderResource createOutputFromInput(ITranscoderResource in, ITranscoderResource temp, TokenReplacer tokenReplacer) throws URISyntaxException, InvalidTranscoderResourceException{
 		
 		IMedia finalOutput = null;
 		IContainer container = null;
@@ -149,11 +150,15 @@ public class IOUtils {
 		String insource = in.getSourcePath();
 		String outsource = temp.getSourcePath();
 		
-		String streamname = FilenameUtils.removeExtension(in.getMediaName());;
-		String inapp = insource.substring(0, insource.indexOf(streamname)-1);
+		String streamname = FilenameUtils.removeExtension(in.getMediaName());
+		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.SOURCE_STREAM_TOKEN, streamname);
+		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.SOURCE_STREAM_TOKEN_2, streamname);
 		
-		outsource = outsource.replace("SourceApplication", inapp);
-		outsource = outsource.replace("SourceStreamName", streamname);
+		String inapp = insource.substring(0, insource.indexOf(streamname)-1);
+		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.SOURCE_APP_TOKEN, inapp);
+		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.SOURCE_APP_TOKEN_2, inapp);
+		
+		outsource = tokenReplacer.processReplacement(outsource);
 		
 		container = (temp.getContainer() == null)?new Container(guessContainer(outsource)):temp.getContainer();
 		finalOutput = (temp.isStreamingMedia())?new StreamMedia(outsource, container):new FileMedia(outsource, container);

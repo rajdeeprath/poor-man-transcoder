@@ -7,6 +7,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderEntity;
 public class PassThruDecorator extends PropertyDecorator implements IPassThru {
 
 	private boolean sameAsSource;
+	private boolean ignore = false;
 	
 	public PassThruDecorator(ITranscoderEntity property)
 	{
@@ -23,5 +24,17 @@ public class PassThruDecorator extends PropertyDecorator implements IPassThru {
 	public boolean getSameAsSource() {
 		// TODO Auto-generated method stub
 		return sameAsSource;
+	}
+
+	@Override
+	public void setIgnore(boolean ignore) {
+		// TODO Auto-generated method stub
+		this.ignore = ignore;
+	}
+
+	@Override
+	public boolean getIgnore() {
+		// TODO Auto-generated method stub
+		return ignore;
 	}
 }

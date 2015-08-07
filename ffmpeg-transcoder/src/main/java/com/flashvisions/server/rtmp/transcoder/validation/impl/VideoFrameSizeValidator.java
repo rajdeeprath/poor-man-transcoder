@@ -23,6 +23,11 @@ public class VideoFrameSizeValidator implements ConstraintValidator<ValidVideoFr
 		
 		try
 		{
+			// if follow source values
+			if(framesize.getSameAsSource())
+			return valid;
+			
+			
 			Integer width = (Integer) framesize.getWidth();
 			Integer height = (Integer) framesize.getHeight();
 			

@@ -40,6 +40,9 @@ public class AudioCodecValidator implements ConstraintValidator<ValidAudioCodec,
 			if(isEnum(codecName, CodecOptions.DISABLE))
 			codec.setEnabled(false);
 			
+			if(isEnum(codecName, CodecOptions.SKIPTHRU))
+			codec.setIgnore(true);
+			
 			if(!valid) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();

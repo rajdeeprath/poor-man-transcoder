@@ -11,9 +11,8 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
-public class TemplateParseHelper {
+public class TemplateTokenParser {
 	
 	
 	private static final Map<String, String> VARIABLEMAP;
@@ -22,7 +21,7 @@ public class TemplateParseHelper {
     	VARIABLEMAP = new HashMap<String, String>();
     	VARIABLEMAP.put("${SourceApplication}", "SourceApplication");
     	VARIABLEMAP.put("${SourceStreamName}", "SourceStreamName");
-    	VARIABLEMAP.put("${homeDirectory}", Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
+    	VARIABLEMAP.put("${homeDirectory}", "HomeDirectory");
     }
 	
 	@SuppressWarnings("rawtypes")

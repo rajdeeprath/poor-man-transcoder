@@ -2,56 +2,61 @@
 <!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>Record mp4 Sample</Name>
-		<Description>Record MP4 transcode template</Description>	
+		<Name>Extract images Sample</Name>
+		<Description>Extract image sequence template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>
-				<Name>Record to Mp4</Name>								
+				<Name>Extract to image sequence</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
+					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
+					<Codec>SkipThru</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
-					<FrameSize>
+					<!--<Implementation>normal</Implementation>-->
+					
+					<!--<FrameSize>
 						<Width>320</Width>
 						<Height>240</Height>
-					</FrameSize>
-					<FrameRate>24</FrameRate>
-					<Bitrate>
-						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
-						<Min>200</Min><!-- K -->
-						<Max>250</Max><!-- K -->
-						<Buffer>300</Buffer> <!-- K (device buffer)-->
-					</Bitrate> 
-					<KeyFrameInterval>
-						<Gop>24</Gop>
-						<IntervalMin>48</IntervalMin>
-					</KeyFrameInterval>
+					</FrameSize>-->
+					
+					<!--<FrameRate>25</FrameRate>-->
+					
+					<!--<Bitrate>
+						<Average>0</Average>
+						<Min>200</Min>
+						<Max>250</Max>
+						<Buffer>300</Buffer>
+					</Bitrate>-->
+					
+					<!--<KeyFrameInterval>
+						<Gop></Gop>
+						<IntervalMin></IntervalMin>
+					</KeyFrameInterval>-->
 					
 					<Parameters>
-						<Parameter>
-							<Key>profile:v</Key>
-							<Value>baseline</Value>
-						</Parameter>
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
 					</Parameters>
 					
 					<Properties>
-						<!--<Property></Property>-->
+						<Property>-vf</Property>
+						<Property>fps=1/30</Property>
 					</Properties>
 				</Video>
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
+					<Codec>Disable</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
-					<Bitrate>128</Bitrate> <!-- Kbps -->
+					<!--<Implementation>normal</Implementation>-->
+					<!--<Bitrate>128</Bitrate> -->
 					<!-- samplerate -->
-					<SampleRate>22050</SampleRate>
+					<!-- <SampleRate>22050</SampleRate>-->
 					<!-- mono, stereo -->
-					<Channels>mono</Channels>
+					<!-- <Channels>mono</Channels> -->
 					<!-- Extra params such as filters -->
 					<Parameters> 
 						<!--<Parameter>
@@ -66,9 +71,9 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceStreamName}.mp4</StreamName>
+						<StreamName>${SourceStreamName}_%03d.jpg</StreamName>
 						<!-- mp4, flv etc.. -->
-						<Container>mp4</Container>
+						<Container>image2</Container>
 						
 						<Parameters> 
 						<!--<Parameter>
@@ -76,9 +81,9 @@
 							<Value></Value>
 						</Parameter>-->
 						</Parameters>
-					
+						
 						<Properties>
-							<!--<Property></Property>-->
+							<!--<Property></Property> -->
 						</Properties>
 				</Output>
 			</Encode>

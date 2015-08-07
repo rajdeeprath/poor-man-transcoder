@@ -27,6 +27,11 @@ public class VideoKeyframeIntervalValidator implements ConstraintValidator<Valid
 		
 		try
 		{
+			// if follow source values
+			if(kfi.getSameAsSource())
+			return valid;
+			
+			
 			Gop gop = kfi.getGop();
 			MinKeyframeInterval minkfi = kfi.getMinimunInterval();
 				

@@ -24,6 +24,10 @@ public class VideoFrameRateValidator implements ConstraintValidator<ValidVideoFr
 		
 		try
 		{
+			// if follow source values
+			if(framerate.getSameAsSource())
+			return valid;
+			
 			Integer fps = (Integer) framerate.getValue();
 			
 			if(fps<=0)

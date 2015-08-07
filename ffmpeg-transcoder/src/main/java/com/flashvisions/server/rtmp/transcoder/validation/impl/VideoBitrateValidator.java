@@ -23,6 +23,10 @@ public class VideoBitrateValidator implements ConstraintValidator<ValidVideoBitr
 		
 		try
 		{
+			// if follow source values
+			if(videobitrate.getSameAsSource())
+			return valid;
+			
 			Integer min = (Integer) videobitrate.getMinimum().getValue();
 			Integer max = (Integer) videobitrate.getMaximum().getValue();
 			Integer avg = (Integer) videobitrate.getAverage().getValue();

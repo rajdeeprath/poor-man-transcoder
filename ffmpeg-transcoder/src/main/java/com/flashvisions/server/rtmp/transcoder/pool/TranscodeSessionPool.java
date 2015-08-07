@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
@@ -13,8 +14,8 @@ import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISessionObserver;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
-import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
 import com.flashvisions.server.rtmp.transcoder.pojo.Session;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 public class TranscodeSessionPool implements ISessionObserver {
@@ -26,7 +27,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  private Hashtable<ISession, Long> locked, unlocked;
 	  private Hashtable<String, ISession> sessionSignatureTable;
 	  private Hashtable<ISession, String> templateTable;
-	  private IOManager ioManager;
+	  
 	  
 	  public long getSessionExpirationTime() 
 	  {
@@ -57,20 +58,22 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  this.unlocked = new Hashtable<ISession, Long>();
 		  this.sessionSignatureTable = new Hashtable<String, ISession>();
 		  this.templateTable = new Hashtable<ISession, String>();
-		  this.setIoManager(context.getStreamManager());
 	  }
 
-	  protected ISession create(ITranscoderResource input, String usingTemplate) throws MalformedTranscodeQueryException, MediaIdentifyException
+	  protected ISession create(ITranscoderResource input, TranscodeRequest request) throws MalformedTranscodeQueryException, MediaIdentifyException
 	  {
 		  String hostserver = this.context.getOperatingMediaServer().toLowerCase();
+		  String workingDirectory = (request.getWorkingDirectory() == null || request.getWorkingDirectory() == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):request.getWorkingDirectory();
 		  ISession session = Session.Builder.newSession()
 					.usingMediaInput(input)
-					.usingTemplateFile(usingTemplate)
+					.usingTemplateFile(request.getTemplateFileName())
+					.inWorkingDirectory(workingDirectory)
+					.cleanUpOnExit(request.isCleanUpSegmentsOnExit())
 					.forServer(hostserver)
 					.build();
 		  
 		  session.registerObserver(this);
-		  templateTable.put(session, usingTemplate);
+		  templateTable.put(session, request.getTemplateFileName());
 		  sessionSignatureTable.put(getSignature(session), session);
 		  
 		  logger.info("new session created " + session.getId());		  
@@ -101,7 +104,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  return SessionUtil.generateSessionSignature(input, template);
 	  }
 
-	  public synchronized ISession checkOut(ITranscoderResource input, String usingTemplate) throws TranscoderException 
+	  public synchronized ISession checkOut(ITranscoderResource input, TranscodeRequest request) throws TranscoderException 
 	  {
 		  
 	    long now = System.currentTimeMillis();
@@ -117,7 +120,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	          expire(t);
 	          t = null;
 	        } else {
-	          if (validate(input, usingTemplate, t)) {
+	          if (validate(input, request.getTemplateFileName(), t)) {
 	            unlocked.remove(t);
 	            locked.put(t, now);
 	            return (t);
@@ -135,7 +138,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 	    // no objects available, create a new one
 	    try 
 	    {
-	    	t = create(input, usingTemplate);
+	    	t = create(input, request);
 	    	
 		} 
 	    catch (MalformedTranscodeQueryException | MediaIdentifyException e) 
@@ -164,23 +167,35 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  *****************************************************/
 
 	  @Override
-	  public void onSessionStart(ISession session, Object data) {
+	  public void onSessionPreStart(ISession session) 
+	  {
+			// TODO Auto-generated method stub	
+		  logger.info("Session prestart " + session.getId());
+		  
+		  
+	  }
+	  
+	  @Override
+	  public void onSessionStart(ISession session, Object data) 
+	  {
 			// TODO Auto-generated method stub
-		  //logger.info("Session started " + session.getId());
+		  logger.info("Session started " + session.getId());
+		  logger.info("Waiting to read stream source");
 	  }
 	  
 	
 	  @Override
 	  public void onSessionComplete(ISession session, Object data) {
 			// TODO Auto-generated method stub
-		  //logger.info("Session complete " + session.getId());
+		  logger.info("Session complete " + session.getId());
 		  checkIn(session);
 	  }
 	
 	  
 	  @Override
 	  public void onSessionFailed(ISession session, Object data) {
-			// TODO Auto-generated method stub	
+			// TODO Auto-generated method stub
+		  logger.info("Session failed. Could not read stream data properly.");
 		  checkIn(session);
 	  }
 	
@@ -192,13 +207,11 @@ public class TranscodeSessionPool implements ISessionObserver {
 	  @Override
 	  public void onSessionProcessAdded(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		 ioManager.registerTranscodeSession(session);
 	  }
 
 	  @Override
 	  public void onSessionProcessRemoved(ISession session, Process proc) {
 		// TODO Auto-generated method stub
-		 ioManager.unRegisterTranscodeSession(session);
 	  }
 
 	  public TranscoderContext getContext() {
@@ -207,13 +220,5 @@ public class TranscodeSessionPool implements ISessionObserver {
 		
 	  public void setContext(TranscoderContext context) {
 			this.context = context;
-	  }
-		
-	  public IOManager getIoManager() {
-			return ioManager;
-	  }
-		
-	  public void setIoManager(IOManager ioManager) {
-			this.ioManager = ioManager;
 	  }
 }

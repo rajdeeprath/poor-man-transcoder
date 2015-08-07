@@ -2,16 +2,23 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.commons.chain.Context;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.command.PostTranscodeCleanupCommand;
+import com.flashvisions.server.rtmp.transcoder.context.CleanUpContext;
 import com.flashvisions.server.rtmp.transcoder.data.factory.AbstractDAOFactory;
 import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
@@ -20,6 +27,7 @@ import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionDestroyer
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionOutputStream;
 import com.flashvisions.server.rtmp.transcoder.helpers.CommandBuilderHelper;
+import com.flashvisions.server.rtmp.transcoder.helpers.TokenReplacer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
@@ -32,8 +40,10 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.SessionEvent;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
+import com.flashvisions.server.rtmp.transcoder.vo.TranscoderExecutionError;
 
 /**
  * @author Rajdeep
@@ -42,10 +52,6 @@ import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 public class Session implements ISession  {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
-	
-	public static enum Event{
-		START, STOP, DATA, FAILED, COMPLETE, PROCESSADDED, PROCESSREMOVED
-	};
 	
 	private ITranscode config;
 	private ITranscoderResource source;
@@ -63,6 +69,8 @@ public class Session implements ISession  {
 	private ArrayList<ISessionObserver> observers;
 	private ArrayList<ITranscoderResource> outputs;
 	
+	private boolean cleanUpOnExit;
+	
 	private static long id;
 	
 	private Session(Builder builder) 
@@ -72,6 +80,7 @@ public class Session implements ISession  {
 		this.config = builder.config;
 		this.source = builder.input;
 		this.cmdLine = builder.cmdLine;	
+		this.cleanUpOnExit = builder.cleanUpOnExit;
 		this.setOutputs(builder.outputs);
 		this.executor = new DefaultExecutor();
 		
@@ -124,14 +133,19 @@ public class Session implements ISession  {
 	{
 		try 
 		{	
+			notifyObservers(SessionEvent.PRESTART, null);
+			
 			this.outstream = new TranscodeSessionOutputStream(this);
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
+			
+			logger.info("working directory " + this.workingDirectoryPath);
 			
 			this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
 			this.executor.setProcessDestroyer(new TranscodeSessionDestroyer(this));
 			this.executor.setWatchdog(this.watchdog);
 			this.executor.setExitValue(0);
+			
 			
 			this.executor.execute(this.cmdLine, this.resultHandler);
 		} 
@@ -163,7 +177,11 @@ public class Session implements ISession  {
 	}
 
 	
-	/***** Not Accurate !! Dont use this *****/
+	/*
+	 * Note: Not Accurate !! Dont use this
+	 * (non-Javadoc)
+	 * @see com.flashvisions.server.rtmp.transcoder.interfaces.ISession#isRunning()
+	 */
 	@Override
 	public boolean isRunning() 
 	{
@@ -175,9 +193,33 @@ public class Session implements ISession  {
 	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.info("onTranscodeProcessComplete exitValue: " + exitValue);
-		notifyObservers(Event.COMPLETE, null);
+		
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.execute(new Runnable() {
+		    public void run() {
+		        if(cleanUpOnExit)
+		        {
+		        	try 
+		        	{
+		        		CleanUpContext ctx = new CleanUpContext();
+		        		ctx.setInput(source);
+		        		ctx.setOutputs(outputs);
+		        		ctx.setWorkingDirectory(getWorkingDirectoryPath());
+		        		
+						new PostTranscodeCleanupCommand().execute(ctx);
+					} 
+		        	catch (Exception e) 
+		        	{
+						logger.error("Cleanup error " + e.getMessage());
+					}
+		        }
+		    }
+		});
+		executorService.shutdown();
+		notifyObservers(SessionEvent.COMPLETE, null);		
 	}
 
+	
 	@Override
 	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp) {
 		// TODO Auto-generated method stub
@@ -187,36 +229,36 @@ public class Session implements ISession  {
 		else cause = "Failure";
 		
 		logger.debug("onTranscodeProcessFailed cause: " + cause);
-		notifyObservers(Event.FAILED, null);
+		notifyObservers(SessionEvent.FAILED, new TranscoderExecutionError(e, cause, timestamp));
 	}
 	
 	@Override
 	public void onTranscodeProcessData(Object data, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessData");
-		notifyObservers(Event.DATA, data);
+		notifyObservers(SessionEvent.DATA, data);
 	}
 	
 	@Override
 	public void onTranscodeProcessStart(long timestamp) {
 		// TODO Auto-generated method stub
 		logger.debug("onTranscodeProcessStart");
-		notifyObservers(Event.START, null);
+		notifyObservers(SessionEvent.START, timestamp);
 	}
 	
 	@Override
 	public void onTranscodeProcessAdded(Process proc) {
 		// TODO Auto-generated method stub
-		logger.debug("onTranscodeProcessAdded");
-		notifyObservers(Event.PROCESSADDED, proc);
+		logger.info("onTranscodeProcessAdded");
+		notifyObservers(SessionEvent.PROCESSADDED, proc);
 	}
 
 
 	@Override
 	public void onTranscodeProcessRemoved(Process proc) {
 		// TODO Auto-generated method stub
-		logger.debug("onTranscodeProcessRemoved");
-		notifyObservers(Event.PROCESSREMOVED, proc);
+		logger.info("onTranscodeProcessRemoved");
+		notifyObservers(SessionEvent.PROCESSREMOVED, proc);
 	}
 	
 	@Override
@@ -277,40 +319,45 @@ public class Session implements ISession  {
 
 
 	@Override
-	public void notifyObservers(Event event, Object data) {
+	public void notifyObservers(SessionEvent event, Object data) {
 		// TODO Auto-generated method stub
 		for(ISessionObserver observer : observers)
 		{
 			switch(event)
 			{
+				case PRESTART:
+				observer.onSessionPreStart(this);
+				break;
+			
 				case START:
-				observer.onSessionStart(this, null);
+				observer.onSessionStart(this, data);
 				break;
 				
 				case DATA:
-				observer.onSessionData(this, null);
+				observer.onSessionData(this, data);
 				break;
 					
 				case COMPLETE:
-				observer.onSessionComplete(this, null);
+				observer.onSessionComplete(this, data);
 				break;
 					
 				case FAILED:
-				observer.onSessionFailed(this, null);
+				observer.onSessionFailed(this, data);
 				break;
 				
 				case STOP:
 				break;
 				
 				case PROCESSADDED:
-				observer.onSessionProcessAdded(this, null);
+				observer.onSessionProcessAdded(this, (Process)data);
 				break;
 				
 				case PROCESSREMOVED:
-				observer.onSessionProcessRemoved(this, null);
+				observer.onSessionProcessRemoved(this, (Process)data);
 				break;
 				
 				default:
+				logger.warn("Unknown session event");
 				break;		
 			}
 		}
@@ -331,6 +378,8 @@ public class Session implements ISession  {
 		// responsible for loading data from xml template
 		private static AbstractDAOFactory daoproducer;
 		private TranscodeConfigurationFactory configFactory;
+		
+		private TokenReplacer tokenReplacer;
 				
 		private ITranscode config;
 		private String templateFile;
@@ -339,6 +388,8 @@ public class Session implements ISession  {
 		private ITranscoderResource input;
 		private ArrayList<ITranscoderResource> outputs;
 		private ISession session;
+		
+		private boolean cleanUpOnExit;
 		
 		private CommandLine cmdLine;
 		@SuppressWarnings("unused")
@@ -350,9 +401,25 @@ public class Session implements ISession  {
 			return new Builder();
 		}
 		
+		private Builder()
+		{
+			this.initTokenReplacer();
+		}
+		
 		public Builder usingTranscodeConfig(ITranscode config){
+			
 			this.config = config;
 			return this;
+		}
+		
+		protected void initTokenReplacer()
+		{
+			this.tokenReplacer = new TokenReplacer();
+			
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.HOME_DIRECTORY_TOKEN_2, Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.HOME_DIRECTORY_TOKEN, Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.TEMPLATE_DIRECTORY, Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.CURRENT_DATE_TOKEN, DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		}
 		
 		public Builder usingMediaInput(ITranscoderResource source){
@@ -360,7 +427,7 @@ public class Session implements ISession  {
 			return this;
 		}
 		
-		public Builder setWorkingDirectory(String workingDirectoryPath){
+		public Builder inWorkingDirectory(String workingDirectoryPath){
 			this.workingDirectoryPath = workingDirectoryPath;
 			return this;
 		}
@@ -373,6 +440,11 @@ public class Session implements ISession  {
 
 		public Builder usingTemplateFile(String templateFile) {
 			this.templateFile = templateFile;
+			return this;
+		}
+		
+		public Builder cleanUpOnExit(boolean cleanUpOnExit) {
+			this.cleanUpOnExit = cleanUpOnExit;
 			return this;
 		}
 
@@ -405,7 +477,7 @@ public class Session implements ISession  {
 			logger.info("Building transcoder command");
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
-			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
+			CommandLine cmdLine = new CommandLine(TokenReplacer.TOKEN.FFMPEG_EXECUTABLE);
 			CommandBuilderHelper helper = new CommandBuilderHelper();
 			
 			
@@ -427,6 +499,16 @@ public class Session implements ISession  {
 						cmdLine.addArgument(option.getData());
 						cmdLine.addArgument("-i");
 						cmdLine.addArgument("${inputSource}");
+						
+						
+						/************************************************
+						 ********** Prepare working directory ***********
+						 ************************************************/
+						
+						String workingDirectory = (this.workingDirectoryPath == null || this.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):this.workingDirectoryPath;
+						workingDirectory = helper.prepareWorkingDirectory(input, workingDirectory);
+						this.workingDirectoryPath = workingDirectory;
+						this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.WORKING_DIRECTORY_TOKEN, this.workingDirectoryPath);
 						
 						
 						/************************************************
@@ -473,7 +555,7 @@ public class Session implements ISession  {
 								}
 								catch(Exception e)
 								{
-									logger.info("Condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
+									logger.info("Error condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
 									cmdLine.addArgument("-vn");
 								}
 								
@@ -501,7 +583,7 @@ public class Session implements ISession  {
 								}
 								catch(Exception e)
 								{
-									logger.info("Condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
+									logger.info("Error condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
 									cmdLine.addArgument("-an");
 								}
 								
@@ -512,12 +594,12 @@ public class Session implements ISession  {
 								 ************************************************/
 								try
 								{				
-									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output);
+									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output, tokenReplacer, workingDirectory);
 									outputBucket.add(transcoderOutput);
 								}
 								catch(Exception e)
 								{
-									logger.info("Error building output");
+									logger.info("Error building output " + e.getCause());
 									throw(e);
 								}
 							}
@@ -542,6 +624,12 @@ public class Session implements ISession  {
 				helper = null;
 			}
 		}
+
+		public boolean isCleanUpOnExit() {
+			return cleanUpOnExit;
+		}
+
+		
 	}
 	
 }
