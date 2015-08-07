@@ -68,6 +68,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 					.usingMediaInput(input)
 					.usingTemplateFile(request.getTemplateFileName())
 					.inWorkingDirectory(workingDirectory)
+					.cleanUpOnExit(request.isCleanUpSegmentsOnExit())
 					.forServer(hostserver)
 					.build();
 		  

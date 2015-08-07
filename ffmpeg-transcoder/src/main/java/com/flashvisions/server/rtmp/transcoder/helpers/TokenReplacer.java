@@ -21,6 +21,7 @@ public class TokenReplacer {
 		public static final String TEMPLATE_DIRECTORY = "${templateDirectory}";
 		public static final String OWN_SEGMENT_DIRECTORY = "${ownSegmentDirectory}";
 		public static final String HLS_SAMPLE_PLAYBACK_TEMPLATE = "${hlsPlaybackTemplate}";
+		public static final String FFMPEG_EXECUTABLE = "${ffmpegExecutable}";
 	}
 	
 	
@@ -54,7 +55,7 @@ public class TokenReplacer {
 	        String token = (String) pair.getKey();
 	        String value = (String) pair.getValue();
 	        subject = subject.replace(token, value);
-	        //subject = subject.replaceAll(token, value);
+	        //subject = subject.replaceAll(token, value); // TO DO
 	    }
 	    
 	    return subject;

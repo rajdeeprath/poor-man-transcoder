@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.commons.chain.Context;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -14,6 +17,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.flashvisions.server.rtmp.transcoder.command.PostTranscodeCleanupCommand;
+import com.flashvisions.server.rtmp.transcoder.context.CleanUpContext;
 import com.flashvisions.server.rtmp.transcoder.data.factory.AbstractDAOFactory;
 import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
@@ -64,6 +69,8 @@ public class Session implements ISession  {
 	private ArrayList<ISessionObserver> observers;
 	private ArrayList<ITranscoderResource> outputs;
 	
+	private boolean cleanUpOnExit;
+	
 	private static long id;
 	
 	private Session(Builder builder) 
@@ -73,6 +80,7 @@ public class Session implements ISession  {
 		this.config = builder.config;
 		this.source = builder.input;
 		this.cmdLine = builder.cmdLine;	
+		this.cleanUpOnExit = builder.cleanUpOnExit;
 		this.setOutputs(builder.outputs);
 		this.executor = new DefaultExecutor();
 		
@@ -185,9 +193,33 @@ public class Session implements ISession  {
 	public void onTranscodeProcessComplete(int exitValue, long timestamp) {
 		// TODO Auto-generated method stub
 		logger.info("onTranscodeProcessComplete exitValue: " + exitValue);
-		notifyObservers(SessionEvent.COMPLETE, null);
+		
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.execute(new Runnable() {
+		    public void run() {
+		        if(cleanUpOnExit)
+		        {
+		        	try 
+		        	{
+		        		CleanUpContext ctx = new CleanUpContext();
+		        		ctx.setInput(source);
+		        		ctx.setOutputs(outputs);
+		        		ctx.setWorkingDirectory(getWorkingDirectoryPath());
+		        		
+						new PostTranscodeCleanupCommand().execute(ctx);
+					} 
+		        	catch (Exception e) 
+		        	{
+						logger.error("Cleanup error " + e.getMessage());
+					}
+		        }
+		    }
+		});
+		executorService.shutdown();
+		notifyObservers(SessionEvent.COMPLETE, null);		
 	}
 
+	
 	@Override
 	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp) {
 		// TODO Auto-generated method stub
@@ -217,7 +249,7 @@ public class Session implements ISession  {
 	@Override
 	public void onTranscodeProcessAdded(Process proc) {
 		// TODO Auto-generated method stub
-		logger.debug("onTranscodeProcessAdded");
+		logger.info("onTranscodeProcessAdded");
 		notifyObservers(SessionEvent.PROCESSADDED, proc);
 	}
 
@@ -225,7 +257,7 @@ public class Session implements ISession  {
 	@Override
 	public void onTranscodeProcessRemoved(Process proc) {
 		// TODO Auto-generated method stub
-		logger.debug("onTranscodeProcessRemoved");
+		logger.info("onTranscodeProcessRemoved");
 		notifyObservers(SessionEvent.PROCESSREMOVED, proc);
 	}
 	
@@ -357,6 +389,8 @@ public class Session implements ISession  {
 		private ArrayList<ITranscoderResource> outputs;
 		private ISession session;
 		
+		private boolean cleanUpOnExit;
+		
 		private CommandLine cmdLine;
 		@SuppressWarnings("unused")
 		private Server serverType;
@@ -408,6 +442,11 @@ public class Session implements ISession  {
 			this.templateFile = templateFile;
 			return this;
 		}
+		
+		public Builder cleanUpOnExit(boolean cleanUpOnExit) {
+			this.cleanUpOnExit = cleanUpOnExit;
+			return this;
+		}
 
 		
 		public ISession build() throws MalformedTranscodeQueryException, MediaIdentifyException{
@@ -438,7 +477,7 @@ public class Session implements ISession  {
 			logger.info("Building transcoder command");
 			
 			HashMap<String, Object> replacementMap = new HashMap<String, Object>();
-			CommandLine cmdLine = new CommandLine("${ffmpegExecutable}");
+			CommandLine cmdLine = new CommandLine(TokenReplacer.TOKEN.FFMPEG_EXECUTABLE);
 			CommandBuilderHelper helper = new CommandBuilderHelper();
 			
 			
@@ -516,7 +555,7 @@ public class Session implements ISession  {
 								}
 								catch(Exception e)
 								{
-									logger.info("Condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
+									logger.info("Error condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
 									cmdLine.addArgument("-vn");
 								}
 								
@@ -544,7 +583,7 @@ public class Session implements ISession  {
 								}
 								catch(Exception e)
 								{
-									logger.info("Condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
+									logger.info("Error condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
 									cmdLine.addArgument("-an");
 								}
 								
@@ -585,6 +624,12 @@ public class Session implements ISession  {
 				helper = null;
 			}
 		}
+
+		public boolean isCleanUpOnExit() {
+			return cleanUpOnExit;
+		}
+
+		
 	}
 	
 }

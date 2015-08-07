@@ -23,8 +23,6 @@ public class InitializeVariables implements Command {
 		try
 		{
 			TranscoderContext ctx = (TranscoderContext) context;
-			
-			
 			TranscodeSessionPool pool = new TranscodeSessionPool(ctx);
 			ctx.setPool(pool);			
 		}

@@ -5,7 +5,7 @@ public class TranscodeRequest {
 
 	private String workingDirectoryPath;
 	private String templateFileName;
-	private String templateDirectoryPath;
+	private boolean cleanUpSegmentsOnExit; 
 	
 	
 	public void setWorkingDirectory(String workingDirectoryPath) {
@@ -17,16 +17,6 @@ public class TranscodeRequest {
 		// TODO Auto-generated method stub
 		return workingDirectoryPath;
 	}
-	
-	public void setTemplateDirectory(String templateDirectoryPath) {
-		// TODO Auto-generated method stub
-		this.templateDirectoryPath = templateDirectoryPath;
-	}
-
-	public String getTemplateDirectory() {
-		// TODO Auto-generated method stub
-		return templateDirectoryPath;
-	}
 
 	public String getTemplateFileName() {
 		return templateFileName;
@@ -34,6 +24,14 @@ public class TranscodeRequest {
 
 	public void setTemplateFileName(String templateFileName) {
 		this.templateFileName = templateFileName;
+	}
+
+	public boolean isCleanUpSegmentsOnExit() {
+		return cleanUpSegmentsOnExit;
+	}
+
+	public void setCleanUpSegmentsOnExit(boolean cleanUpSegmentsOnExit) {
+		this.cleanUpSegmentsOnExit = cleanUpSegmentsOnExit;
 	}
 
 }
