@@ -159,8 +159,6 @@ public class IOUtils {
 		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.SOURCE_APP_TOKEN_2, inapp);
 		
 		outsource = tokenReplacer.processReplacement(outsource);
-		//outsource = outsource.replace("SourceApplication", inapp);
-		//outsource = outsource.replace("SourceStreamName", streamname);
 		
 		container = (temp.getContainer() == null)?new Container(guessContainer(outsource)):temp.getContainer();
 		finalOutput = (temp.isStreamingMedia())?new StreamMedia(outsource, container):new FileMedia(outsource, container);

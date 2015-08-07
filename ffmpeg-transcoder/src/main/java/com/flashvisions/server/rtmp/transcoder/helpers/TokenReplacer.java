@@ -54,6 +54,7 @@ public class TokenReplacer {
 	        String token = (String) pair.getKey();
 	        String value = (String) pair.getValue();
 	        subject = subject.replace(token, value);
+	        //subject = subject.replaceAll(token, value);
 	    }
 	    
 	    return subject;

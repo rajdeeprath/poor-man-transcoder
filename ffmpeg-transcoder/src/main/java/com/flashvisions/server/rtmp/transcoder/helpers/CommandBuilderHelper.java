@@ -41,7 +41,6 @@ public class CommandBuilderHelper {
 		logger.info("Processing output destination for encode");
 		
 		String HLS_FILES_PATTERN = "([^\\s]+(\\.(?i)(m3u8|ts))$)";
-		String SOURCE_STREAM_NAME_PATTERN = "SourceStreamName";
 		
 		String segmentDirectory = null;
 		
