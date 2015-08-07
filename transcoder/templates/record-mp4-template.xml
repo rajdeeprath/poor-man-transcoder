@@ -68,7 +68,15 @@
 				<Output>
 						<StreamName>${SourceStreamName}.mp4</StreamName>
 						<!-- mp4, flv etc.. -->
-						<Container></Container>
+						<Container>mp4</Container>
+						
+						<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+						</Parameters>
+					
 						<Properties>
 							<!--<Property></Property>-->
 						</Properties>
