@@ -53,7 +53,6 @@ public class InitializeEnvironment implements Command {
 			Globals.addEnv(Globals.Vars.WORKING_DIRECTORY, ctx.getWorkingDirectory());
 			logger.info("Working directory " + ctx.getWorkingDirectory());
 			
-			
 			if(ctx.getOperatingMediaServer().equalsIgnoreCase(null) || ctx.getOperatingMediaServer() == null || !TranscoderUtils.isValidMediaServer(ctx.getOperatingMediaServer())) 
 			throw new IllegalArgumentException("Invalid media server type");
 			Globals.addEnv(Globals.Vars.OPERATING_SERVER, ctx.getOperatingMediaServer());

@@ -1,6 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
-import java.io.File;
 
 import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;

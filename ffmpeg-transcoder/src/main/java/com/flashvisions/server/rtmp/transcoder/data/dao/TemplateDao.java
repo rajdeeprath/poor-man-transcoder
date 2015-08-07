@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 
 import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscodeConfigurationException;
-import com.flashvisions.server.rtmp.transcoder.helpers.SubstitutionParseHelper;
+import com.flashvisions.server.rtmp.transcoder.helpers.TemplateTokenParser;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
@@ -130,7 +130,7 @@ public class TemplateDao implements ITranscodeDao {
 			validator = validatorFactory.getValidator();  
 			
 			logger.debug("Updating document with expression variables");
-			SubstitutionParseHelper.updateDocumentWithVariables(document, xpath);
+			TemplateTokenParser.updateDocumentWithVariables(document, xpath);
 			
 			/****************** template name ****************/
 			String templateNameExpression = "/Template/Transcode/Name";

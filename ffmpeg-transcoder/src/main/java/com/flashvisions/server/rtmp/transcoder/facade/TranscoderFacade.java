@@ -1,7 +1,5 @@
 package com.flashvisions.server.rtmp.transcoder.facade;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +11,6 @@ import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
-import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
 
 public final class TranscoderFacade implements ITranscoderFacade {
 

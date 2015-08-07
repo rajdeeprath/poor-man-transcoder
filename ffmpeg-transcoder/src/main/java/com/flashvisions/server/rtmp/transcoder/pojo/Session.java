@@ -2,6 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.exec.CommandLine;
@@ -9,7 +10,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionDestroyer
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionOutputStream;
 import com.flashvisions.server.rtmp.transcoder.helpers.CommandBuilderHelper;
+import com.flashvisions.server.rtmp.transcoder.helpers.TokenReplacer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
@@ -344,6 +346,8 @@ public class Session implements ISession  {
 		// responsible for loading data from xml template
 		private static AbstractDAOFactory daoproducer;
 		private TranscodeConfigurationFactory configFactory;
+		
+		private TokenReplacer tokenReplacer;
 				
 		private ITranscode config;
 		private String templateFile;
@@ -363,9 +367,25 @@ public class Session implements ISession  {
 			return new Builder();
 		}
 		
+		private Builder()
+		{
+			this.initTokenReplacer();
+		}
+		
 		public Builder usingTranscodeConfig(ITranscode config){
+			
 			this.config = config;
 			return this;
+		}
+		
+		protected void initTokenReplacer()
+		{
+			this.tokenReplacer = new TokenReplacer();
+			
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.HOME_DIRECTORY_TOKEN_2, Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.HOME_DIRECTORY_TOKEN, Globals.getEnv(Globals.Vars.HOME_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.TEMPLATE_DIRECTORY, Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY));
+			this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.CURRENT_DATE_TOKEN, DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 		}
 		
 		public Builder usingMediaInput(ITranscoderResource source){
@@ -448,7 +468,8 @@ public class Session implements ISession  {
 						
 						String workingDirectory = (this.workingDirectoryPath == null || this.workingDirectoryPath == "")?Globals.getEnv(Globals.Vars.WORKING_DIRECTORY):this.workingDirectoryPath;
 						workingDirectory = helper.prepareWorkingDirectory(input, workingDirectory);
-						this.inWorkingDirectory(workingDirectory);
+						this.workingDirectoryPath = workingDirectory;
+						this.tokenReplacer.setTokenValue(TokenReplacer.TOKEN.WORKING_DIRECTORY_TOKEN, this.workingDirectoryPath);
 						
 						
 						/************************************************
@@ -534,12 +555,12 @@ public class Session implements ISession  {
 								 ************************************************/
 								try
 								{				
-									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output, workingDirectory);
+									ITranscoderResource transcoderOutput = helper.buildOutput(cmdLine, input, output, tokenReplacer, workingDirectory);
 									outputBucket.add(transcoderOutput);
 								}
 								catch(Exception e)
 								{
-									logger.info("Error building output");
+									logger.info("Error building output " + e.getCause());
 									throw(e);
 								}
 							}

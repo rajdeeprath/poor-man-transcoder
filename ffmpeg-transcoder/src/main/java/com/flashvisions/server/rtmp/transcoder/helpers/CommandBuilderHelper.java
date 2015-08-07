@@ -3,10 +3,6 @@ package com.flashvisions.server.rtmp.transcoder.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
@@ -14,7 +10,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.data.factory.LibRtmpConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
@@ -25,7 +20,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ICodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IKeyFrameInterval;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ILibRtmpConfig;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscodeOutput;
@@ -33,9 +27,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideo;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.CodecImplementations;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Format;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Protocol;
-import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
@@ -44,17 +36,19 @@ public class CommandBuilderHelper {
 	private static Logger logger = LoggerFactory.getLogger(CommandBuilderHelper.class);
 	
 	
-	public ITranscoderResource buildOutput(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output, String workingDirectory) throws Exception
+	public ITranscoderResource buildOutput(CommandLine cmdLine, ITranscoderResource input, ITranscodeOutput output, TokenReplacer tokenReplacer, String workingDirectory) throws Exception
 	{
 		logger.info("Processing output destination for encode");
 		
-		String HLS_PATTERN = "([^\\s]+(\\.(?i)(m3u8|ts))$)";
+		String HLS_FILES_PATTERN = "([^\\s]+(\\.(?i)(m3u8|ts))$)";
+		String SOURCE_STREAM_NAME_PATTERN = "SourceStreamName";
+		
 		String segmentDirectory = null;
 		
 		ITranscoderResource template = output.getMediaOutput();
 		ArrayList<IProperty> properties = output.getOutputProperties();
 		ArrayList<IParameter> parameters = output.getOutputIParameters();
-		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template);
+		ITranscoderResource transcoderOutput = IOUtils.createOutputFromInput(input, template, tokenReplacer);
 		
 		
 		cmdLine.addArgument(Flags.OVERWRITE);
@@ -67,7 +61,8 @@ public class CommandBuilderHelper {
 		switch(transcoderOutput.getContainer().getType())
 		{
 			case SSEGMENT:
-			segmentDirectory = prepareSegmentDirectory(cmdLine, transcoderOutput, workingDirectory);
+			segmentDirectory = prepareSegmentDirectory(cmdLine, transcoderOutput, tokenReplacer, workingDirectory);
+			tokenReplacer.setTokenValue(TokenReplacer.TOKEN.OWN_SEGMENT_DIRECTORY, segmentDirectory);
 			break;
 			
 			default:
@@ -83,10 +78,12 @@ public class CommandBuilderHelper {
 				String key = param.getKey();
 				String value = String.valueOf(param.getValue());
 				
+				
 				switch(transcoderOutput.getContainer().getType())
 				{
 					case SSEGMENT:
-					value = value.replaceAll(HLS_PATTERN, segmentDirectory + File.separator + value);
+					value = value.replaceAll(HLS_FILES_PATTERN, tokenReplacer.asPlaceholder(TokenReplacer.TOKEN.OWN_SEGMENT_DIRECTORY) + value);
+					value = tokenReplacer.processReplacement(value);
 					break;
 					
 					default:
@@ -104,10 +101,12 @@ public class CommandBuilderHelper {
 			for(IProperty property: properties){
 				String data = property.getData();
 				
+				
 				switch(transcoderOutput.getContainer().getType())
 				{
 					case SSEGMENT:
-					data = data.replaceAll(HLS_PATTERN, segmentDirectory + File.separator + data);
+					data = data.replaceAll(HLS_FILES_PATTERN, tokenReplacer.asPlaceholder(TokenReplacer.TOKEN.OWN_SEGMENT_DIRECTORY) + data);
+					data = tokenReplacer.processReplacement(data);
 					break;
 					
 					default:
@@ -123,10 +122,13 @@ public class CommandBuilderHelper {
 	}
 	
 	
-	protected String prepareSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, String masterWorkingDirectory) throws IOException
+	protected String prepareSegmentDirectory(CommandLine cmdLine, ITranscoderResource output, TokenReplacer tokenReplacer, String masterWorkingDirectory) throws IOException
 	{	
 		// create sub directory for hls output
 		String HLS_SAMPLE_PLAYBACK_TEMPLATE = "hls-index-sample.html";
+		String OUTPUT_HLS_PLAYBACK_TEMPLATE = "index.html";
+		tokenReplacer.setTokenValue(TokenReplacer.TOKEN.HLS_SAMPLE_PLAYBACK_TEMPLATE, HLS_SAMPLE_PLAYBACK_TEMPLATE);
+		
 		String outName = output.getMediaName();
 		String outNameWithOutExt = FilenameUtils.removeExtension(outName);
 		
@@ -134,7 +136,7 @@ public class CommandBuilderHelper {
 		if(!sub.exists()) sub.mkdir();
 		
 		File indexTemplateSample = new File(Globals.getEnv(Globals.Vars.TEMPLATE_DIRECTORY) + File.separator + HLS_SAMPLE_PLAYBACK_TEMPLATE);
-		File indexTemplate = new File(sub.getAbsolutePath() + File.separator + "index.html");
+		File indexTemplate = new File(sub.getAbsolutePath() + File.separator + OUTPUT_HLS_PLAYBACK_TEMPLATE);
 		if(indexTemplateSample.exists())  FileUtils.copyFile(indexTemplateSample, indexTemplate);
 		logger.info("Copying html template for hls playback into " + sub.getAbsolutePath());
 		
@@ -146,7 +148,7 @@ public class CommandBuilderHelper {
 	}
 	
 	
-	public String prepareWorkingDirectory(ITranscoderResource input, String masterWorkingDirectory)
+	public String prepareWorkingDirectory(ITranscoderResource input, String masterWorkingDirectory) throws Exception
 	{
 		// create master working directory if not exists
 		File dir = new File(masterWorkingDirectory);
@@ -156,24 +158,12 @@ public class CommandBuilderHelper {
 		switch(Protocol.valueOf(input.getProtocol().toUpperCase()))
 		{
 			case RTSP:
-			case RTP:
-			logger.info("create application name folder");	
+			case RTP:	
 			break;
 		
 			case RTMP:
 			case RTMPS:
 			case RTMPT:
-			/*
-			String inName = input.getMediaName();
-			
-			ILibRtmpConfig rtmpInterpretor = LibRtmpConfigurationFactory.getLibRtmpConfiguration(Server.valueOf(Globals.getEnv(Globals.Vars.OPERATING_SERVER).toUpperCase()));
-			rtmpInterpretor.prepareFrom(input);
-			String appName = rtmpInterpretor.getAppName();
-			
-			File appScopeDir = new File(dir.getAbsolutePath() + File.separator + appName);
-			if(!appScopeDir.exists()) appScopeDir.mkdirs();
-			dir = appScopeDir;
-			*/
 			break;
 				
 			default:
