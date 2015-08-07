@@ -58,14 +58,26 @@ https://github.com/rajdeeprath/red5-server/blob/master/transcoderlive/src/org/re
 
 First time bootsrap (onAppStart / onServerStart):
 ```
+/* Boot strap */
 ITranscoderFacade facade = TranscoderFacade.getInstance();
-facade.setFFmpegPath("/path/to/ffmpeg/");
-facade.setHomeDirectory("/path-to/server-home-directory/");
-facade.setWorkingDirectory("/path-to/working-directory/);
-facade.setTemplateDirectory("/path-to/templates/directory/");
-facade.setOperatingMediaServer("red5"); // server string => red5 / wowza
+facade.setFFmpegPath("DRIVE:\\ffmpeg\\bin\\ffmpeg.exe");
+facade.setHomeDirectory("DRIVE:\\red5-server-1.0.5\\");
+facade.setWorkingDirectory("DRIVE:\\red5-server-1.0.5\\webapps\\");
+facade.setTemplateDirectory("DRIVE:\\red5-server-1.0.5\\transcoder\\templates\\");
+facade.setOperatingMediaServer("red5");
 facade.init();
 ```
+
+
+Form a transcode request object::
+```
+/* Transcode request Object */
+TranscodeRequest request = new TranscodeRequest();
+request.setWorkingDirectory("DRIVE:\\red5-server-1.0.5\\webapps\\live\\streams\\");
+request.setTemplateFileName("hls-template.xml");
+request.setCleanUpSegmentsOnExit(true); // works on hls output only
+```
+
 
 To transcode your stream::
 ```
@@ -146,8 +158,17 @@ facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
 						<StreamName>${SourceApplication}/mp4:${SourceStreamName}</StreamName>
+						
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
+						
+						<Parameters>
+							<!--<Parameter>
+								<Key></Key>
+								<Value></Value>
+							</Parameter>-->
+						</Parameters>
+					
 						<Properties>
 							<!--<Property></Property>-->
 						</Properties>
@@ -161,7 +182,14 @@ facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/
 
 ## Status
 
-####### [ Unstable (Not for production) ]
+
+###### 07 - 08 - 2015
+
++ HLS folder generation
++ HLS folder auto cleanup
++ Multi bitrate HLS
++ Live image snapshot extraction
++ Major Bug fixes
 
 
 TO DO:
@@ -175,13 +203,14 @@ TO DO:
 5. Java docs
 6. Red5 plugin development
 7. Wowza plugin develpment
-8. HLS enhancements
+8. ~~HLS enhancements~~
 9. User defined RTMP url format interpret strategy
 10. Easy overlays
 11. video cropping
 12. Auto SMIL generation
-13. HLS cleanup
+13. ~~HLS cleanup~~
 14. Secure url params based url interpret strategy
+15. ~~Live image snapshot extraction~~
 
 
 
