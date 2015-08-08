@@ -10,6 +10,7 @@ public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
 
 	private ExecuteWatchdog watchdog;
 	private TranscodeSessionResultCallback callback;
+	private long abortRequestTimestamp = 0;
 	
 	public TranscodeSessionResultHandler(ExecuteWatchdog watchdog){
 		this.setWatchdog(watchdog);
@@ -71,6 +72,14 @@ public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
 
 	public void setCallback(TranscodeSessionResultCallback callback) {
 		this.callback = callback;
+	}
+
+	public long getAbortRequestTimestamp() {
+		return abortRequestTimestamp;
+	}
+
+	public void setAbortRequestTimestamp(long abortRequestTimestamp) {
+		this.abortRequestTimestamp = abortRequestTimestamp;
 	}
 
 }

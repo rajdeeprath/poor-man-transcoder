@@ -53,6 +53,11 @@ public class Session implements ISession  {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
+	private static final int  ABORT_TIMEOUT = 2000; 
+	
+	private static final String  FAILURE_BY_TIMEOUT = "Timeout";
+	private static final String  GENERIC_FAILURE = "Failure";
+	
 	private ITranscode config;
 	private ITranscoderResource source;
 	private String workingDirectoryPath;	
@@ -133,12 +138,12 @@ public class Session implements ISession  {
 	{
 		try 
 		{	
+			logger.info("Starting transcode");
+			
 			notifyObservers(SessionEvent.PRESTART, null);
 			
 			this.outstream = new TranscodeSessionOutputStream(this);
 			this.resultHandler = new TranscodeSessionResultHandler(this.watchdog, this);
-			
-			logger.info("working directory " + this.workingDirectoryPath);
 			
 			this.executor.setWorkingDirectory(new File(this.workingDirectoryPath));
 			this.executor.setStreamHandler(new PumpStreamHandler(this.outstream));
@@ -158,6 +163,7 @@ public class Session implements ISession  {
 	@Override
 	public boolean stop() 
 	{
+		this.resultHandler.setAbortRequestTimestamp(System.currentTimeMillis());
 		return stopTranscode();
 	}
 
@@ -165,6 +171,7 @@ public class Session implements ISession  {
 	{
 		try
 		{
+			logger.info("Stopping transcode");
 			executor.getWatchdog().destroyProcess();
 		}
 		catch(Exception e)
@@ -194,6 +201,13 @@ public class Session implements ISession  {
 		// TODO Auto-generated method stub
 		logger.info("onTranscodeProcessComplete exitValue: " + exitValue);
 		
+		doCleanUp();
+		notifyObservers(SessionEvent.COMPLETE, null);		
+	}
+
+	
+	protected void doCleanUp()
+	{
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.execute(new Runnable() {
 		    public void run() {
@@ -216,20 +230,25 @@ public class Session implements ISession  {
 		    }
 		});
 		executorService.shutdown();
-		notifyObservers(SessionEvent.COMPLETE, null);		
 	}
-
 	
 	@Override
 	public void onTranscodeProcessFailed(ExecuteException e, ExecuteWatchdog watchdog, long timestamp) {
 		// TODO Auto-generated method stub
 		String cause = null;
 		
-		if(watchdog != null && watchdog.killedProcess()) cause = "Timeout";
-		else cause = "Failure";
+		if(watchdog != null && watchdog.killedProcess()) cause = FAILURE_BY_TIMEOUT;
+		else cause = GENERIC_FAILURE;
 		
-		logger.debug("onTranscodeProcessFailed cause: " + cause);
-		notifyObservers(SessionEvent.FAILED, new TranscoderExecutionError(e, cause, timestamp));
+		if(timestamp - this.resultHandler.getAbortRequestTimestamp()>ABORT_TIMEOUT)
+		{
+			logger.warn("onTranscodeProcessFailed cause: " + cause);
+			notifyObservers(SessionEvent.FAILED, new TranscoderExecutionError(e, cause, timestamp));
+		}
+		else
+		{
+			logger.warn("Probable force abort");
+		}
 	}
 	
 	@Override
