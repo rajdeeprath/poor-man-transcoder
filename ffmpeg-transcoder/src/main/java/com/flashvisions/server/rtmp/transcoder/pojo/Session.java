@@ -248,6 +248,7 @@ public class Session implements ISession  {
 		else
 		{
 			logger.warn("Probable force abort");
+			doCleanUp();
 		}
 	}
 	
