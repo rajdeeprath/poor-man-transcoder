@@ -12,15 +12,15 @@ import com.flashvisions.server.rtmp.transcoder.generic.command.DoTranscodeComman
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 
-public final class TranscoderFacade implements ITranscoderFacade {
+public final class GenericTranscoderFacade implements ITranscoderFacade {
 
-	private static Logger logger = LoggerFactory.getLogger(TranscoderFacade.class);
+	private static Logger logger = LoggerFactory.getLogger(GenericTranscoderFacade.class);
 	
 	private static TranscoderContext context;
 	private static volatile ITranscoderFacade instance;
 	private static boolean bootstrap = false;
 	
-	private TranscoderFacade(){
+	private GenericTranscoderFacade(){
 		context = new TranscoderContext();
 	}	
 	
@@ -28,9 +28,9 @@ public final class TranscoderFacade implements ITranscoderFacade {
 	{
 		if(instance == null)
 		{
-			synchronized (TranscoderFacade.class){
+			synchronized (GenericTranscoderFacade.class){
 				if(instance == null){
-					instance = new TranscoderFacade();
+					instance = new GenericTranscoderFacade();
 				}
 			}
 		}
