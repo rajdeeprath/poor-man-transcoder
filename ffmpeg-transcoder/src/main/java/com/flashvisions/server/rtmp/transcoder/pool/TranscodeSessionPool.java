@@ -97,7 +97,7 @@ public class TranscodeSessionPool implements ISessionObserver {
 		  session = null;
 	  }
 	  
-	  private String getSignature(ISession session)
+	  public String getSignature(ISession session)
 	  {
 		  String template = templateTable.get(session);
 		  String input = session.getInputSource().getSourcePath();
