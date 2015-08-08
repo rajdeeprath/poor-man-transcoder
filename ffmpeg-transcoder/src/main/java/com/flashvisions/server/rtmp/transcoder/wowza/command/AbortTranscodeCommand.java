@@ -1,4 +1,4 @@
-package com.flashvisions.server.rtmp.transcoder.command;
+package com.flashvisions.server.rtmp.transcoder.wowza.command;
 
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
@@ -14,13 +14,6 @@ public class AbortTranscodeCommand implements Command {
 	@Override
 	public boolean execute(Context context) throws Exception {
 		// TODO Auto-generated method stub
-		TranscoderContext ctx = (TranscoderContext) context;
-		TranscodeSessionPool pool =  ctx.getPool();
-		IConnection connnection = Red5.getConnectionLocal();
-		
-		String signature = (String) connnection.getAttribute("TRANSCODERSESSION");
-		ISession session = pool.getSession(signature);
-		session.stop();
 		
 		return false;
 	}

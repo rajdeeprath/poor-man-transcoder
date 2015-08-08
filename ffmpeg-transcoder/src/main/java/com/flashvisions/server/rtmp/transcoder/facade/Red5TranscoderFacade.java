@@ -5,12 +5,12 @@ import org.red5.server.api.Red5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.flashvisions.server.rtmp.transcoder.command.AbortTranscodeCommand;
-import com.flashvisions.server.rtmp.transcoder.command.DoTranscodeCommand;
 import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap;
 import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
+import com.flashvisions.server.rtmp.transcoder.generic.command.AbortTranscodeCommand;
+import com.flashvisions.server.rtmp.transcoder.generic.command.DoTranscodeCommand;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;

@@ -53,7 +53,7 @@
 	</dependency>
 	<dependency>
 		<groupId>org.red5</groupId>
-		<artifactId>red5-server</artifactId>
+		<artifactId>red5-server-common</artifactId>
 		<version>1.0.5-RELEASE</version>
 	</dependency>
 	<dependency>
