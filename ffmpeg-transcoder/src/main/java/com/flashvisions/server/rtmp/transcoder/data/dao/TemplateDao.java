@@ -115,7 +115,6 @@ public class TemplateDao implements ITranscodeDao {
 			logger.debug("preparing new transcode session");
 			
 			
-			
 			this.templateFile = new File(this.templatePath);
 			if(!this.templateFile.exists()) throw new FileNotFoundException("Template not found");
 			

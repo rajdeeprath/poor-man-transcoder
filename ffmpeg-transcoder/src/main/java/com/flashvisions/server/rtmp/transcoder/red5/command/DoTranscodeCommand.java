@@ -40,14 +40,10 @@ public class DoTranscodeCommand implements Command {
 		IConnection connnection = Red5.getConnectionLocal();
 		connnection.setAttribute("TRANSCODERSESSION", pool.getSignature(session));
 		
-		if(this.request.getWorkingDirectory() != null)
-		{
-			File workingDir = new File(this.request.getWorkingDirectory());
-			if(!workingDir.exists()) throw new IOException("Working directory not found"); 
-				
-			session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
-		}
-		
+		File workingDir = new File(this.request.getWorkingDirectory());
+		if(!workingDir.exists()) throw new IOException("Working directory not found"); 
+			
+		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
 		session.start();
 		
 		return false;
