@@ -42,7 +42,6 @@ public class DoTranscodeCommand implements Command {
 		if(!workingDir.exists()) throw new IOException("Working directory not found"); 
 			
 		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
-		
 		session.start();
 		
 		return false;
