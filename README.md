@@ -295,3 +295,6 @@ Output will appear according to the template selected.
 * For record to file transcoding the recorded file(s) can be found inside the configured workingDirectory
 ***
 * For live image extraction the extracted sequence can be found inside the configured workingDirectory
+
+
+**Note: {output_name} is the output name set in the template's output section for a encode configuration**
