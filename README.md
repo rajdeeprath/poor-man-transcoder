@@ -217,3 +217,39 @@ TO DO:
 ## Special Thanks
 
 To: Mr. Chris Allen, Dominick Accattato and the entire infrared5 team for inspiration.
+
+
+
+## Building the project & deploying on Media server
+
+
+This is a maven project, so you need to install maven on your computer.
+
+
+1. **Install Maven**
+
+[https://maven.apache.org/download.cgi](https://maven.apache.org/download.cgi)
+
+
+
+2. **Build process** (using maven)
+```
+$ mvn clean
+```
+
+```
+$ mvn compile
+```
+
+```
+$ mvn package
+```
+
+
+3. **Deployment on media server (Java based servers only)**
+
+* The output will be a jar file:  **ffmpeg-transcoder.jar**
+* Copy the jar file and other jars from maven project dependency-jars folder into media server's lib folder.
+* Copy the **transcoder** folder to appropriate location on your server. **Example: C://red5/transcoder/**
+* Restart your media server
+
