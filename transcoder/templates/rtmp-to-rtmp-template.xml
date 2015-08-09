@@ -2,8 +2,8 @@
 <!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>Record mp4 Sample</Name>
-		<Description>Record MP4 transcode template</Description>	
+		<Name>RTMP to RTMP sample</Name>
+		<Description>RTMP to RTMP transcode template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>
@@ -66,9 +66,17 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/${SourceStreamName}_transcoded</StreamName>
+						<StreamName>rtmp://localhost/oflaDemo/${SourceStreamName}_200k</StreamName>
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
+						
+						<Parameters> 
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
+						</Parameters>
+					
 						<Properties>
 							<!--<Property></Property>-->
 						</Properties>

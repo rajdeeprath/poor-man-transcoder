@@ -2,15 +2,15 @@
 <!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>Multibitrate template</Name>
-		<Description>Multibitrate template sample</Description>	
+		<Name>RTMP to RTMP multibitrate sample</Name>
+		<Description>RTMP to RTMP multibitrate transcode template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>
-				<Name>200k</Name>								
+				<Name>Sample A</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
+					<!-- Any supported codec, copy, Disable, {codecname} -->
 					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
@@ -44,9 +44,9 @@
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>Copy</Codec>
+					<Codec>aac</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
+					<Implementation>experimental</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
 					<!-- samplerate -->
 					<SampleRate>22050</SampleRate>
@@ -66,7 +66,7 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}_200k</StreamName>
+						<StreamName>rtmp://localhost/oflaDemo/${SourceStreamName}_200k</StreamName>
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
 						
@@ -85,10 +85,10 @@
 			
 			<Encode>
 				<Enable>true</Enable>
-				<Name>400k</Name>								
+				<Name>Sample B</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, SkipThru, {codecname} -->
+					<!-- Any supported codec, copy, Disable, {codecname} -->
 					<Codec>libx264</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
@@ -101,7 +101,7 @@
 						<Average>0</Average><!-- average auto excludes min max buffer and uses ABR enoding-->
 						<Min>400</Min><!-- K -->
 						<Max>450</Max><!-- K -->
-						<Buffer>500</Buffer> <!-- K (device buffer)-->
+						<Buffer>800</Buffer> <!-- K (device buffer)-->
 					</Bitrate> 
 					<KeyFrameInterval>
 						<Gop>24</Gop>
@@ -122,9 +122,9 @@
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>libvo_aacenc</Codec>
+					<Codec>aac</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
-					<Implementation>normal</Implementation>
+					<Implementation>experimental</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
 					<!-- samplerate -->
 					<SampleRate>22050</SampleRate>
@@ -144,7 +144,7 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}_400k</StreamName>
+						<StreamName>rtmp://localhost/oflaDemo/${SourceStreamName}_400k</StreamName>
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
 						
