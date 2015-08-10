@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.chain.Context;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -53,7 +54,9 @@ public class Session implements ISession  {
 
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
-	private static final int  ABORT_TIMEOUT = 2000; 
+	private static final int  ABORT_TIMEOUT = 2000;
+	private static final int  READ_TIMEOUT = 7000;
+	private static final int  READ_TIME_THRESHOLD = 3000;
 	
 	private static final String  FAILURE_BY_TIMEOUT = "Timeout";
 	private static final String  GENERIC_FAILURE = "Failure";
@@ -76,6 +79,8 @@ public class Session implements ISession  {
 	
 	private boolean cleanUpOnExit;
 	
+	private Timer processReadInTimer;
+	
 	private static long id;
 	
 	private Session(Builder builder) 
@@ -95,6 +100,7 @@ public class Session implements ISession  {
 		this.executonTimeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 		this.watchdog = new ExecuteWatchdog(executonTimeout);
 		this.observers = new ArrayList<ISessionObserver>();
+		
 		
 		logger.info("Command :" + this.cmdLine.toString());
 	}
@@ -259,6 +265,7 @@ public class Session implements ISession  {
 		notifyObservers(SessionEvent.DATA, data);
 	}
 	
+	
 	@Override
 	public void onTranscodeProcessStart(long timestamp) {
 		// TODO Auto-generated method stub
@@ -266,11 +273,16 @@ public class Session implements ISession  {
 		notifyObservers(SessionEvent.START, timestamp);
 	}
 	
+	
 	@Override
 	public void onTranscodeProcessAdded(Process proc) {
 		// TODO Auto-generated method stub
 		logger.info("onTranscodeProcessAdded");
 		notifyObservers(SessionEvent.PROCESSADDED, proc);
+		
+		// start timer to monitor timeout
+		this.processReadInTimer = new Timer();
+		this.processReadInTimer.schedule(new ReadTimeoutTask(this.processReadInTimer, this.outstream, this.watchdog), READ_TIMEOUT);
 	}
 
 
@@ -389,6 +401,53 @@ public class Session implements ISession  {
 
 	private void setOutputs(ArrayList<ITranscoderResource> outputs) {
 		this.outputs = outputs;
+	}
+	
+	
+	
+	/* Timeout timer task */
+	private class ReadTimeoutTask extends TimerTask
+	{
+		TranscodeSessionOutputStream outstream;
+		ExecuteWatchdog watchdog;
+		Timer timer;
+		
+		public ReadTimeoutTask(Timer timer, TranscodeSessionOutputStream outstream, ExecuteWatchdog watchdog){
+			
+			this.timer = timer;
+			this.outstream = outstream;
+			this.watchdog = watchdog;
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+			this.outstream.flush();
+			long lastOutput = this.outstream.getLastOutputTime();
+			
+			
+			if(System.currentTimeMillis() - lastOutput > READ_TIME_THRESHOLD)
+			{
+				try
+				{
+					logger.info("Aborting transcode due to read timeout");
+					executor.getWatchdog().destroyProcess();
+				}
+				catch(Exception e)
+				{
+					logger.info("Error aborting process " + e.getMessage());
+				}
+				
+			}
+			
+			
+			// discard calling timer object
+			this.timer.cancel();
+			this.timer = null;
+			
+		}
+		
 	}
 
 	/***************** Session Builder *********************/
@@ -518,7 +577,7 @@ public class Session implements ISession  {
 						if(options != null) for(IProperty option: options) 
 						cmdLine.addArgument(option.getData());
 						cmdLine.addArgument("-i");
-						cmdLine.addArgument("${inputSource}");
+						cmdLine.addArgument("${inputSource}", false);
 						
 						
 						/************************************************
@@ -630,7 +689,8 @@ public class Session implements ISession  {
 							}
 						}
 						
-						replacementMap.put("inputSource", input.describe());
+						String inputSource = input.describe();
+						replacementMap.put("inputSource", inputSource);
 						cmdLine.setSubstitutionMap(replacementMap);
 						return cmdLine;
 			}

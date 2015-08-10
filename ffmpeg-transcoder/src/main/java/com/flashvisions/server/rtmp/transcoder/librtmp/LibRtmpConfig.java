@@ -177,7 +177,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		// TODO Auto-generated method stub
 		String fullUrl = rtmpApplication + "/" + stream; 
 		String SPACE = " ";
-		String command = "\"";
+		String command = "";
 		
 		command += fullUrl;
 		command += SPACE;
@@ -229,7 +229,6 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		}
 		
 		command = command.replaceAll("^\\s+|\\s+$", "");
-		command += "\"";
 		return command;
 	}
 }

@@ -65,7 +65,7 @@ public class CommandBuilderHelper {
 			break;
 			
 			default:
-			cmdLine.addArgument(transcoderOutput.describe());
+			cmdLine.addArgument(transcoderOutput.describe(), true);
 			break;
 		}
 		
