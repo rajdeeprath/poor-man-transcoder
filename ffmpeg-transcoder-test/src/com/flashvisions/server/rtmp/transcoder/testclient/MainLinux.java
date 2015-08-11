@@ -11,7 +11,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
 import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamMedia;
 
-public class Main  {
+public class MainLinux  {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
