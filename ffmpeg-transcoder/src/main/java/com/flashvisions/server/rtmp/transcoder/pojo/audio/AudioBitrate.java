@@ -4,13 +4,14 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioBitrate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class AudioBitrate extends PassThruObject implements IAudioBitrate 
 {
-	private static final String key = "-b:a";
+	private static final String key = Flags.AUDIO_BITRATE;
 	
 	@NotNull
 	@Range(min = 0, max = 1000, message = "{com.flashvisions.server.rtmp.transcoder.validation.audio.bitrate.invalid}")

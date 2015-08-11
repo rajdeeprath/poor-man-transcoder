@@ -55,6 +55,7 @@ public class TranscodeSessionResultHandler extends DefaultExecuteResultHandler {
 	@Override
 	public void onProcessFailed(ExecuteException e) {
 		// TODO Auto-generated method stub
+				
 		if(this.callback != null) 
 		this.callback.onTranscodeProcessFailed(e, watchdog, System.currentTimeMillis());
 		

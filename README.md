@@ -298,3 +298,8 @@ Output will appear according to the template selected.
 
 
 **Note: {output_name} is the output name set in the template's output section for a encode configuration**
+
+## Detailed Guide on setup, api and templates
+
+Detailed document on understanding the library and making the best out of it :
+[https://goo.gl/YW0Vje](https://goo.gl/YW0Vje)

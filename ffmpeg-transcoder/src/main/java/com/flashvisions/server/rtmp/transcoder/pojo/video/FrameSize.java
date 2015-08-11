@@ -7,13 +7,14 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class FrameSize extends PassThruObject implements IFrameSize  {
 	
-	private static final String key = "-s"; 
+	private static final String key = Flags.VIDEO_FRAMESIZE; 
 	
 	
 	@NotNull

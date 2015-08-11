@@ -65,7 +65,7 @@ public class CommandBuilderHelper {
 			break;
 			
 			default:
-			cmdLine.addArgument(transcoderOutput.describe());
+			cmdLine.addArgument(transcoderOutput.describe(), true);
 			break;
 		}
 		
@@ -98,7 +98,7 @@ public class CommandBuilderHelper {
 		if(!properties.isEmpty())
 		{
 			for(IProperty property: properties){
-				String data = property.getData();
+			String data = property.getData();
 				
 				
 				switch(transcoderOutput.getContainer().getType())

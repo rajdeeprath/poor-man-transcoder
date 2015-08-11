@@ -20,6 +20,14 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	private final Queue<String> lines = new LinkedList<String>();
 	private long lastOutputTime = 0;
 	
+	public long getLastOutputTime() {
+		return lastOutputTime;
+	}
+
+	public void setLastOutputTime(long lastOutputTime) {
+		this.lastOutputTime = lastOutputTime;
+	}
+
 	public TranscodeSessionOutputStream(){
 		
 	}
@@ -31,7 +39,8 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	@Override
 	protected void processLine(String line, int level) {
 		
-		logger.debug(line);
+		if(!line.contains("frame"))
+		logger.info(line);
 		
 		if(lines.size()>QUEUE_SIZE)
 		lines.remove();

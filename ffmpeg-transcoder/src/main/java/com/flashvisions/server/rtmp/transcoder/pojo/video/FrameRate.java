@@ -4,13 +4,14 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class FrameRate extends PassThruObject implements IFrameRate {
 	
-	private static final String key = "-r"; 
+	private static final String key = Flags.VIDEO_FRAMERATE; 
 	
 	@NotNull
 	@Range(min = 1, max = 60, message = "")

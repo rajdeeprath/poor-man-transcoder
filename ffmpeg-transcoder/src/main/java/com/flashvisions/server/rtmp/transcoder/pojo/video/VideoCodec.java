@@ -1,6 +1,7 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
@@ -8,7 +9,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 public class VideoCodec extends Codec {
 	
-	private static final String key = "-codec:v";
+	private static final String key = Flags.VIDEO_CODEC;
 	
 	
 	public VideoCodec(){

@@ -38,8 +38,10 @@
 					</Parameters>
 					
 					<Properties>
-						<Property>-force_key_frames </Property>
-						<Property>"expr:gte(t,n_forced*2)"</Property>
+						<!--
+						<Property></Property>
+						<Property></Property>
+						-->
 					</Properties>
 				</Video>
 				

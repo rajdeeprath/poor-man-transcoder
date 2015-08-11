@@ -1,12 +1,13 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioSampleRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
 
 public class AudioSampleRate extends PassThruObject implements IAudioSampleRate
 {
-	private static final String key = "-ar";
+	private static final String key = Flags.AUDIO_SAMPLERATE;
 	private Object value;
 	
 	/*************** Copy constructor ************/
