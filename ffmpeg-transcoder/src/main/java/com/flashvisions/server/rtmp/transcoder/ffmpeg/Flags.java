@@ -26,7 +26,5 @@ public class Flags {
 	public static final String AUDIO_CHANNEL = DASH + "ac";
 	public static final String AUDIO_SAMPLERATE = DASH + "ar";
 	public static final String AUDIO_CODEC = DASH + "codec:a";
-	
-	
 }
 

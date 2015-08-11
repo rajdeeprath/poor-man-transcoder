@@ -56,7 +56,7 @@ public class Session implements ISession  {
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
 	private static final int  ABORT_TIMEOUT = 2000;
-	private static final int  READ_TIMEOUT = 4000;
+	private static final int  READ_TIMEOUT = 6000;
 	private static final int  READ_TIME_THRESHOLD = 5000;
 	
 	private static final String  FAILURE_BY_TIMEOUT = "Timeout";
