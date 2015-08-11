@@ -49,6 +49,7 @@ public class TokenReplacer {
 		return "\\" + placeHolder;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public String processReplacement(String subject)
 	{		
 		Iterator<?> it = tokenMap.entrySet().iterator();

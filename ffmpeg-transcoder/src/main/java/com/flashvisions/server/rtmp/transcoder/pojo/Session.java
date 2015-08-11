@@ -56,8 +56,8 @@ public class Session implements ISession  {
 	private static Logger logger = LoggerFactory.getLogger(Session.class);
 	
 	private static final int  ABORT_TIMEOUT = 2000;
-	private static final int  READ_TIMEOUT = 7000;
-	private static final int  READ_TIME_THRESHOLD = 3000;
+	private static final int  READ_TIMEOUT = 4000;
+	private static final int  READ_TIME_THRESHOLD = 5000;
 	
 	private static final String  FAILURE_BY_TIMEOUT = "Timeout";
 	private static final String  GENERIC_FAILURE = "Failure";
@@ -407,6 +407,7 @@ public class Session implements ISession  {
 	
 	
 	/* Timeout timer task */
+	@SuppressWarnings("unused")
 	private class ReadTimeoutTask extends TimerTask
 	{
 		TranscodeSessionOutputStream outstream;

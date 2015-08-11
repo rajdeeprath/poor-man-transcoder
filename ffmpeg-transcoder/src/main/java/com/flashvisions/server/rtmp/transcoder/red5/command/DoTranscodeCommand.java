@@ -16,6 +16,7 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
+@SuppressWarnings("unused")
 public class DoTranscodeCommand implements Command {
 
 	ITranscoderResource input;
@@ -32,22 +33,27 @@ public class DoTranscodeCommand implements Command {
 	public boolean execute(Context context) throws Exception {
 		// TODO Auto-generated method stub
 		TranscoderContext ctx = (TranscoderContext) context;
+		File workingDir = null;
+		
+		File templateFile = new File(ctx.getTemplateDirectory() + File.separator + this.request.getTemplateFileName());
+		if(!templateFile.exists()) throw new IOException("Template not found");
+		
+		if(this.request.getWorkingDirectory() != null) {
+		workingDir = new File(this.request.getWorkingDirectory());
+		if(!workingDir.exists()) throw new IOException("Working directory not found");
+		}
 		
 		IOUtils.IdentifyInput(input);
 		String stream = input.getMediaName();
 		
 		TranscodeSessionPool pool =  ctx.getPool();
+		
 		ISession session = pool.checkOut(input, request);
+		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
 		
 		IConnection connnection = Red5.getConnectionLocal();
 		connnection.setAttribute(Constants.TRANSCODER_SESSION_ATTR, pool.getSignature(session));
 				
-		if(this.request.getWorkingDirectory() != null) {
-		File workingDir = new File(this.request.getWorkingDirectory());
-		if(!workingDir.exists()) throw new IOException("Working directory not found");
-		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
-		}
-		
 		session.start();
 		
 		return true;

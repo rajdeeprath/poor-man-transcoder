@@ -39,6 +39,7 @@ public class TranscodeSessionOutputStream extends LogOutputStream {
 	@Override
 	protected void processLine(String line, int level) {
 		
+		if(!line.contains("frame"))
 		logger.info(line);
 		
 		if(lines.size()>QUEUE_SIZE)

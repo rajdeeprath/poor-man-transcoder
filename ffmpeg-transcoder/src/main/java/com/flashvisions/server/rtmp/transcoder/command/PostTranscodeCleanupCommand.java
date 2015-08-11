@@ -10,10 +10,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.flashvisions.server.rtmp.transcoder.context.CleanUpContext;
-import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
-import com.flashvisions.server.rtmp.transcoder.helpers.TokenReplacer;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
 
+@SuppressWarnings("unused")
 public class PostTranscodeCleanupCommand implements Command {
 
 	
