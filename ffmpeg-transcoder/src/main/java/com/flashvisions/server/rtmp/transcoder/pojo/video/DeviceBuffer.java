@@ -1,13 +1,16 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.video;
 
 import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.Range;
+
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
 
 public class DeviceBuffer extends Parameter implements IParameter {
 
-	private static final String key = "-bufsize"; 
+	private static final String key = Flags.VIDEO_BUFFER; 
 	
 	@NotNull
 	@Range(min = 0, max = 5000, message = "{com.flashvisions.server.rtmp.transcoder.validation.video.bitrate.invalid.devicebuffer}")

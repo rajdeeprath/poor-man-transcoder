@@ -38,13 +38,15 @@ public class DoTranscodeCommand implements Command {
 		TranscodeSessionPool pool =  ctx.getPool();
 		ISession session = pool.checkOut(input, request);
 		
+		if(this.request.getWorkingDirectory() != null) {
 		File workingDir = new File(this.request.getWorkingDirectory());
-		if(!workingDir.exists()) throw new IOException("Working directory not found"); 
-			
+		if(!workingDir.exists()) throw new IOException("Working directory not found");
 		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
+		}
+		
 		session.start();
 		
-		return false;
+		return true;
 	}
 
 }

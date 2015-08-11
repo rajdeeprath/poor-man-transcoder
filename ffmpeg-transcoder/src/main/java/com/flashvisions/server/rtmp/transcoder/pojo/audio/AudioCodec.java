@@ -2,6 +2,7 @@ package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
 
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ICodec;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
@@ -9,7 +10,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 
 public class AudioCodec extends Codec {
 
-	private static final String key = "-codec:a";
+	private static final String key = Flags.AUDIO_CODEC;
 	
 
 	public AudioCodec(){

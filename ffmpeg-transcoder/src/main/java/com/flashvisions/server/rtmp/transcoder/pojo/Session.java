@@ -24,6 +24,7 @@ import com.flashvisions.server.rtmp.transcoder.data.factory.AbstractDAOFactory;
 import com.flashvisions.server.rtmp.transcoder.data.factory.TranscodeConfigurationFactory;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionDestroyer;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionResultHandler;
 import com.flashvisions.server.rtmp.transcoder.handler.TranscodeSessionOutputStream;
@@ -576,8 +577,8 @@ public class Session implements ISession  {
 						ArrayList<IProperty> options = input.getOptionFlags();
 						if(options != null) for(IProperty option: options) 
 						cmdLine.addArgument(option.getData());
-						cmdLine.addArgument("-i");
-						cmdLine.addArgument("${inputSource}", false);
+						cmdLine.addArgument(Flags.INPUT);
+						cmdLine.addArgument(TokenReplacer.TOKEN.INPUT_SOURCE, false);
 						
 						
 						/************************************************
@@ -635,7 +636,7 @@ public class Session implements ISession  {
 								catch(Exception e)
 								{
 									logger.info("Error condition in video encode settings.{"+e.getMessage()+"} Disabling video..");
-									cmdLine.addArgument("-vn");
+									cmdLine.addArgument(Flags.DISABLE_VIDEO);
 								}
 								
 								
@@ -663,7 +664,7 @@ public class Session implements ISession  {
 								catch(Exception e)
 								{
 									logger.info("Error condition in audio encode settings.{"+e.getMessage()+"} Disabling audio..");
-									cmdLine.addArgument("-an");
+									cmdLine.addArgument(Flags.DISABLE_AUDIO);
 								}
 								
 								

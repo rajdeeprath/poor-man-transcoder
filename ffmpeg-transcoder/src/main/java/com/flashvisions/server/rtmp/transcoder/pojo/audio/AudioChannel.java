@@ -1,5 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.pojo.audio;
 
+import com.flashvisions.server.rtmp.transcoder.ffmpeg.Flags;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudioChannel;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.pojo.base.PassThruObject;
@@ -7,7 +8,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.AudioChannelType;
 
 public class AudioChannel extends PassThruObject implements IAudioChannel  {
 	
-	private static final String key = "-ac";
+	private static final String key = Flags.AUDIO_CHANNEL;
 	private Object value;
 
 	

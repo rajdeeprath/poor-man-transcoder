@@ -9,6 +9,7 @@ public final class Globals {
 		public static final String FFMPEG_EXECUTABLE_PATH = "ffmpegExcutable";
 		public static final String OPERATING_SERVER = "operatingServer";
 		public static final String HOME_DIRECTORY = "homeDirectory";
+		public static final String HLS_DIRECTORY = "hlsDirectory";
 		public static final String WORKING_DIRECTORY = "workingDirectory";
 		public static final String TEMPLATE_DIRECTORY = "templateDirectory";
 	}

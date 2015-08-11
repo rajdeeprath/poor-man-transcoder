@@ -18,10 +18,12 @@ public class TokenReplacer {
 		public static final String HOME_DIRECTORY_TOKEN_2 = "HomeDirectory"	;
 		public static final String CURRENT_DATE_TOKEN = "${currentDate}";
 		public static final String WORKING_DIRECTORY_TOKEN = "${workingDirectory}";
+		public static final String HLS_DIRECTORY_TOKEN = "${hlsDirectory}";
 		public static final String TEMPLATE_DIRECTORY = "${templateDirectory}";
 		public static final String OWN_SEGMENT_DIRECTORY = "${ownSegmentDirectory}";
 		public static final String HLS_SAMPLE_PLAYBACK_TEMPLATE = "${hlsPlaybackTemplate}";
 		public static final String FFMPEG_EXECUTABLE = "${ffmpegExecutable}";
+		public static final String INPUT_SOURCE = "${inputSource}";
 	}
 	
 	

@@ -55,6 +55,7 @@ public class CheckFFmpegLibraries implements Command {
 		    
 		   /************* get version *************/
 		   String version = TranscoderUtils.captureVersion(capturedOutput);
+		   logger.info("FFmpeg version " + version);
 		   ctx.setFfmpegVersion(version);
 		   
 		    

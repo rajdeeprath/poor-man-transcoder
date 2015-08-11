@@ -8,6 +8,7 @@ import org.apache.commons.chain.Context;
 import org.red5.server.api.IConnection;
 import org.red5.server.api.Red5;
 
+import com.flashvisions.server.rtmp.transcoder.Constants;
 import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
@@ -37,16 +38,19 @@ public class DoTranscodeCommand implements Command {
 		
 		TranscodeSessionPool pool =  ctx.getPool();
 		ISession session = pool.checkOut(input, request);
-		IConnection connnection = Red5.getConnectionLocal();
-		connnection.setAttribute("TRANSCODERSESSION", pool.getSignature(session));
 		
+		IConnection connnection = Red5.getConnectionLocal();
+		connnection.setAttribute(Constants.TRANSCODER_SESSION_ATTR, pool.getSignature(session));
+				
+		if(this.request.getWorkingDirectory() != null) {
 		File workingDir = new File(this.request.getWorkingDirectory());
-		if(!workingDir.exists()) throw new IOException("Working directory not found"); 
-			
+		if(!workingDir.exists()) throw new IOException("Working directory not found");
 		session.setWorkingDirectoryPath(workingDir.getAbsolutePath());
+		}
+		
 		session.start();
 		
-		return false;
+		return true;
 	}
 
 }

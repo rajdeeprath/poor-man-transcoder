@@ -5,6 +5,7 @@ import org.apache.commons.chain.Context;
 import org.red5.server.api.IConnection;
 import org.red5.server.api.Red5;
 
+import com.flashvisions.server.rtmp.transcoder.Constants;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ISession;
 import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
@@ -18,11 +19,11 @@ public class AbortTranscodeCommand implements Command {
 		TranscodeSessionPool pool =  ctx.getPool();
 		IConnection connnection = Red5.getConnectionLocal();
 		
-		String signature = (String) connnection.getAttribute("TRANSCODERSESSION");
+		String signature = (String) connnection.getAttribute(Constants.TRANSCODER_SESSION_ATTR);
 		ISession session = pool.getSession(signature);
 		session.stop();
 		
-		return false;
+		return true;
 	}
 
 }
