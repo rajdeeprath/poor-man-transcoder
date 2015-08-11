@@ -48,7 +48,10 @@ Setup:
 
 2. From the project copy the transcoder/templates folder to a location on your media server (ie: {red5-home}/transcoder/templates/)
 
-3. You can test the codebase from eclipse by creating a simple java project or implementing the code given below in a red5/wowza live type application. If you decide to try this code inside a rtmp application (NOT RECOMMENDED!!) make sure to initialize the facade in appStart and make the transcoder request in the publish callback method of the rtmp server. [ Since the project is in early stages i will recommend testing it from a separate java application and not from within your rtmp server application code. ]
+3. You can test the codebase from eclipse by creating a simple java project or implementing the code given below in a red5/wowza live type application. ~~If you decide to try this code inside a rtmp application (NOT RECOMMENDED!!) make sure to initialize the facade in appStart and make the transcoder request in the publish callback method of the rtmp server. [ Since the project is in early stages i will recommend testing it from a separate java application and not from within your rtmp server application code. ]~~
+4. You can use the GenericTranscoderFacade for running the code from a simple java app or Red5TranscoderFacade to run the code from within a red5 app.
+5. Use the red5 sample app as a reference point for red5 integration:
+**[https://github.com/rajdeeprath/red5-server/tree/master/transcoderLive](https://github.com/rajdeeprath/red5-server/tree/master/transcoderLive)**
 
 Red5 sample concept code:
 ```
