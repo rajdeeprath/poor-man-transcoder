@@ -59,11 +59,11 @@ https://github.com/rajdeeprath/red5-server/blob/master/transcoderlive/src/org/re
 First time bootsrap (onAppStart / onServerStart):
 ```
 /* Boot strap */
-ITranscoderFacade facade = TranscoderFacade.getInstance();
-facade.setFFmpegPath("DRIVE:\\ffmpeg\\bin\\ffmpeg.exe");
-facade.setHomeDirectory("DRIVE:\\red5-server-1.0.5\\");
-facade.setWorkingDirectory("DRIVE:\\red5-server-1.0.5\\webapps\\");
-facade.setTemplateDirectory("DRIVE:\\red5-server-1.0.5\\transcoder\\templates\\");
+ITranscoderFacade facade = GenericTranscoderFacade.getInstance();
+facade.setFFmpegPath("/home/rajdeeprath/bin/ffmpeg");
+facade.setHomeDirectory("/home/rajdeeprath/red5-server/");
+facade.setWorkingDirectory("/home/rajdeeprath/red5-server/webapps/");
+facade.setTemplateDirectory("/home/rajdeeprath/red5-server/transcoder/templates/");
 facade.setOperatingMediaServer("red5");
 facade.init();
 ```
@@ -71,19 +71,21 @@ facade.init();
 
 Form a transcode request object::
 ```
-/* Transcode request Object */
+/* Transcode request Object - these params override the global params set in bootsrap */
 TranscodeRequest request = new TranscodeRequest();
-request.setWorkingDirectory("DRIVE:\\red5-server-1.0.5\\webapps\\live\\streams\\");
+request.setWorkingDirectory("/home/rajdeeprath/red5-server/webapps/live/streams/hls/");
 request.setTemplateFileName("hls-template.xml");
-request.setCleanUpSegmentsOnExit(true); // works on hls output only
+request.setCleanUpSegmentsOnExit(true);
 ```
 
 
 To transcode your stream::
 ```
+/* fire request */
 ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
-facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/stream"),inputflags), "sample-rtmp-template.xml");
+facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/test"),inputflags), request);
 ```
+**(Where "test" is the stream name and rtmp://localhost/live is the application where the stream is being published)**
 
 
 ## Template Structure
@@ -302,4 +304,4 @@ Output will appear according to the template selected.
 ## Detailed Guide on setup, api and templates
 
 Detailed document on understanding the library and making the best out of it :
-[https://goo.gl/YW0Vje](https://goo.gl/YW0Vje)
+[https://goo.gl/YW0Vje](https://goo.gl/YW0Vje) => **(Important!!)**

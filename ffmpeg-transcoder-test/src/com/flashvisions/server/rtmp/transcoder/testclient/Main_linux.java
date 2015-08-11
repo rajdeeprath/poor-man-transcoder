@@ -28,10 +28,10 @@ public class Main  {
 			facade.init();
 			
 			
-			/* Transcode request Object */
+			/* Transcode request Object - these params override the global params set in bootsrap */
 			TranscodeRequest request = new TranscodeRequest();
 			request.setWorkingDirectory("/home/rajdeeprath/red5-server/webapps/live/streams/hls/");
-			request.setTemplateFileName("rtmp-to-rtmp-template.xml");
+			request.setTemplateFileName("hls-template.xml");
 			request.setCleanUpSegmentsOnExit(true);
 			
 			
