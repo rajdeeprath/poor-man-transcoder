@@ -2,16 +2,16 @@
 <!-- sample transcoder template for java-ffmpeg wrapper -->
 <Template version="1">
 	<Transcode>
-		<Name>HLS Sample</Name>
-		<Description>HLS Sample transcode template</Description>	
+		<Name>Record Mp3 Sample</Name>
+		<Description>Record Mp3 transcode template</Description>	
 		<Encodes>
 			<Encode>
 				<Enable>true</Enable>
-				<Name>HLS B</Name>								
+				<Name>Record to Mp3</Name>								
 				<!-- must be unique in this sequence of encodes -->
 				<Video>
-					<!-- Any supported codec, Copy, Disable, SkipThru{codecname} -->
-					<Codec>libx264</Codec>
+					<!-- Any supported codec, copy, Disable, {codecname} -->
+					<Codec>Disable</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<FrameSize>
@@ -38,16 +38,13 @@
 					</Parameters>
 					
 					<Properties>
-						<!--
-						<Property></Property>
-						<Property></Property>
-						-->
+						<!--<Property></Property>-->
 					</Properties>
 				</Video>
 				
 				<Audio>
 					<!-- Any supported codec, Copy, Disable, {codecname} -->
-					<Codec>libvo_aacenc</Codec>
+					<Codec>Copy</Codec>
 					<!-- very, strict, normal, unofficial, experimental (dont set if you dont know) -->
 					<Implementation>normal</Implementation>
 					<Bitrate>128</Bitrate> <!-- Kbps -->
@@ -69,28 +66,19 @@
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<!-- for hls {StreamName} extension is not looked up -->
-						<StreamName>${SourceStreamName}.m3u8</StreamName> 
+						<StreamName>${SourceStreamName}.mp3</StreamName>
 						<!-- mp4, flv etc.. -->
-						<Container>ssegment</Container>
+						<Container>mp3</Container>
 						
 						<Parameters> 
-							<Parameter>
-								<Key>segment_list</Key>
-								<Value>playlist.m3u8</Value>
-							</Parameter>
-							<Parameter>
-								<Key>segment_list_flags</Key>
-								<Value>+live</Value>
-							</Parameter>
-							<Parameter>
-								<Key>segment_time</Key>
-								<Value>2</Value>
-							</Parameter>
+						<!--<Parameter>
+							<Key></Key>
+							<Value></Value>
+						</Parameter>-->
 						</Parameters>
 					
 						<Properties>
-							<Property>${SourceStreamName}%03d.ts</Property>
+							<!--<Property></Property>-->
 						</Properties>
 				</Output>
 			</Encode>
