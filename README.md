@@ -162,7 +162,7 @@ facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/
 				
 				<!-- Extra params to appear towards the end of command such as format container definition or hls flags -->		
 				<Output>
-						<StreamName>${SourceApplication}/mp4:${SourceStreamName}</StreamName>
+						<StreamName>rtmp://localhost/oflaDemo/mp4:${SourceStreamName}</StreamName>
 						
 						<!-- mp4, flv etc.. -->
 						<Container></Container>
