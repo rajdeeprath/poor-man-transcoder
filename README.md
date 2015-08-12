@@ -88,6 +88,18 @@ To transcode your stream::
 ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
 facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/test"),inputflags), request);
 ```
+
+OR
+
+
+For low latency try : (This command aims to reduce the overall FFMPEG transcoding start-up time)
+
+```
+/* fire request */
+ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-probesize"), new Property("32"), new Property("-analyzeduration"), new Property("1000000")));
+facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/test"),inputflags), request);
+```
+
 **(Where "test" is the stream name and rtmp://localhost/live is the application where the stream is being published)**
 
 

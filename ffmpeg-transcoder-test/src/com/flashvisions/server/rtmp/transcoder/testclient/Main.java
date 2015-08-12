@@ -36,7 +36,8 @@ public class Main  {
 			
 			
 			/* fire request */
-			ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
+			// ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-probesize"), new Property("32"), new Property("-analyzeduration"), new Property("1000000"))); // for low latency
+			ArrayList<IProperty> inputflags = new ArrayList<IProperty>();
 			facade.doTranscode(new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/test"),inputflags), request);
 			
 			new java.util.Timer().schedule( 
