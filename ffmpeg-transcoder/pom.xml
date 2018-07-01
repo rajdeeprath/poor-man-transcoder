@@ -240,6 +240,7 @@
 		    <groupId>com.google.code.gson</groupId>
 		    <artifactId>gson</artifactId>
 		    <version>2.3.1</version>
+		    <scope>provided</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-chain/commons-chain -->
 		<dependency>
@@ -316,8 +317,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
                     <configuration>
-                    	<source>${jdk.version}</source>
-						<target>${jdk.version}</target>
+                    	<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
                 </plugin>
@@ -366,6 +367,7 @@
 	        		<extensions>true</extensions>
     			</plugin>
                 <!-- Copy project dependency -->
+                <!--  
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
@@ -378,15 +380,16 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-						  <!-- exclude junit, we need runtime dependency only -->
 						  <includeScope>runtime</includeScope>
 						  <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
 						</configuration>
 					  </execution>
 					</executions>
-				</plugin>                 
+				</plugin> 
+				-->
+				               
                  <!-- any other plugins -->
-			      <plugin>
+			    <plugin>
 			        <artifactId>maven-assembly-plugin</artifactId>
 			        <executions>
 			          <execution>
@@ -404,49 +407,7 @@
 								<!-- <mainClass>com.red5pro.test.ffmpeg.processor.App</mainClass> -->
 					 </manifest>
 			        </configuration>
-			      </plugin>
-                <plugin>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.maven-nar</groupId>
-                    <artifactId>nar-maven-plugin</artifactId>
-                    <version>3.5.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.wvengen</groupId>
-                    <artifactId>proguard-maven-plugin</artifactId>
-                    <version>2.0.12</version>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals><goal>proguard</goal></goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <maxMemory>1024m</maxMemory>
-                        <!-- File with proguard configuration -->
-                        <proguardInclude>${basedir}/src/main/proguard/proguard.conf</proguardInclude>
-                        <libs>
-                            <lib>${java.home}/lib/rt.jar</lib>
-                            <lib>${java.home}/lib/jce.jar</lib>
-                            <lib>${java.home}/lib/ext/sunjce_provider.jar</lib>
-                        </libs>
-                    </configuration>
-                </plugin>
+			    </plugin>
             </plugins>
         </pluginManagement>
     </build>
