@@ -1,7 +1,6 @@
 package com.flashvisions.server.rtmp.transcoder.interfaces;
 
 
-import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 
 public interface ITranscoderFacade {
@@ -22,8 +21,4 @@ public interface ITranscoderFacade {
 	
 	public void setTemplateDirectory(String templateDirectoryPath);
 	public String getTemplateDirectory();
-	
-	public void doTranscode(ITranscoderResource input, TranscodeRequest request) throws TranscoderException;
-	
-	public void abortTranscode();
 }

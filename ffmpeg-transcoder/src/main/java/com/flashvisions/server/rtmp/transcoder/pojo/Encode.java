@@ -24,31 +24,37 @@ public class Encode extends MutableObject implements IEncode  {
 	private ITranscodeOutput output;	
 	
 
+	@Override
 	public IAudio getAudioConfig() {
 		return aConfig;
 	}
 	
 	
+	@Override
 	public void setAudioConfig(IAudio aConfig) {
 		this.aConfig = aConfig;
 	}
 	
 	
+	@Override
 	public IVideo getVideoConfig() {
 		return vConfig;
 	}
 	
 	
+	@Override
 	public void setVideoConfig(IVideo vConfig) {
 		this.vConfig = vConfig;
 	}
 
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}

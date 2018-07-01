@@ -14,17 +14,20 @@ public class Property implements IProperty {
 	public Property() {
 	}
 
+	@Override
 	public String getData() {
 		return data;
 	}
 
+	@Override
 	public void setData(String data) {
 		this.data = data;
 	}
 
+	@Override
 	public IProperty clone() {
 		// TODO Auto-generated method stub
-		return (IProperty) new Property(this.data);
+		return new Property(this.data);
 	}
 	
 	

@@ -25,6 +25,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		prepareFrom(source);
 	}
 	
+	@Override
 	public int getTimeout() {
 		return timeout;
 	}
@@ -34,26 +35,32 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	Timeout the session after num seconds without receiving any data from the server.
 	The default is 120.
 	********************************************************************************/
+	@Override
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
 	
+	@Override
 	public String getRtmpApplication() {
 		return rtmpApplication;
 	}
 	
+	@Override
 	public void setRtmpApplication(String rtmpApplication) {
 		this.rtmpApplication = rtmpApplication;
 	}
 	
+	@Override
 	public String getStream() {
 		return stream;
 	}
 	
+	@Override
 	public void setStream(String stream) {
 		this.stream = stream;
 	}
 	
+	@Override
 	public boolean isLive() {
 		return live;
 	}
@@ -62,6 +69,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	live=0|1
 	Specify that the media is a live stream. No resuming or seeking in live streams is possible.
 	*******************************************************************************************/
+	@Override
 	public void setLive(boolean live) {
 		this.live = live;
 	}
@@ -71,14 +79,17 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	Name of application to connect to on the RTMP server. Overrides the app in the RTMP URL. 
 	Sometimes the librtmp URL parser cannot determine the app name automatically, so it must be given explicitly using this option.
 	******************************************************************************************************************************/
+	@Override
 	public String getAppName() {
 		return appName;
 	}
 	
+	@Override
 	public void setAppName(String appName) {
 		this.appName = appName;
 	}
 	
+	@Override
 	public String getPlayPath() {
 		return playPath;
 	}
@@ -87,10 +98,12 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	playpath=path
 	Overrides the playpath parsed from the RTMP URL. Sometimes the rtmpdump URL parser cannot determine the correct playpath automatically, so it must be given explicitly using this option.
 	*****************************************************************************************************************************************************************************************/
+	@Override
 	public void setPlayPath(String playPath) {
 		this.playPath = playPath;
 	}
 	
+	@Override
 	public String getTcUrl() {
 		return tcUrl;
 	}
@@ -99,6 +112,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	tcUrl=url
 	URL of the target stream. Defaults to rtmp[t][e|s]://host[:port]/app.
 	********************************************************************/
+	@Override
 	public void setTcUrl(String tcUrl) {
 		this.tcUrl = tcUrl;
 	}
@@ -116,6 +130,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		this.buffer = buffer;
 	}
 	
+	@Override
 	public String getConn() {
 		return conn;
 	}
@@ -126,10 +141,12 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	Append arbitrary AMF data to the Connect message. The type must be B for Boolean, N for number, S for string, O for object, or Z for null. For Booleans the data must be either 0 or 1 for FALSE or TRUE, respectively. Likewise for Objects the data must be 0 or 1 to end or begin an object, respectively. Data items in subobjects may be named, by prefixing the type with 'N' and specifying the name before the value, e.g. NB:myFlag:1. This option may be used multiple times to construct arbitrary AMF sequences. E.g.
 	conn=B:1 conn=S:authMe conn=O:1 conn=NN:code:1.23 conn=NS:flag:ok conn=O:0
 	**************************************************************************************/
+	@Override
 	public void setConn(String conn) {
 		this.conn = conn;
 	}
 
+	@Override
 	public String getSwfUrl() {
 		return swfUrl;
 	}
@@ -138,10 +155,12 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	swfUrl=url
 	URL of the SWF player for the media. By default no value will be sent.
 	********************************************************************/
+	@Override
 	public void setSwfUrl(String swfUrl) {
 		this.swfUrl = swfUrl;
 	}
 
+	@Override
 	public String getPageUrl() {
 		return pageUrl;
 	}
@@ -150,10 +169,12 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 	pageUrl=url
 	URL of the web page in which the media was embedded. By default no value will be sent.
 	************************************************************************************/
+	@Override
 	public void setPageUrl(String pageUrl) {
 		this.pageUrl = pageUrl;
 	}
 
+	@Override
 	public void prepareFrom(ITranscoderResource input) {
 		// TODO Auto-generated method stub
 		String source = input.getSourcePath();

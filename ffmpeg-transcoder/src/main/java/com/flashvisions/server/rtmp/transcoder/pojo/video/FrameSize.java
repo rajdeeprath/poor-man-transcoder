@@ -50,24 +50,28 @@ public class FrameSize extends PassThruObject implements IFrameSize  {
 		this.height = height;
 	}
 
+	@Override
 	public Object getWidth() 
 	{
 		// TODO Auto-generated method stub
 		return width;
 	}
 
+	@Override
 	public void setWidth(Object width) 
 	{
 		// TODO Auto-generated method stub
 		this.width = width;
 	}
 
+	@Override
 	public Object getHeight() 
 	{
 		// TODO Auto-generated method stub
 		return height;
 	}
 
+	@Override
 	public void setHeight(Object height) 
 	{
 		// TODO Auto-generated method stub

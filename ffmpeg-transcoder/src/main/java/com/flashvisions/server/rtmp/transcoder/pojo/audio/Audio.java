@@ -48,42 +48,52 @@ public class Audio extends MutableObject implements IAudio  {
 	private ArrayList<IProperty> extraProperties;
 
 
+	@Override
 	public ICodec getCodec() {
 		return codec;
 	}
 
+	@Override
 	public void setCodec(ICodec codec) {
 		this.codec = codec;
 	}
 
+	@Override
 	public IAudioBitrate getBitrate() {
 		return bitrate;
 	}
 
+	@Override
 	public void setBitrate(IAudioBitrate bitrate) {
 		this.bitrate = bitrate;
 	}
 
+	@Override
 	public IAudioSampleRate getSamplerate() {
 		return samplerate;
 	}
 
+	@Override
 	public void setSamplerate(IAudioSampleRate samplerate) {
 		this.samplerate = samplerate;
 	}
 
+	@Override
 	public IAudioChannel getChannel() {
 		return channel;
 	}
 
+	@Override
 	public void setChannel(IAudioChannel channel) {
 		this.channel = channel;
 	}
 
+	@Override
 	public ArrayList<IParameter> getExtraParams() {
 		return extraParams;
 	}
 
+	@Override
 	public void setExtraParams(ArrayList<IParameter> extraParams) {
 		this.extraParams = extraParams;
 	}

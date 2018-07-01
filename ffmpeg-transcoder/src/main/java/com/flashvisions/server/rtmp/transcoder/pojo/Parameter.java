@@ -16,28 +16,33 @@ public class Parameter implements IParameter {
 	}
 	
 	
+	@Override
 	public String getKey() 
 	{
 		return key;
 	}
 	
+	@Override
 	public void setKey(String key) 
 	{
 		this.key = key;
 	}
 
+	@Override
 	public Object getValue()
 	{
 		return value;
 	}
 
+	@Override
 	public void setValue(Object value) 
 	{
 		this.value = value;
 	}
 	
+	@Override
 	public IParameter clone() {
 		// TODO Auto-generated method stub
-		return (IParameter) new Parameter(this.key, this.value);
+		return new Parameter(this.key, this.value);
 	}
 }

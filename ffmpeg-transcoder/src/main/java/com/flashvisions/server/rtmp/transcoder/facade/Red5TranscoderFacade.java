@@ -5,13 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap;
-import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
-import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderResource;
-import com.flashvisions.server.rtmp.transcoder.red5.command.AbortTranscodeCommand;
-import com.flashvisions.server.rtmp.transcoder.red5.command.DoTranscodeCommand;
 
 public final class Red5TranscoderFacade implements ITranscoderFacade {
 
@@ -116,34 +112,5 @@ public final class Red5TranscoderFacade implements ITranscoderFacade {
 	public String getHomeDirectory() {
 		// TODO Auto-generated method stub
 		return context.getHomeDirectory();
-	}
-
-	
-	/*********************************************************************************************/
-	
-	@Override
-	public void doTranscode(ITranscoderResource input, TranscodeRequest request) throws TranscoderException {
-		
-		try 
-		{
-			new DoTranscodeCommand(input, request).execute(context);
-		} 
-		catch (Exception e) 
-		{
-			logger.error("doTranscode ->"+e.getMessage());
-		}
-	}
-	
-	@Override
-	public void abortTranscode()
-	{
-		try 
-		{
-			new AbortTranscodeCommand().execute(context);
-		} 
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-		}
 	}
 }

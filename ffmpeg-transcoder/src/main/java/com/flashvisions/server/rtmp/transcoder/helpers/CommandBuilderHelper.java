@@ -251,7 +251,7 @@ public class CommandBuilderHelper {
 		}
 		else
 		{
-			if((Integer)achannel.getChannels()>0){
+			if(achannel.getChannels()>0){
 			cmdLine.addArgument(achannel.getKey());
 			cmdLine.addArgument(String.valueOf(achannel.getChannels()));
 			}
@@ -393,7 +393,7 @@ public class CommandBuilderHelper {
 			IParameter gop = keyframeinterval.getGop();
 			if((Integer)gop.getValue()>0)
 			{
-				IParameter g = (IParameter) gop;
+				IParameter g = gop;
 				cmdLine.addArgument(g.getKey());
 				cmdLine.addArgument(String.valueOf(g.getValue()));
 			}
@@ -401,7 +401,7 @@ public class CommandBuilderHelper {
 			
 			IParameter minkfi = keyframeinterval.getMinimunInterval();
 			{
-				IParameter kfi_min = (IParameter) minkfi;
+				IParameter kfi_min = minkfi;
 				cmdLine.addArgument(kfi_min.getKey());
 				cmdLine.addArgument(String.valueOf(kfi_min.getValue()));
 			}

@@ -30,21 +30,25 @@ public class KeyFrameInterval extends PassThruObject implements IKeyFrameInterva
 		this.minimunInterval = minimunInterval;
 	}
 	
+	@Override
 	public MinKeyframeInterval getMinimunInterval() 
 	{
 		return minimunInterval;
 	}
 	
+	@Override
 	public void setMinimunInterval(MinKeyframeInterval minimunInterval) 
 	{
 		this.minimunInterval = minimunInterval;
 	}
 
+	@Override
 	public Gop getGop() 
 	{
 		return gop;
 	}
 
+	@Override
 	public void setGop(Gop gop) 
 	{
 		this.gop = gop;

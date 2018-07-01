@@ -1,18 +1,12 @@
 package com.flashvisions.server.rtmp.transcoder.data.dao;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -44,7 +38,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameRate;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IFrameSize;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IParameter;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IAudio;
-import com.flashvisions.server.rtmp.transcoder.interfaces.IDisposable;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncode;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IEncodeCollection;
 import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
@@ -57,7 +50,6 @@ import com.flashvisions.server.rtmp.transcoder.interfaces.IVideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.CodecImplementation;
 import com.flashvisions.server.rtmp.transcoder.pojo.Container;
 import com.flashvisions.server.rtmp.transcoder.pojo.Parameter;
-import com.flashvisions.server.rtmp.transcoder.pojo.Codec;
 import com.flashvisions.server.rtmp.transcoder.pojo.Encode;
 import com.flashvisions.server.rtmp.transcoder.pojo.Property;
 import com.flashvisions.server.rtmp.transcoder.pojo.Transcode;
@@ -82,7 +74,6 @@ import com.flashvisions.server.rtmp.transcoder.pojo.video.MinimumBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.Video;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoBitrate;
 import com.flashvisions.server.rtmp.transcoder.pojo.video.VideoCodec;
-import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 
 @SuppressWarnings("unused")
 public class TemplateDao implements ITranscodeDao {
@@ -810,10 +801,12 @@ public class TemplateDao implements ITranscodeDao {
 		return session;
 	}
 
+	@Override
 	public String getTemplate() {
 		return this.templatePath;
 	}
 
+	@Override
 	public void setTemplate(String templatePath) {
 		this.templatePath = templatePath;
 	}

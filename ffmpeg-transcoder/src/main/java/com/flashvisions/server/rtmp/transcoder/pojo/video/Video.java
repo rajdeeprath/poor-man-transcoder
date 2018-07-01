@@ -55,50 +55,62 @@ public class Video extends MutableObject implements IVideo  {
 	
 	
 
+	@Override
 	public ICodec getCodec() {
 		return codec;
 	}
 
+	@Override
 	public void setCodec(ICodec codec) {
 		this.codec = codec;
 	}
 
+	@Override
 	public IFrameSize getFramesize() {
 		return framesize;
 	}
 
+	@Override
 	public void setFramesize(IFrameSize framesize) {
 		this.framesize = framesize;
 	}
 
+	@Override
 	public IFrameRate getFramerate() {
 		return framerate;
 	}
 
+	@Override
 	public void setFramerate(IFrameRate framerate) {
 		this.framerate = framerate;
 	}
 
+	@Override
 	public IVideoBitrate getBitrate() {
 		return bitrate;
 	}
 
+	@Override
 	public void setBitrate(IVideoBitrate bitrate) {
 		this.bitrate = bitrate;
 	}
 
+	@Override
 	public IKeyFrameInterval getKeyFrameInterval() {
 		return keyFrameInterval;
 	}
 
+	@Override
 	public void setKeyFrameInterval(IKeyFrameInterval keyFrameInterval) {
 		this.keyFrameInterval = keyFrameInterval;
 	}
 
+	@Override
 	public ArrayList<IParameter> getExtraParams() {
 		return extraParams;
 	}
 
+	@Override
 	public void setExtraParams(ArrayList<IParameter> extraParams) {
 		this.extraParams = extraParams;
 	}

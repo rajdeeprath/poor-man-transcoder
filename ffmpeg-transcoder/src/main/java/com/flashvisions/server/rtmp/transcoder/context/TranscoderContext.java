@@ -10,7 +10,6 @@ import org.apache.commons.chain.Context;
 import org.apache.commons.chain.impl.ContextBase;
 
 import com.flashvisions.server.rtmp.transcoder.managers.IOManager;
-import com.flashvisions.server.rtmp.transcoder.pool.TranscodeSessionPool;
 
 public class TranscoderContext extends ContextBase implements Context {
 
@@ -29,7 +28,6 @@ public class TranscoderContext extends ContextBase implements Context {
 	private List<String> libraries;
 	private String ffmpegVersion;
 	
-	private TranscodeSessionPool pool;
 	private IOManager streamManager;
 	private boolean contextReady;
 	
@@ -163,14 +161,6 @@ public class TranscoderContext extends ContextBase implements Context {
 	public Collection<?> values() {
 		// TODO Auto-generated method stub
 		return this.map.values();
-	}
-
-	public TranscodeSessionPool getPool() {
-		return pool;
-	}
-
-	public void setPool(TranscodeSessionPool pool) {
-		this.pool = pool;
 	}
 
 	public List<String> getSupportedLibraries() {

@@ -26,46 +26,57 @@ public static class Location implements IOverlayLocation{
 		private ALIGNMENT align;
 		
 		
+		@Override
 		public int getX() {
 			return x;
 		}
 		
+		@Override
 		public void setX(int x) {
 			this.x = x;
 		}
 		
+		@Override
 		public int getY() {
 			return y;
 		}
 		
+		@Override
 		public void setY(int y) {
 			this.y = y;
 		}
 		
+		@Override
 		public int getWidth() {
 			return width;
 		}
 		
+		@Override
 		public void setWidth(int width) {
 			this.width = width;
 		}
 		
+		@Override
 		public int getHeight() {
 			return height;
 		}
 		
+		@Override
 		public void setHeight(int height) {
 			this.height = height;
 		}
 		
+		@Override
 		public ALIGNMENT getAlign() {
 			return align;
 		}
 		
+		@Override
 		public void setAlign(ALIGNMENT align) {
 			this.align = align;
 		}
 		
+		@Override
 		public void setAlign(String alignment) 
 		{
 			try
@@ -127,43 +138,53 @@ public static class Location implements IOverlayLocation{
 	private int imageHeight;
 	
 	
+	@Override
 	public String getLabel() {
 		return label;
 	}
 	
+	@Override
 	public void setLabel(String label) {
 		this.label = label;
 	}
 	
+	@Override
 	public int getZindex() {
 		return zindex;
 	}
 	
+	@Override
 	public void setZindex(int zindex) {
 		this.zindex = zindex;
 	}
 	
+	@Override
 	public String getOverlayImagePath() {
 		return overlayImagePath;
 	}
 	
+	@Override
 	public void setOverlayImagePath(String overlayImagePath) throws IOException {
 		this.overlayImagePath = overlayImagePath;
 		this.evaluateImageDimensions();
 	}
 	
+	@Override
 	public int getOpacity() {
 		return opacity;
 	}
 	
+	@Override
 	public void setOpacity(int opacity) {
 		this.opacity = opacity;
 	}
 	
+	@Override
 	public IOverlayLocation getLocation() {
 		return location;
 	}
 	
+	@Override
 	public void setLocation(IOverlayLocation location) {
 		this.location = location;
 	}
@@ -186,6 +207,7 @@ public static class Location implements IOverlayLocation{
 		}
 	}
 
+	@Override
 	public int getOverlayImageWidth() {
 		return imageWidth;
 	}
@@ -194,6 +216,7 @@ public static class Location implements IOverlayLocation{
 		this.imageWidth = imageWidth;
 	}
 
+	@Override
 	public int getOverlayImageHeight() {
 		return imageHeight;
 	}

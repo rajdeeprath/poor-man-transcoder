@@ -16,6 +16,7 @@ public class EncodeCollection implements IEncodeCollection  {
 		encodeList = new ArrayList<IEncode>();
 	}
 
+	@Override
 	public void addEncode(IEncode e) 
 	{
 		// TODO Auto-generated method stub
@@ -23,6 +24,7 @@ public class EncodeCollection implements IEncodeCollection  {
 	}
 
 	
+	@Override
 	public void removeEncode(IEncode e) 
 	{
 		// TODO Auto-generated method stub
@@ -30,6 +32,7 @@ public class EncodeCollection implements IEncodeCollection  {
 	}
 
 	
+	@Override
 	public IEncodeIterator iterator() 
 	{
 		// TODO Auto-generated method stub
@@ -37,6 +40,7 @@ public class EncodeCollection implements IEncodeCollection  {
 	}
 
 	
+	@Override
 	public List<IEncode> getEncodeList() 
 	{
 		return encodeList;
@@ -48,6 +52,7 @@ public class EncodeCollection implements IEncodeCollection  {
 	}
 
 	
+	@Override
 	public void clear() 
 	{
 		this.encodeList.clear();	
@@ -66,6 +71,7 @@ public class EncodeCollection implements IEncodeCollection  {
         }
  
 
+		@Override
 		public boolean hasNext() 
 		{
 			if(position < encodeList.size()){
@@ -75,6 +81,7 @@ public class EncodeCollection implements IEncodeCollection  {
 			return false;
 		}
 
+		@Override
 		public IEncode next() 
 		{
 			IEncode e = encodeList.get(position);

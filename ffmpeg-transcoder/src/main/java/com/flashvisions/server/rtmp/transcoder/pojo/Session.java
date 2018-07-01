@@ -106,11 +106,13 @@ public class Session implements ISession  {
 		logger.info("Command :" + this.cmdLine.toString());
 	}
 
+	@Override
 	public String getWorkingDirectoryPath() 
 	{
 		return workingDirectoryPath;
 	}
 
+	@Override
 	public void setWorkingDirectoryPath(String workingDirectoryPath) 
 	{
 		this.workingDirectoryPath = workingDirectoryPath;
@@ -217,7 +219,8 @@ public class Session implements ISession  {
 	{
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.execute(new Runnable() {
-		    public void run() {
+		    @Override
+			public void run() {
 		        if(cleanUpOnExit)
 		        {
 		        	try 
@@ -396,6 +399,7 @@ public class Session implements ISession  {
 		}
 	}
 
+	@Override
 	public ArrayList<ITranscoderResource> getOutputs() {
 		return outputs;
 	}

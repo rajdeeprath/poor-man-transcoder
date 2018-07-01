@@ -25,6 +25,7 @@ public class Transcode extends MutableObject implements ITranscode  {
 		this.setEnabled(builder.enabled);
 	}
 	
+	@Override
 	public String getLabel() 
 	{
 		return label;
@@ -35,6 +36,7 @@ public class Transcode extends MutableObject implements ITranscode  {
 		this.label = label;
 	}
 	
+	@Override
 	public String getDescription() 
 	{
 		return description;
@@ -45,6 +47,7 @@ public class Transcode extends MutableObject implements ITranscode  {
 		this.description = description;
 	}
 	
+	@Override
 	public IEncodeCollection getEncodes() 
 	{
 		return encodes;

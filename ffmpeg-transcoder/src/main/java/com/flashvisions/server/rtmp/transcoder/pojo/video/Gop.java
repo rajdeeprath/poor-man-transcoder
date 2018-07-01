@@ -28,11 +28,13 @@ public class Gop extends Parameter implements IParameter {
 		this.value = (int) object.getValue();
 	}
 	
+	@Override
 	public Object getValue()
 	{
 		return this.value;
 	}
 	
+	@Override
 	public String getKey()
 	{
 		return Gop.key;

@@ -29,10 +29,10 @@ public class VideoBitrate extends PassThruObject implements IVideoBitrate
 	public VideoBitrate(IVideoBitrate object){
 		this.setSameAsSource(object.getSameAsSource());
 		
-		this.average = (AverageBitrate) object.getAverage();
-		this.minimum = (MinimumBitrate) object.getMinimum();
-		this.maximum = (MaximumBitrate) object.getMaximum();
-		this.deviceBuffer = (DeviceBuffer) object.getDeviceBuffer();		
+		this.average = object.getAverage();
+		this.minimum = object.getMinimum();
+		this.maximum = object.getMaximum();
+		this.deviceBuffer = object.getDeviceBuffer();		
 	}
 	
 	public VideoBitrate(boolean sameAsSource){
@@ -51,26 +51,32 @@ public class VideoBitrate extends PassThruObject implements IVideoBitrate
 		this.deviceBuffer = deviceBuffer;
 	}
 	
+	@Override
 	public IParameter getMinimum() {
 		return minimum;
 	}
 	
+	@Override
 	public void setMinimum(IParameter minimum) {
 		this.minimum = minimum;
 	}
 	
+	@Override
 	public IParameter getMaximum() {
 		return maximum;
 	}
 	
+	@Override
 	public void setMaximum(IParameter maximum) {
 		this.maximum = maximum;
 	}
 	
+	@Override
 	public IParameter getDeviceBuffer() {
 		return deviceBuffer;
 	}
 	
+	@Override
 	public void setDeviceBuffer(IParameter deviceBuffer) {
 		this.deviceBuffer = deviceBuffer;
 	}

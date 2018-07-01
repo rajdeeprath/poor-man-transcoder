@@ -16,6 +16,7 @@ public class OverlayCollection implements IOverlayCollection {
 		overlayList = new ArrayList<IOverlay>();
 	}
 	
+	@Override
 	public void addOverlay(IOverlay e) 
 	{
 		// TODO Auto-generated method stub
@@ -23,6 +24,7 @@ public class OverlayCollection implements IOverlayCollection {
 	}
 
 	
+	@Override
 	public void removeOverlay(IOverlay e) 
 	{
 		// TODO Auto-generated method stub
@@ -30,6 +32,7 @@ public class OverlayCollection implements IOverlayCollection {
 	}
 
 	
+	@Override
 	public IOverlayIterator iterator() 
 	{
 		// TODO Auto-generated method stub
@@ -47,6 +50,7 @@ public class OverlayCollection implements IOverlayCollection {
 		this.overlayList = overlayList;
 	}
 
+	@Override
 	public void clear() 
 	{
 		this.overlayList.clear();	
@@ -64,6 +68,7 @@ public class OverlayCollection implements IOverlayCollection {
         }
  
 
+		@Override
 		public boolean hasNext() 
 		{
 			if(position < overlayList.size()){
@@ -73,6 +78,7 @@ public class OverlayCollection implements IOverlayCollection {
 			return false;
 		}
 
+		@Override
 		public IOverlay next() 
 		{
 			IOverlay e = overlayList.get(position);
