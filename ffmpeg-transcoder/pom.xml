@@ -4,7 +4,7 @@
 
   <groupId>com.red5pro</groupId>
   <artifactId>ffmpeg-transcoder</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>ffmpeg-transcoder</name>
   <url>http://maven.apache.org</url>
@@ -363,7 +363,7 @@
               <descriptors>
                    <descriptor>/src/assembly/jar-with-deps-with-exclude.xml</descriptor> 
               </descriptors>
-            <finalName>ffmpeg-transcoder-with-deps-${project.version}</finalName>
+            <finalName>${project.name}-${project.version}</finalName>
             <appendAssemblyId>false</appendAssemblyId>
             </configuration>
             <executions>
