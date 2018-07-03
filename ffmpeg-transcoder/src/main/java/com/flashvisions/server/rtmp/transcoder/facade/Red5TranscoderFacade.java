@@ -8,32 +8,26 @@ import com.flashvisions.server.rtmp.transcoder.command.chain.TranscoderBootStrap
 import com.flashvisions.server.rtmp.transcoder.context.TranscoderContext;
 import com.flashvisions.server.rtmp.transcoder.exception.TranscoderException;
 import com.flashvisions.server.rtmp.transcoder.interfaces.ITranscoderFacade;
+import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
+import com.flashvisions.server.rtmp.transcoder.system.Globals;
 
 public final class Red5TranscoderFacade implements ITranscoderFacade {
 
 	private static Logger logger = LoggerFactory.getLogger(Red5TranscoderFacade.class);
 	
 	private static TranscoderContext context;
-	private static volatile ITranscoderFacade instance;
 	private static boolean bootstrap = false;
 	
-	private Red5TranscoderFacade(){
+	private String FFmpegPath;
+	private String operatingMediaServer;
+	private String workingDirectory;
+	private String templateDirectory;
+	private String homeDirectory;
+	
+	
+	public Red5TranscoderFacade(){
 		context = new TranscoderContext();
 	}	
-	
-	public static ITranscoderFacade getInstance()
-	{
-		if(instance == null)
-		{
-			synchronized (Red5TranscoderFacade.class){
-				if(instance == null){
-					instance = new Red5TranscoderFacade();
-				}
-			}
-		}
-		
-		return instance;
-	}
 	
 
 	@Override
@@ -41,8 +35,15 @@ public final class Red5TranscoderFacade implements ITranscoderFacade {
 		// TODO Auto-generated method stub		
 		try
 		{
-			if(!bootstrap)
-			new TranscoderBootStrap().execute(context);
+			if(!bootstrap){
+				
+				context.setFFmpegPath(this.FFmpegPath);
+				context.setWorkingDirectory(this.workingDirectory);
+				context.setOperatingMediaServer(Server.RED5.name().toLowerCase());
+				context.setTemplateDirectory(this.templateDirectory);
+				context.setHomeDirectory(this.homeDirectory);				
+				new TranscoderBootStrap().execute(context);
+			}
 		}
 		catch(Exception e)
 		{
@@ -57,60 +58,55 @@ public final class Red5TranscoderFacade implements ITranscoderFacade {
 	@Override
 	public void setFFmpegPath(String ffmpegPath) {
 		// TODO Auto-generated method stub
-		context.setFFmpegPath(ffmpegPath);
+		this.FFmpegPath = ffmpegPath;
 	}
 
 	@Override
 	public  String getFFmpegPath() {
 		// TODO Auto-generated method stub
-		return context.getFFmpegPath();
+		return this.FFmpegPath;
 	}
 
 	@Override
 	public void setOperatingMediaServer(String serverName) {
-		// TODO Auto-generated method stub
-		context.setOperatingMediaServer(serverName);
+		this.operatingMediaServer = serverName;
 	}
 
 	@Override
 	public String getOperatingMediaServer() {
 		// TODO Auto-generated method stub
-		return context.getOperatingMediaServer();
+		return this.operatingMediaServer;
 	}
 
 	@Override
 	public void setWorkingDirectory(String workingDirectoryPath) {
 		// TODO Auto-generated method stub
-		context.setWorkingDirectory(workingDirectoryPath);
+		this.workingDirectory = workingDirectoryPath;
 	}
 
 	@Override
 	public  String getWorkingDirectory() {
-		// TODO Auto-generated method stub
-		return context.getWorkingDirectory();
+		return this.workingDirectory;
 	}
 	
 	@Override
 	public void setTemplateDirectory(String templateDirectoryPath) {
-		// TODO Auto-generated method stub
-		context.setTemplateDirectory(templateDirectoryPath);
+		this.templateDirectory = templateDirectoryPath;
 	}
 
 	@Override
 	public String getTemplateDirectory() {
-		// TODO Auto-generated method stub
-		return context.getTemplateDirectory();
+		return this.templateDirectory;
 	}
 
 	@Override
 	public void setHomeDirectory(String homeDirectoryPath) {
-		// TODO Auto-generated method stub
-		context.setHomeDirectory(homeDirectoryPath);
+		this.homeDirectory = homeDirectoryPath;
 	}
 
 	@Override
 	public String getHomeDirectory() {
 		// TODO Auto-generated method stub
-		return context.getHomeDirectory();
+		return this.homeDirectory;
 	}
 }

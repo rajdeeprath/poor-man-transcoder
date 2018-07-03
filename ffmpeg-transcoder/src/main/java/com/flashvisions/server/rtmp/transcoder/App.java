@@ -17,10 +17,10 @@ public class App {
 	public static void main(String[] args) {
 		logger.info("Test runnning");
 		
-		ITranscoderFacade facade = Red5TranscoderFacade.getInstance();
+		ITranscoderFacade facade = new Red5TranscoderFacade();
 		facade.setFFmpegPath("N:\\ffmpeg\\bin\\ffmpeg.exe");
 		facade.setHomeDirectory("N:\\Red5_Pro_Server_Builds\\red5pro-server-4.5.4.b209-ffmpeg-thumbnailing");
-		facade.setWorkingDirectory("N:\\Red5_Pro_Server_Builds\\red5pro-server-4.5.4.b209-ffmpeg-thumbnailing\\webapps\\live");
+		facade.setWorkingDirectory("N:\\Red5_Pro_Server_Builds\\red5pro-server-4.5.4.b209-ffmpeg-thumbnailing\\webapps\\root");
 		facade.setTemplateDirectory("N:\\Red5_Pro_Server_Builds\\red5pro-server-4.5.4.b209-ffmpeg-thumbnailing\\transcoder\\templates");
 		facade.setOperatingMediaServer(Server.RED5.name().toLowerCase());
 		

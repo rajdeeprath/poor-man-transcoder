@@ -44,7 +44,7 @@ public class InitializeEnvironment implements Command {
 			File templatesHome = new File(ctx.getTemplateDirectory());
 			if(!templatesHome.exists()) throw new IOException("Invalid templates directory. Does not exist!");
 			Globals.addEnv(Globals.Vars.TEMPLATE_DIRECTORY, ctx.getTemplateDirectory());
-			logger.info("Templates directory " + ctx.getWorkingDirectory());
+			logger.info("Templates directory " + ctx.getTemplateDirectory());
 			
 			if(ctx.getWorkingDirectory() == null)
 			throw new IOException("Global working directory not specified");
