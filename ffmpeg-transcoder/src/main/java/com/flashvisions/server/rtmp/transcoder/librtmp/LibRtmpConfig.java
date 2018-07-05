@@ -179,7 +179,7 @@ public abstract class LibRtmpConfig implements ILibRtmpConfig {
 		// TODO Auto-generated method stub
 		String source = input.getSourcePath();
 		String stream = input.getMediaName();
-		String rtmpApplication = source.substring(0, source.indexOf(stream)-1);
+		String rtmpApplication = source.substring(0, source.lastIndexOf(stream)-1);
 		String appname = rtmpApplication.substring(rtmpApplication.lastIndexOf("/")+1);
 		String playpath = source.substring(rtmpApplication.length(), source.indexOf(stream)-1);
 		String tcUrl = rtmpApplication + "/" + stream;

@@ -1,11 +1,19 @@
 package com.flashvisions.server.rtmp.transcoder.context;
 
+import java.util.ArrayList;
+
+import com.flashvisions.server.rtmp.transcoder.interfaces.IProperty;
+
 
 public class TranscodeRequest {
 
 	private String workingDirectoryPath;
 	private String templateFileName;
 	private boolean cleanUpSegmentsOnExit; 
+	private String readProtocol = "rtsp";
+	private String readHost = "127.0.0.1";
+	private int readPort = 8554;
+	private ArrayList<IProperty> inputflags;
 	
 	
 	public void setWorkingDirectory(String workingDirectoryPath) {
@@ -32,6 +40,38 @@ public class TranscodeRequest {
 
 	public void setCleanUpSegmentsOnExit(boolean cleanUpSegmentsOnExit) {
 		this.cleanUpSegmentsOnExit = cleanUpSegmentsOnExit;
+	}
+
+	public String getReadProtocol() {
+		return readProtocol;
+	}
+
+	public void setReadProtocol(String readProtocol) {
+		this.readProtocol = readProtocol;
+	}
+
+	public String getReadHost() {
+		return readHost;
+	}
+
+	public void setReadHost(String readHost) {
+		this.readHost = readHost;
+	}
+
+	public int getReadPort() {
+		return readPort;
+	}
+
+	public void setReadPort(int readPort) {
+		this.readPort = readPort;
+	}
+
+	public ArrayList<IProperty> getInputflags() {
+		return inputflags;
+	}
+
+	public void setInputflags(ArrayList<IProperty> inputflags) {
+		this.inputflags = inputflags;
 	}
 
 }

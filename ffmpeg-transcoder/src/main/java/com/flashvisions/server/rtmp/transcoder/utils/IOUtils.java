@@ -4,7 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.red5.server.api.scope.IScope;
+import org.red5.server.api.scope.ScopeType;
+import org.red5.server.api.stream.IBroadcastStream;
+import org.red5.server.util.ScopeUtils;
 
+import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.decorator.SimpleTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResourceException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
@@ -165,6 +170,29 @@ public class IOUtils {
 		finalOutput.setContainer(container);
 		
 		return new SimpleTranscoderResource(finalOutput);
+	}
+
+	
+	public static String buildStreamingMediaURL(IBroadcastStream stream, TranscodeRequest request) 
+	{
+		String protocol = request.getReadProtocol();
+		int port = request.getReadPort();
+		String server = request.getReadHost();
+		
+		IScope streamScope = stream.getScope();
+		IScope appScope = ScopeUtils.findApplication(streamScope);
+		
+		if(streamScope.getType() == ScopeType.APPLICATION)
+		{
+			return protocol + "://" + server + ":" + String.valueOf(port) + "/" + appScope.getName() + "/" + stream.getPublishedName();
+		}
+		else
+		{
+			String path = streamScope.getPath();
+			String exclude = appScope.getPath() + "/" + appScope.getName();
+			path = path.replace(exclude, streamScope.getName());
+			return protocol + "://" + server + ":" + String.valueOf(port) + "/" + appScope.getName() + "/" + path + "/" + stream.getPublishedName();
+		}
 	}
 	
 	

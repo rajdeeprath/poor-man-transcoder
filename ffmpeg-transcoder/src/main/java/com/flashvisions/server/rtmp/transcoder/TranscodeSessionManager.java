@@ -3,12 +3,15 @@ package com.flashvisions.server.rtmp.transcoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.flashvisions.server.rtmp.transcoder.context.TranscodeRequest;
 import com.flashvisions.server.rtmp.transcoder.decorator.RTMPTranscoderResource;
+import com.flashvisions.server.rtmp.transcoder.decorator.RTSPTranscoderResource;
 import com.flashvisions.server.rtmp.transcoder.exception.InvalidTranscoderResourceException;
 import com.flashvisions.server.rtmp.transcoder.exception.MalformedTranscodeQueryException;
 import com.flashvisions.server.rtmp.transcoder.exception.MediaIdentifyException;
@@ -22,6 +25,7 @@ import com.flashvisions.server.rtmp.transcoder.pojo.Session;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.StreamMedia;
 import com.flashvisions.server.rtmp.transcoder.pojo.io.enums.Server;
 import com.flashvisions.server.rtmp.transcoder.system.Globals;
+import com.flashvisions.server.rtmp.transcoder.utils.IOUtils;
 import com.flashvisions.server.rtmp.transcoder.utils.SessionUtil;
 
 import org.red5.server.api.stream.IBroadcastStream;
@@ -33,6 +37,7 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 
 	private volatile static TranscodeSessionManager instance;
 	private Hashtable<String, ISession> sessionSignatureTable;
+	private ExecutorService threadPoolExecuttor;
 	
 	
 	
@@ -47,6 +52,7 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 	
 	private void init()
 	{
+		this.threadPoolExecuttor = Executors.newCachedThreadPool();
 		this.sessionSignatureTable = new Hashtable<String, ISession>();
 		logger.debug("Transcode manager initialized");
 	}
@@ -58,14 +64,35 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 	@Override
 	public void doTranscode(IBroadcastStream stream, TranscodeRequest request) throws InvalidTranscoderResourceException, MalformedTranscodeQueryException, MediaIdentifyException
 	{
-		ArrayList<IProperty> inputflags = new ArrayList<IProperty>(Arrays.asList(new Property("-re")));
-		ITranscoderResource resource = new RTMPTranscoderResource(new StreamMedia("rtmp://localhost/live/" + stream.getPublishedName()),inputflags);
+		String streamingMedia = IOUtils.buildStreamingMediaURL(stream, request);
+		
+		ArrayList<IProperty> inputflags = new ArrayList<IProperty>();
+		ITranscoderResource resource = new RTSPTranscoderResource(new StreamMedia(streamingMedia),inputflags);
+		
 		ISession session = create(resource, request);
 		
-		String sessionSignature = getSessionSignature(stream);
-		sessionSignatureTable.put(sessionSignature, session);
 		
-		session.start();
+		this.threadPoolExecuttor.execute(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				try 
+				{
+					Thread.sleep(5000);
+				} catch (InterruptedException e) 
+				{
+					e.printStackTrace();
+				}
+				
+				String sessionSignature = getSessionSignature(stream);
+				sessionSignatureTable.put(sessionSignature, session);
+				
+				session.start();
+			}
+			
+		});
+		
 	}
 	
 	
@@ -78,12 +105,20 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 		String sessionSignature = getSessionSignature(stream);
 		ISession session = getSession(sessionSignature);
 		if(session != null){
-			if(session.isRunning()){
-				session.stop();
-			}
 			
-			sessionSignatureTable.remove(sessionSignature);
-			destroy(session);
+			this.threadPoolExecuttor.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					
+					if(session.isRunning()){
+						session.stop();
+					}
+					
+					sessionSignatureTable.remove(sessionSignature);
+					destroy(session);
+				}
+			});
 		}
 	}
 	
