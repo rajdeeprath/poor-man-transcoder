@@ -14,6 +14,7 @@ public class TranscodeRequest {
 	private String readHost = "127.0.0.1";
 	private int readPort = 8554;
 	private ArrayList<IProperty> inputflags;
+	private long readDelay = 4000;
 	
 	
 	public void setWorkingDirectory(String workingDirectoryPath) {
@@ -72,6 +73,14 @@ public class TranscodeRequest {
 
 	public void setInputflags(ArrayList<IProperty> inputflags) {
 		this.inputflags = inputflags;
+	}
+
+	public long getReadDelay() {
+		return readDelay;
+	}
+
+	public void setReadDelay(long readDelay) {
+		this.readDelay = readDelay;
 	}
 
 }

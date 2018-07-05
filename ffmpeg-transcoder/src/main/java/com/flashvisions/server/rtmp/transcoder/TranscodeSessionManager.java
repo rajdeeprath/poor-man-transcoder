@@ -67,9 +67,14 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 		String streamingMedia = IOUtils.buildStreamingMediaURL(stream, request);
 		
 		ArrayList<IProperty> inputflags = new ArrayList<IProperty>();
+		
+		if(request.getInputflags() != null){
+			inputflags.addAll(request.getInputflags());
+		}
+		
 		ITranscoderResource resource = new RTSPTranscoderResource(new StreamMedia(streamingMedia),inputflags);
 		
-		ISession session = create(resource, request);
+		final ISession session = create(resource, request);
 		
 		
 		this.threadPoolExecuttor.execute(new Runnable(){
@@ -79,7 +84,7 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 				
 				try 
 				{
-					Thread.sleep(5000);
+					Thread.sleep(request.getReadDelay());
 				} catch (InterruptedException e) 
 				{
 					e.printStackTrace();
@@ -103,7 +108,7 @@ public class TranscodeSessionManager implements ISessionObserver, ITranscodeSess
 	public void stopTranscode(IBroadcastStream stream)
 	{
 		String sessionSignature = getSessionSignature(stream);
-		ISession session = getSession(sessionSignature);
+		final ISession session = getSession(sessionSignature);
 		if(session != null){
 			
 			this.threadPoolExecuttor.execute(new Runnable(){

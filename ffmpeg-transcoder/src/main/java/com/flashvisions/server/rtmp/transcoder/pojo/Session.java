@@ -251,7 +251,7 @@ public class Session implements ISession  {
 		if(watchdog != null && watchdog.killedProcess()) cause = FAILURE_BY_TIMEOUT;
 		else cause = GENERIC_FAILURE;
 		
-		if(timestamp - this.resultHandler.getAbortRequestTimestamp()>ABORT_TIMEOUT)
+		if((this.resultHandler != null) && (timestamp - this.resultHandler.getAbortRequestTimestamp()>ABORT_TIMEOUT))
 		{
 			logger.warn("onTranscodeProcessFailed cause: " + cause);
 			notifyObservers(SessionEvent.FAILED, new TranscoderExecutionError(e, cause, timestamp));
